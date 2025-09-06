@@ -1,11 +1,11 @@
 // app/api/checkout/route.ts
+import 'server-only';
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { getAuth } from "@clerk/nextjs/server";
 import { getOrigin } from "@/lib/origin";
 
-export const runtime = "nodejs";        // ✅ ensure Node runtime
-export const dynamic = "force-dynamic"; // ✅ no caching for this route
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -18,23 +18,22 @@ const PRICE_MAP: Record<string, string | undefined> = {
 };
 
 export async function POST(req: NextRequest) {
+  // ✅ Lazy import Clerk server helpers at runtime to avoid build-time init
+  const { getAuth } = await import("@clerk/nextjs/server");
   const { userId } = getAuth(req);
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json().catch(() => ({} as any));
   const planKey = (body?.plan as string | undefined)?.toUpperCase();
   const priceId = planKey ? PRICE_MAP[planKey] : process.env.STRIPE_PRICE_ID;
-
-  const origin = getOrigin();
-
   if (!priceId) {
     return NextResponse.json(
       { error: "Missing Stripe Price ID (set STRIPE_PRICE_ID or STRIPE_PRICE_* for the plan)" },
       { status: 500 }
     );
   }
+
+  const origin = getOrigin();
 
   try {
     const session = await stripe.checkout.sessions.create({

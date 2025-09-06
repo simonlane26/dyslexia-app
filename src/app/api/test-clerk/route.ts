@@ -4,12 +4,12 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
 try {
-const clerk = await clerkClient();
+const clerk = clerkClient;
 const users = await clerk.users.getUserList({ limit: 1 });
 
 if (users.data.length > 0) {
 const testUser = users.data[0];
-const updatedUser = await clerk.users.updateUser(testUser.id, {
+const updatedUser = await clerk.clerkClient.users.updateUser(testUser.id, {
 publicMetadata: { test: Date.now().toString() }
 });
 

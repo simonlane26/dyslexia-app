@@ -35,8 +35,8 @@ export async function POST(req: NextRequest) {
         const clerkUserId =
           (s.metadata as any)?.userId || (s.client_reference_id as string | undefined);
         if (clerkUserId) {
-          const clerk = await clerkClient();
-          await clerk.users.updateUser(clerkUserId, {
+          const clerk = clerkClient;
+          await clerk.clerkClient.users.updateUser(clerkUserId, {
             publicMetadata: {
               isPro: true,
               proSince: new Date().toISOString(),
@@ -50,8 +50,8 @@ export async function POST(req: NextRequest) {
         const inv = event.data.object as Stripe.Invoice;
         const clerkUserId = (inv.metadata as any)?.userId;
         if (clerkUserId) {
-          const clerk = await clerkClient();
-          await clerk.users.updateUser(clerkUserId, { publicMetadata: { isPro: false } });
+          const clerk = clerkClient;
+          await clerk.clerkClient.users.updateUser(clerkUserId, { publicMetadata: { isPro: false } });
         }
         break;
       }
@@ -59,8 +59,8 @@ export async function POST(req: NextRequest) {
         const sub = event.data.object as Stripe.Subscription;
         const clerkUserId = (sub.metadata as any)?.userId;
         if (clerkUserId) {
-          const clerk = await clerkClient();
-          await clerk.users.updateUser(clerkUserId, { publicMetadata: { isPro: false } });
+          const clerk = clerkClient;
+          await clerk.clerkClient.users.updateUser(clerkUserId, { publicMetadata: { isPro: false } });
         }
         break;
       }

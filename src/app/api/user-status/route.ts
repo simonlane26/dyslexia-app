@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await (await clerkClient()).users.getUser(userId);
+    const user = await (clerkClient).clerkClient.users.getUser(userId);
 
     // Be defensive about shapes coming back from Clerk
     const publicMeta = (user.publicMetadata ?? {}) as Record<string, unknown>;

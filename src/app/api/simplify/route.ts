@@ -1,7 +1,6 @@
-// src/app/api/simplify/route.ts
 import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, clerkClient } from '@clerk/nextjs/server';
+import { clerkClient, auth } from "@clerk/nextjs/server";
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -38,71 +37,72 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  try {
-    // Get Clerk user and Pro status
-    const client = await clerkClient();
-    const user = await client.users.getUser(userId);
-    const isPro =
-      user?.publicMetadata?.isPro === true ||
-      (user?.unsafeMetadata as any)?.isPro === true;
+try {
+  // ✅ Get Clerk user and Pro status (your Clerk version uses the async client)
+  const client = await clerkClient();
+  const user = await client.users.getUser(userId);
 
-    // Free quota: 5/day (non-Pro)
-    let newCount = 0;
-    if (!isPro) {
-      const today = todayStr();
-      const rec = dailyUsage.get(userId);
-      const current = rec && rec.date === today ? rec.count : 0;
+  const isPro =
+    user.publicMetadata?.isPro === true ||
+    (user.unsafeMetadata as any)?.isPro === true;
 
-      if (current >= 5) {
-        return NextResponse.json(
-          {
-            error:
-              'Daily limit reached (5/5). Upgrade to Pro for unlimited simplifications.',
-            usage: { count: current, limit: 5, isPro: false },
-          },
-          { status: 429 }
-        );
-      }
+  // Free quota: 5/day (non-Pro)
+  let newCount = 0;
+  if (!isPro) {
+    const today = todayStr();
+    const rec = dailyUsage.get(userId);
+    const current = rec && rec.date === today ? rec.count : 0;
 
-      newCount = current + 1;
-      dailyUsage.set(userId, { count: newCount, date: today });
-    }
-
-    // Lazy import + init OpenAI (prevents build-time crash)
-    const { default: OpenAI } = await import('openai');
-    const openai = new OpenAI({ apiKey });
-
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo', // swap to your preferred model
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You simplify text for people with dyslexia. Use short sentences, simple words, and clear structure while keeping the original meaning.',
-        },
-        { role: 'user', content: `Please simplify this text:\n\n${text}` },
-      ],
-      max_tokens: 500,
-      temperature: 0.3,
-    });
-
-    const simplifiedText = completion.choices?.[0]?.message?.content?.trim();
-    if (!simplifiedText) {
+    if (current >= 5) {
       return NextResponse.json(
-        { error: 'No simplified text generated' },
-        { status: 500 }
+        {
+          error:
+            'Daily limit reached (5/5). Upgrade to Pro for unlimited simplifications.',
+          usage: { count: current, limit: 5, isPro: false },
+        },
+        { status: 429 }
       );
     }
 
-    return NextResponse.json({
-      simplifiedText,
-      usage: {
-        count: isPro ? 0 : newCount,
-        limit: isPro ? 'Unlimited' : 5,
-        isPro,
+    newCount = current + 1;
+    dailyUsage.set(userId, { count: newCount, date: today });
+  }
+
+  // Lazy import + init OpenAI (prevents build-time crash)
+  const { default: OpenAI } = await import('openai');
+  const openai = new OpenAI({ apiKey });
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-3.5-turbo', // swap to your preferred model
+    messages: [
+      {
+        role: 'system',
+        content:
+          'You simplify text for people with dyslexia. Use short sentences, simple words, and clear structure while keeping the original meaning.',
       },
-    });
-  } catch (error: any) {
+      { role: 'user', content: `Please simplify this text:\n\n${text}` },
+    ],
+    max_tokens: 500,
+    temperature: 0.3,
+  });
+
+  const simplifiedText = completion.choices?.[0]?.message?.content?.trim();
+  if (!simplifiedText) {
+    return NextResponse.json(
+      { error: 'No simplified text generated' },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json({
+    simplifiedText,
+    usage: {
+      count: isPro ? 0 : newCount,
+      limit: isPro ? 'Unlimited' : 5,
+      isPro,
+    },
+  });
+} catch (error: any) {
     console.error('❌ Simplify API Error:', error?.message || error);
     return NextResponse.json(
       { error: `Simplification failed: ${error?.message || 'Unknown error'}` },
