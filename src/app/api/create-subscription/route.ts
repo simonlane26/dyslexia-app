@@ -1,51 +1,59 @@
-'use client';
-import { NextRequest } from 'next/server';
+// src/app/api/create-subscription/route.ts
+import 'server-only';
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
-import { currentUser } from '@clerk/nextjs/server';
-import { clerkClient } from '@clerk/nextjs/server'; // ✅ Import
+import { getOrigin } from '@/lib/origin';
 
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-07-30.basil",
-});
+export const runtime = 'nodejs';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!); // apiVersion optional
 
 export async function POST(req: NextRequest) {
-  const { priceId } = await req.json();
-  const user = await currentUser();
-
-  if (!user) {
-    return new Response('Unauthorized', { status: 401 });
+  // ✅ Get the signed-in user (server-side)
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  
-  const userId = user.id;
+
+  // Get priceId from client body
+  const { priceId } = await req.json().catch(() => ({ priceId: undefined as string | undefined }));
+  if (!priceId) {
+    return NextResponse.json({ error: 'Missing priceId' }, { status: 400 });
+  }
+
+  const origin = getOrigin();
 
   try {
-    const customer = await stripe.customers.create({
-      metadata: { clerkUserId: userId },
-    });
+    // (Optional) You can let Stripe auto-create the customer.
+    // If you DO want a customer up-front, attach the Clerk userId in metadata.
+    // const customer = await stripe.customers.create({ metadata: { clerkUserId: userId } });
 
     const session = await stripe.checkout.sessions.create({
-  customer: customer.id,
-  line_items: [{ price: priceId, quantity: 1 }],
-  mode: 'subscription',
-  success_url: 'http://localhost:3000/dashboard',
-  cancel_url: 'http://localhost:3000/pricing',
-});
+      mode: 'subscription',
+      // customer: customer.id, // optional
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/cancel`,
+      // ✅ Pass the Clerk userId so the WEBHOOK can flip isPro after successful payment
+      metadata: { userId: String(userId) },
+      client_reference_id: String(userId),
+      subscription_data: { metadata: { userId: String(userId) } },
+      allow_promotion_codes: true,
+      automatic_tax: { enabled: true },
+    });
 
-// ✅ Mark user as Pro — ONCE, with correct key
-const client = await clerkClient();
-await client.users.updateUserMetadata(userId, {
-  privateMetadata: {
-    isPro: true,
-    stripeCustomerId: customer.id,
-    subscriptionStatus: 'active',
-  },
-});
-
-return new Response(JSON.stringify({ url: session.url }), {
-  headers: { 'Content-Type': 'application/json' },
-});
-  } catch (error) {
-    console.error('Checkout error:', error);
-    return new Response('Failed to create checkout', { status: 500 });
+    return NextResponse.json({ url: session.url });
+  } catch (error: any) {
+    console.error('❌ create-subscription error', {
+      message: error?.message,
+      code: error?.code,
+      type: error?.type,
+      raw: error?.raw?.message,
+    });
+    return NextResponse.json(
+      { error: error?.raw?.message ?? error?.message ?? 'Stripe error' },
+      { status: 500 }
+    );
   }
 }
