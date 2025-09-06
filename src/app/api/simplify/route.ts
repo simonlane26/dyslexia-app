@@ -1,26 +1,19 @@
 // src/app/api/simplify/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
-import { getAuth, clerkClient } from "@clerk/nextjs/server";
+import 'server-only';
+import { NextRequest, NextResponse } from 'next/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 // In-memory daily usage (demo only — resets on server restart)
 const dailyUsage = new Map<string, { count: number; date: string }>();
-const todayStr = () => new Date().toISOString().split("T")[0];
+const todayStr = () => new Date().toISOString().split('T')[0];
 
 export async function POST(req: NextRequest) {
-  const { userId } = getAuth(req);
+  const { userId } = await auth();
   if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  if (!process.env.OPENAI_API_KEY) {
-    console.error("❌ Missing OPENAI_API_KEY");
-    return NextResponse.json(
-      { error: "OpenAI API key not configured" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   // Parse JSON body safely
@@ -28,35 +21,32 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const text = body?.text as string | undefined;
-  if (typeof text !== "string" || !text.trim()) {
-    return NextResponse.json({ error: "Text is required" }, { status: 400 });
+  const text = (body?.text as string | undefined)?.trim();
+  if (!text) {
+    return NextResponse.json({ error: 'Text is required' }, { status: 400 });
+  }
+
+  // If OPENAI_API_KEY is missing, fail at runtime (don’t crash build)
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    return NextResponse.json(
+      { error: 'OpenAI not configured' },
+      { status: 501 } // Not Implemented
+    );
   }
 
   try {
-    console.log("🤖 Simplify API for user:", userId);
-    console.log(
-      "📝 Text preview:",
-      text.slice(0, 80) + (text.length > 80 ? "…" : "")
-    );
-
-    // ✅ Correct Clerk usage (call clerkClient function first)
-    const clerkUser = await (await clerkClient()).users.getUser(userId);
-
+    // Get Clerk user and Pro status
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
     const isPro =
-      clerkUser?.publicMetadata?.isPro === true ||
-      (clerkUser?.unsafeMetadata as any)?.isPro === true;
+      user?.publicMetadata?.isPro === true ||
+      (user?.unsafeMetadata as any)?.isPro === true;
 
-    console.log("🔎 Clerk user isPro check:", {
-  fromPublic: clerkUser?.publicMetadata?.isPro,
-  fromUnsafe: (clerkUser?.unsafeMetadata as any)?.isPro,
-});
-
-
-    // Free quota: 5/day (only for non-Pro)
+    // Free quota: 5/day (non-Pro)
     let newCount = 0;
     if (!isPro) {
       const today = todayStr();
@@ -67,7 +57,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           {
             error:
-              "Daily limit reached (5/5). Upgrade to Pro for unlimited simplifications.",
+              'Daily limit reached (5/5). Upgrade to Pro for unlimited simplifications.',
             usage: { count: current, limit: 5, isPro: false },
           },
           { status: 429 }
@@ -76,28 +66,30 @@ export async function POST(req: NextRequest) {
 
       newCount = current + 1;
       dailyUsage.set(userId, { count: newCount, date: today });
-      console.log("📊 Usage incremented to:", newCount);
     }
 
-    console.log("🤖 Calling OpenAI…");
+    // Lazy import + init OpenAI (prevents build-time crash)
+    const { default: OpenAI } = await import('openai');
+    const openai = new OpenAI({ apiKey });
+
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: 'gpt-3.5-turbo', // swap to your preferred model
       messages: [
         {
-          role: "system",
+          role: 'system',
           content:
-            "You simplify text for people with dyslexia. Use short sentences, simple words, and clear structure while keeping the original meaning.",
+            'You simplify text for people with dyslexia. Use short sentences, simple words, and clear structure while keeping the original meaning.',
         },
-        { role: "user", content: `Please simplify this text:\n\n${text}` },
+        { role: 'user', content: `Please simplify this text:\n\n${text}` },
       ],
       max_tokens: 500,
       temperature: 0.3,
     });
 
-    const simplifiedText = completion.choices[0]?.message?.content?.trim();
+    const simplifiedText = completion.choices?.[0]?.message?.content?.trim();
     if (!simplifiedText) {
       return NextResponse.json(
-        { error: "No simplified text generated" },
+        { error: 'No simplified text generated' },
         { status: 500 }
       );
     }
@@ -106,20 +98,20 @@ export async function POST(req: NextRequest) {
       simplifiedText,
       usage: {
         count: isPro ? 0 : newCount,
-        limit: isPro ? "Unlimited" : 5,
+        limit: isPro ? 'Unlimited' : 5,
         isPro,
       },
     });
   } catch (error: any) {
-    console.error("❌ Simplify API Error:", error?.message || error);
+    console.error('❌ Simplify API Error:', error?.message || error);
     return NextResponse.json(
-      { error: `Simplification failed: ${error?.message || "Unknown error"}` },
+      { error: `Simplification failed: ${error?.message || 'Unknown error'}` },
       { status: 500 }
     );
   }
 }
 
 export function GET() {
-  return NextResponse.json({ message: "Simplify API is working" });
+  return NextResponse.json({ message: 'Simplify API is working' });
 }
 
