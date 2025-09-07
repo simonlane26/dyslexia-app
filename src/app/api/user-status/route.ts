@@ -1,36 +1,36 @@
 // src/app/api/user-status/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import { getAuth, clerkClient } from "@clerk/nextjs/server";
+import "server-only";
+import { NextResponse } from "next/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 
-export async function GET(req: NextRequest) {
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+export async function GET() {
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    const { userId } = getAuth(req);
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // ✅ Correct: clerkClient is an async function
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
 
-    const user = await (clerkClient).users.getUser(userId);
-
-    // Be defensive about shapes coming back from Clerk
     const publicMeta = (user.publicMetadata ?? {}) as Record<string, unknown>;
-    const isPro = Boolean(publicMeta.isPro);
+    const unsafeMeta = (user.unsafeMetadata ?? {}) as Record<string, unknown>;
 
-    return new NextResponse(
-      JSON.stringify({ isPro }),
-      {
-        status: 200,
-        headers: {
-          "content-type": "application/json",
-          // prevent caching so the flag flips immediately after webhook
-          "cache-control": "no-store",
-        },
-      }
-    );
+    const isPro =
+      publicMeta["isPro"] === true ||
+      (unsafeMeta as any)?.isPro === true;
+
+    return NextResponse.json({
+      userId,
+      isPro,
+      publicMetadata: publicMeta,
+    });
   } catch (err: any) {
-    console.error("❌ /api/user-status failed:", err?.message || err);
-    return NextResponse.json(
-      { error: "Failed to load user status" },
-      { status: 500 }
-    );
+    console.error("user-status error:", err?.message || err);
+    return NextResponse.json({ error: "Failed to load user" }, { status: 500 });
   }
 }
