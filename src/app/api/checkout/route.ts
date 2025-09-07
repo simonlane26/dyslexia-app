@@ -1,5 +1,5 @@
-// app/api/checkout/route.ts
-import 'server-only';
+// src/app/api/checkout/route.ts
+import "server-only";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getOrigin } from "@/lib/origin";
@@ -7,7 +7,7 @@ import { getOrigin } from "@/lib/origin";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2025-08-27.basil" });
 
 const PRICE_MAP: Record<string, string | undefined> = {
   PRO_MONTHLY: process.env.STRIPE_PRO_PRICE_ID,
@@ -18,7 +18,7 @@ const PRICE_MAP: Record<string, string | undefined> = {
 };
 
 export async function POST(req: NextRequest) {
-  // ✅ Lazy import Clerk server helpers at runtime to avoid build-time init
+  // ✅ Lazy import Clerk server helper so nothing initializes at module load
   const { getAuth } = await import("@clerk/nextjs/server");
   const { userId } = getAuth(req);
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({} as any));
   const planKey = (body?.plan as string | undefined)?.toUpperCase();
   const priceId = planKey ? PRICE_MAP[planKey] : process.env.STRIPE_PRICE_ID;
+
   if (!priceId) {
     return NextResponse.json(
       { error: "Missing Stripe Price ID (set STRIPE_PRICE_ID or STRIPE_PRICE_* for the plan)" },
