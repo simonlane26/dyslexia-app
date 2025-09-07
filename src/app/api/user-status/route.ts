@@ -1,5 +1,4 @@
-// src/app/api/user-status/route.ts
-import "server-only";
+﻿import "server-only";
 import { NextResponse } from "next/server";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 
@@ -13,7 +12,7 @@ export async function GET() {
   }
 
   try {
-    // ✅ Correct: clerkClient is an async function
+    // clerkClient is an async function in your setup — call and await it
     const client = await clerkClient();
     const user = await client.users.getUser(userId);
 

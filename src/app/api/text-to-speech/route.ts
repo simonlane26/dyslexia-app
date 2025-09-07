@@ -1,12 +1,12 @@
 // src/app/api/text-to-speech/route.ts
 import { NextRequest } from 'next/server';
-import { getAuth, clerkClient } from '@clerk/nextjs/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 
 const RACHEL_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // Rachel (stock)
 const MODEL_ID = 'eleven_multilingual_v2';
 
 export async function POST(req: NextRequest) {
-  const { userId } = getAuth(req);
+  const { userId } = await auth();
   if (!userId) return new Response('Unauthorized', { status: 401 });
 
   if (!process.env.ELEVENLABS_API_KEY) {
