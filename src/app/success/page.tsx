@@ -1,12 +1,23 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
+import { useUser } from '@clerk/nextjs';
 
-export default function SuccessPage() {
-  const searchParams = useSearchParams();
-  const sessionId = searchParams?.get('session_id');
+
+export const dynamic = 'force-dynamic'; // avoid static prerender issues for query params
+
+function SuccessContent() {
+  const params = useSearchParams();
+  const sessionId = params ? params.get('session_id') : null;
   const [loading, setLoading] = useState(true);
   
+  const { user } = useUser();
+  useEffect(() => {
+    if (user?.reload) {
+      user.reload().catch(() => {});
+    }
+  }, [user]);
+
   useEffect(() => {
     // You could verify the session with Stripe here if needed
     setLoading(false);
