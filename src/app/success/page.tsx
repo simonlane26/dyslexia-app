@@ -1,7 +1,8 @@
-import { Suspense } from 'react';
-import SuccessClient from './SuccessClient';
+﻿// src/app/success/page.tsx
+import { Suspense } from "react";
+import SuccessClient from "./SuccessClient";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default function SuccessPage(): JSX.Element {
   return (
