@@ -6,13 +6,14 @@ import Stripe from "stripe";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-08-27.basil",
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2025-08-27.basil" });
 
 function getUserIdFromLines(inv: Stripe.Invoice): string | undefined {
   for (const line of inv.lines?.data ?? []) {
-    const fromLine = (line.metadata as any)?.userId;
+    const fromLine =
+      (line.metadata as any)?.userId ||
+      ((line as any).price?.metadata as any)?.userId ||
+      (((line as any).price?.product as any)?.metadata?.userId);
     if (fromLine) return String(fromLine);
   }
   return undefined;
@@ -32,9 +33,29 @@ async function getUserIdFromInvoice(inv: Stripe.Invoice): Promise<string | undef
       const sub = await stripe.subscriptions.retrieve((inv as any).subscription as string);
       const uid = (sub.metadata as any)?.userId as string | undefined;
       if (uid) return uid;
-    } catch {}
+    } catch {
+      // ignore fetch errors here
+    }
   }
   return undefined;
+}
+
+/** Minimal Clerk REST helper (no SDK import) */
+async function clerkPatchUserPublicMetadata(userId: string, publicMetadata: Record<string, unknown>) {
+  const key = process.env.CLERK_SECRET_KEY;
+  if (!key) throw new Error("Missing CLERK_SECRET_KEY");
+  const res = await fetch(`https://api.clerk.com/v1/users/${encodeURIComponent(userId)}`, {
+    method: "PATCH",
+    headers: {
+      "Authorization": `Bearer ${key}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ public_metadata: publicMetadata }),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Clerk PATCH failed: ${res.status} ${res.statusText} ${text}`);
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -62,15 +83,10 @@ export async function POST(req: NextRequest) {
           (s.metadata as any)?.userId || (s.client_reference_id as string | undefined);
         if (!clerkUserId) break;
 
-        // ✅ Lazy import Clerk only when needed (no top-level import)
-        const { clerkClient } = await import("@clerk/nextjs/server");
-        const client = await clerkClient();
-        await client.users.updateUser(clerkUserId, {
-          publicMetadata: {
-            isPro: true,
-            proSince: new Date().toISOString(),
-            stripeCustomerId: s.customer as string | undefined,
-          },
+        await clerkPatchUserPublicMetadata(clerkUserId, {
+          isPro: true,
+          proSince: new Date().toISOString(),
+          stripeCustomerId: s.customer as string | undefined,
         });
         break;
       }
@@ -80,11 +96,7 @@ export async function POST(req: NextRequest) {
         const clerkUserId = await getUserIdFromInvoice(inv);
         if (!clerkUserId) break;
 
-        const { clerkClient } = await import("@clerk/nextjs/server");
-        const client = await clerkClient();
-        await client.users.updateUser(clerkUserId, {
-          publicMetadata: { isPro: false },
-        });
+        await clerkPatchUserPublicMetadata(clerkUserId, { isPro: false });
         break;
       }
 
@@ -95,15 +107,12 @@ export async function POST(req: NextRequest) {
           (sub.items?.data?.[0]?.price?.metadata as any)?.userId;
         if (!clerkUserId) break;
 
-        const { clerkClient } = await import("@clerk/nextjs/server");
-        const client = await clerkClient();
-        await client.users.updateUser(clerkUserId, {
-          publicMetadata: { isPro: false },
-        });
+        await clerkPatchUserPublicMetadata(clerkUserId, { isPro: false });
         break;
       }
 
       default:
+        // ignore other events
         break;
     }
 
@@ -113,4 +122,3 @@ export async function POST(req: NextRequest) {
     return new Response("Server error", { status: 500 });
   }
 }
-
