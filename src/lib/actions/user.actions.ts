@@ -6,7 +6,7 @@ export async function createUser(userData: CreateUserParams) {
   try {
 const { firstName, lastName, username, email, imageUrl } = userData;
 
-const client = clerkClient;
+const client = await clerkClient();
 const user = await client.users.createUser({
       firstName,
       lastName,
@@ -24,8 +24,8 @@ export async function updateUser(userId: string, userData: UpdateUserParams) {
   try {
     const { firstName, lastName, username, imageUrl } = userData;
 
-const client = clerkClient;
-const user = await client.clerkClient.users.updateUser(userId, {
+const client = await clerkClient();
+const user = await client.users.updateUser(userId, {
   firstName,
   lastName,
   username,
@@ -40,7 +40,7 @@ const user = await client.clerkClient.users.updateUser(userId, {
 
 export async function deleteUser(userId: string) {
   try {
-    const client = clerkClient;
+    const client = await clerkClient();
     await client.users.deleteUser(userId);
   } catch (error: any) {
     console.error('Error deleting user:', error);

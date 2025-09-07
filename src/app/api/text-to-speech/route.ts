@@ -28,10 +28,10 @@ export async function POST(req: NextRequest) {
   let isPro = false;
   try {
     // If your project uses the "clerkClient" form elsewhere, use that:
-    const client = clerkClient;
-    const user = await client.clerkClient.users.getUser(userId);
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
 
-    // const user = await clerkClient.clerkClient.users.getUser(userId);
+    // const user = await clerkClient.users.getUser(userId);
     isPro =
       (user.publicMetadata as any)?.isPro === true ||
       (user.unsafeMetadata as any)?.isPro === true;
