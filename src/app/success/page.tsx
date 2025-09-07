@@ -2,10 +2,18 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import { useUser } from '@clerk/nextjs';
+import SuccessClient from './SuccessClient';
 
 
 export const dynamic = 'force-dynamic'; // avoid static prerender issues for query params
 
+export default function SuccessPage(): JSX.Element {
+  return (
+    <Suspense fallback={<div className="max-w-lg py-10 mx-auto">Loading…</div>}>
+      <SuccessClient />
+    </Suspense>
+  );
+}
 function SuccessContent() {
   const params = useSearchParams();
   const sessionId = params ? params.get('session_id') : null;
