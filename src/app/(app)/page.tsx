@@ -11,6 +11,7 @@ import { SettingsPanel } from '@/components/SettingsPanel';
 import { UpgradeButton } from '@/components/UpgradeButton';
 import { ExportPDFButton } from '@/components/ExportPDFButton';
 import { ExportMP3Button } from '@/components/ExportMP3Button';
+import AuthDebug from '@/components/AuthDebug';
 
 export default function HomePage() {
   // Core state
@@ -64,7 +65,7 @@ export default function HomePage() {
       id: user?.id,
     });
   }, [user]);
-
+<AuthDebug />
   // ✅ TOP-LEVEL effect to sync isPro from Clerk user
   useEffect(() => {
     if (!user) return;
@@ -83,6 +84,7 @@ export default function HomePage() {
       } catch {
         return defaultValue;
       }
+  
     };
 
     setBgColor(load('bgColor', '#f9f7ed'));
@@ -424,8 +426,9 @@ const handleReadAloud = async () => {
         </div>
       </div>
 
-      <UpgradeButton />
-
+      <div className="flex items-center gap-3">
+  <UpgradeButton />
+</div>
       <SettingsPanel
         bgColor={bgColor}
         setBgColor={setBgColor}

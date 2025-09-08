@@ -116,10 +116,6 @@ useEffect(() => {
       default: return `'Lexend', sans-serif`;
     }
   };
-useEffect(() => {
-  // Warm up the /api/text-to-speech route to avoid cold start delays
-  fetch('/api/text-to-speech', { method: 'GET', cache: 'no-store' }).catch(() => {});
-}, []);
 
   const resetSettings = () => {
     setBgColor('#f9f7ed');
@@ -376,8 +372,9 @@ const handleReadAloudSimplified = async () => {
 </h1>
 
 
-
+<div className="flex items-center gap-3">
   <UpgradeButton />
+</div>
 
   <SettingsPanel
     bgColor={bgColor}

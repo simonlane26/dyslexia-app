@@ -21,12 +21,7 @@ export function UpgradeButton() {
 
   if (!isSignedIn) {
     return (
-      <ModernButton
-        onClick={() => router.push('/sign-in')}
-        variant="primary"
-        size="lg"
-        className="mb-6 transition-all duration-200 transform hover:scale-105 active:scale-95"
-      >
+      <ModernButton onClick={() => router.push('/sign-in')} variant="primary" size="lg" className="mb-6">
         Sign in to upgrade
       </ModernButton>
     );
@@ -34,12 +29,7 @@ export function UpgradeButton() {
 
   if (isPro) {
     return (
-      <ModernButton
-        onClick={() => router.push('/pricing')}
-        variant="secondary"
-        size="sm"
-        className="mb-6"
-      >
+      <ModernButton onClick={() => router.push('/pricing')} variant="secondary" size="sm" className="mb-6">
         Manage subscription
       </ModernButton>
     );
@@ -48,10 +38,7 @@ export function UpgradeButton() {
   return (
     <ModernButton
       onClick={() => { setBusy(true); router.push('/pricing'); }}
-      variant="primary"
-      size="lg"
-      disabled={busy}
-      className="mb-6 transition-all duration-200 transform hover:scale-105 active:scale-95"
+      variant="primary" size="lg" disabled={busy} className="mb-6"
     >
       {busy ? 'Redirecting…' : '💎 Upgrade to Pro'}
     </ModernButton>

@@ -4,8 +4,10 @@ export type CreateUserParams = {
   firstName: string;
   lastName: string;
   username: string;
-  email: string; // ✅ Add this
-  imageUrl: string; // ✅ Add this
+  email: string;
+  imageUrl: string;
+  // Add a typo to test
+  __TEST__: string; // ❌ This should cause an error
 };
 
 export type UpdateUserParams = {
