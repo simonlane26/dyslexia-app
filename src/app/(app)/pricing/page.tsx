@@ -431,27 +431,9 @@ export default function ModernPricingPage() {
   </div>
 </PricingCard>
 
-{/* Pro Monthly TEST */}
-<PricingCard featured={true}>
+{/* Pro Test (£1) */}
+<PricingCard>
   <div style={{ padding: '32px' }}>
-    <div style={{
-      position: 'absolute',
-      top: '20px',
-      right: '20px',
-      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-      color: 'white',
-      padding: '6px 12px',
-      borderRadius: '20px',
-      fontSize: '12px',
-      fontWeight: '600',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '4px'
-    }}>
-      <Star size={12} />
-      Most Popular
-    </div>
-
     <div style={{ textAlign: 'center', marginBottom: '32px' }}>
       <h3 style={{
         fontSize: '1.5rem',
@@ -459,45 +441,48 @@ export default function ModernPricingPage() {
         color: '#1e293b',
         marginBottom: '8px'
       }}>
-        Pro Monthly TEST
+        Pro Test
       </h3>
       <div style={{
         fontSize: '3rem',
         fontWeight: '800',
-        background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        backgroundClip: 'text',
+        color: '#3b82f6',
         marginBottom: '4px'
       }}>
-       {"£"}1.00
+        £1
       </div>
-      <div style={{ color: '#64748b', fontSize: '14px' }}>per month</div>
+      <div style={{ color: '#64748b', fontSize: '14px' }}>one-time (testing)</div>
     </div>
 
     <div style={{ marginBottom: '32px' }}>
-      <FeatureItem highlighted icon={<Sparkles size={18} style={{ color: '#10b981' }} />}>
-        Unlimited Simplifications
-      </FeatureItem>
-      <FeatureItem highlighted icon={<Volume2 size={18} style={{ color: '#10b981' }} />}>
-        All voices (Molli, Liam, etc.)
-      </FeatureItem>
-      <FeatureItem highlighted icon={<Download size={18} style={{ color: '#10b981' }} />}>
-        Export as MP3
-      </FeatureItem>
-      <FeatureItem highlighted icon={<Palette size={18} style={{ color: '#10b981' }} />}>
-        Font & color tools
-      </FeatureItem>
+      <FeatureItem highlighted>Unlock Pro features (test)</FeatureItem>
+      <FeatureItem>Good for flow validation</FeatureItem>
+      <FeatureItem>Auto-upgrades your account</FeatureItem>
     </div>
 
-    <ModernButton
-      variant="primary"
-      size="lg"
-      style={{ width: '100%' }}
-      onClick={() => handleGetPro('PRO_TEST')}
-    >
-      Get Pro Test
-    </ModernButton>
+    <SignedIn>
+      <ModernButton
+        variant="primary"
+        size="lg"
+        style={{ width: '100%' }}
+        onClick={() => handleGetPro('pro_test')}
+      >
+        Buy Test Pro (£1)
+      </ModernButton>
+    </SignedIn>
+    <SignedOut>
+      <SignInButton mode="modal">
+        <ModernButton variant="primary" size="lg" style={{ width: '100%' }}>
+          Sign in to buy
+        </ModernButton>
+      </SignInButton>
+    </SignedOut>
+
+    {/* Helper: Stripe test card details */}
+    <div style={{ marginTop: '12px', fontSize: '12px', color: '#64748b', lineHeight: 1.6 }}>
+      Test card: <strong>4242 4242 4242 4242</strong><br/>
+      Any future date • Any CVC • Any postcode
+    </div>
   </div>
 </PricingCard>
 
@@ -566,7 +551,7 @@ export default function ModernPricingPage() {
                     variant="success"
                     size="lg"
                     style={{ width: '100%' }}
-                    onClick={() => handleGetPro('PRO_ANNUAL')}
+                    onClick={() => handleGetPro('pro_annual')}
                   >
                     Get Pro Annual
                   </ModernButton>
