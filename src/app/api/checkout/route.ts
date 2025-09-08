@@ -24,11 +24,10 @@ const PLAN_TO_PRICE_ENV: Record<PlanKey, string> = {
   school_full: "STRIPE_SCHOOL_FULL_PRICE_ID",
 };
 
-function getPriceId(plan: PlanKey) {
+function getPriceIdOrNull(plan: PlanKey) {
   const envKey = PLAN_TO_PRICE_ENV[plan];
   const priceId = process.env[envKey];
-  if (!priceId) throw new Error(`Missing env var: ${envKey}`);
-  return priceId;
+  return priceId ? { envKey, priceId } : { envKey, priceId: null as string | null };
 }
 
 export async function POST(req: Request) {
@@ -39,42 +38,41 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json().catch(() => ({}));
-    const plan: PlanKey = body?.plan;
+    const plan = body?.plan as PlanKey | undefined;
 
     if (!plan || !(plan in PLAN_TO_PRICE_ENV)) {
       return NextResponse.json(
-        { error: "Invalid plan. Provide one of: pro_test, pro_monthly, pro_annual, school_starter, school_mid, school_full" },
+        { error: "Invalid plan. Use one of: pro_test, pro_monthly, pro_annual, school_starter, school_mid, school_full" },
         { status: 400 }
       );
     }
 
-    const priceId = getPriceId(plan);
+    const { envKey, priceId } = getPriceIdOrNull(plan);
+    if (!priceId) {
+      return NextResponse.json(
+        { error: `Plan temporarily unavailable (missing ${envKey} in server config)` },
+        { status: 400 }
+      );
+    }
+
     const successUrl = `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/upgrade`;
 
-        const session = await stripe.checkout.sessions.create({
-          mode: "subscription",
-          payment_method_types: ["card"],
-          allow_promotion_codes: true,
-          line_items: [
-            {
-              price: priceId,
-              quantity: 1,
-            },
-          ],
-          success_url: successUrl,
-          cancel_url: cancelUrl,
-          metadata: {
-            userId: userId,
-          },
-        });
-    
-        return NextResponse.json({ url: session.url });
-      } catch (error) {
-        console.error("Error creating checkout session:", error);
-        return NextResponse.json(
-          { error: "Internal server error" },
-          { status: 500 }
-        );
-      }
-    }
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      payment_method_types: ["card"],
+      line_items: [{ price: priceId, quantity: 1 }],
+      allow_promotion_codes: true,
+      automatic_tax: { enabled: true },
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata: { userId, plan },
+    });
+
+    return NextResponse.json({ url: session.url });
+  } catch (err: any) {
+    console.error("Error creating checkout session:", err);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
