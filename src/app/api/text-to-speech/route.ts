@@ -1,6 +1,6 @@
 // src/app/api/text-to-speech/route.ts
 import { NextRequest } from 'next/server';
-import { auth, clerkClient } from '@clerk/nextjs/server';
+import { auth, clerkClient, currentUser } from '@clerk/nextjs/server';
 
 const RACHEL_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // Rachel (stock)
 const MODEL_ID = 'eleven_multilingual_v2';

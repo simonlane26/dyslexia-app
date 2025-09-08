@@ -567,7 +567,7 @@ const handleReadAloud = async () => {
           variant="secondary"
           className="text-white transition-all shadow-md bg-gradient-to-r from-indigo-500 to-blue-500 hover:shadow-lg hover:scale-105"
         >
-          🔑 Sign in to export PDF/MP3
+          🔑 Sign up for Basic Features
         </ModernButton>
       </SignInButton>
     </div>

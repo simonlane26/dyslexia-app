@@ -1,6 +1,6 @@
 import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
-import { clerkClient, auth } from "@clerk/nextjs/server";
+import { clerkClient, auth, currentUser } from "@clerk/nextjs/server";
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
