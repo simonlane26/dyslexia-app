@@ -11,23 +11,14 @@ export function UpgradeButton() {
   const { isLoaded, isSignedIn, user } = useUser();
   const [busy, setBusy] = useState(false);
 
-  // Refresh user once when ready so Pro status updates immediately after webhooks
   useEffect(() => {
-    if (isLoaded && user?.reload) {
-      user.reload().catch(() => {});
-    }
+    if (isLoaded && user?.reload) user.reload().catch(() => {});
   }, [isLoaded, user]);
 
-  // Derive Pro state from publicMetadata only
-  const isPro = useMemo(
-    () => user?.publicMetadata?.isPro === true,
-    [user?.publicMetadata]
-  );
+  const isPro = useMemo(() => user?.publicMetadata?.isPro === true, [user?.publicMetadata]);
 
-  // Not ready yet — keep layout stable (optional: return a skeleton)
   if (!isLoaded) return null;
 
-  // Not signed in — invite to sign in first
   if (!isSignedIn) {
     return (
       <ModernButton
@@ -41,7 +32,6 @@ export function UpgradeButton() {
     );
   }
 
-  // Already Pro — show Manage link
   if (isPro) {
     return (
       <ModernButton
@@ -55,15 +45,9 @@ export function UpgradeButton() {
     );
   }
 
-  // Free user — show Upgrade
-  const handleUpgrade = () => {
-    setBusy(true);
-    router.push('/pricing');
-  };
-
   return (
     <ModernButton
-      onClick={handleUpgrade}
+      onClick={() => { setBusy(true); router.push('/pricing'); }}
       variant="primary"
       size="lg"
       disabled={busy}

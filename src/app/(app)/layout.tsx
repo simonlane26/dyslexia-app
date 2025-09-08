@@ -1,8 +1,16 @@
-// src/app/layout.tsx
-import "../globals.css";
+// src/app/layout.tsx (Server Component)
+import "./globals.css";
 import { Inter } from "next/font/google";
+import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
+import { HeaderBar } from "@/components/HeaderBar";
 
 const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "Dyslexia Writer",
+  description: "Dyslexia-friendly writing and reading tools.",
+};
 
 export default function RootLayout({
   children,
@@ -10,11 +18,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div
-      className={`${inter.className} min-h-screen antialiased bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50`}
-    >
-      {children}
-    </div>
+    <html lang="en">
+      <body className={inter.className}>
+        {/* Do NOT pass publishableKey prop; SDK reads NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY */}
+        <ClerkProvider>
+          <HeaderBar />
+          {children}
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }
 
