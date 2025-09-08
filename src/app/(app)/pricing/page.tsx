@@ -494,7 +494,7 @@ export default function ModernPricingPage() {
       variant="primary"
       size="lg"
       style={{ width: '100%' }}
-      onClick={() => handleGetPro('pro_test')}
+      onClick={() => handleGetPro('PRO_TEST')}
     >
       Get Pro Monthly
     </ModernButton>
