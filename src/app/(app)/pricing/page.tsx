@@ -361,75 +361,146 @@ export default function ModernPricingPage() {
               </div>
             </PricingCard>
 
-            {/* Pro Monthly */}
-            <PricingCard featured={true}>
-              <div style={{ padding: '32px' }}>
-                <div style={{
-                  position: 'absolute',
-                  top: '20px',
-                  right: '20px',
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                  color: 'white',
-                  padding: '6px 12px',
-                  borderRadius: '20px',
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}>
-                  <Star size={12} />
-                  Most Popular
-                </div>
+{/* Pro Monthly */}
+<PricingCard featured={true}>
+  <div style={{ padding: '32px' }}>
+    <div style={{
+      position: 'absolute',
+      top: '20px',
+      right: '20px',
+      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+      color: 'white',
+      padding: '6px 12px',
+      borderRadius: '20px',
+      fontSize: '12px',
+      fontWeight: '600',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '4px'
+    }}>
+      <Star size={12} />
+      Most Popular
+    </div>
 
-                <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                  <h3 style={{
-                    fontSize: '1.5rem',
-                    fontWeight: '700',
-                    color: '#1e293b',
-                    marginBottom: '8px'
-                  }}>
-                    Pro Monthly
-                  </h3>
-                  <div style={{
-                    fontSize: '3rem',
-                    fontWeight: '800',
-                    background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                    marginBottom: '4px'
-                  }}>
-                   {"£"}6.99
-                  </div>
-                  <div style={{ color: '#64748b', fontSize: '14px' }}>per month</div>
-                </div>
+    <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+      <h3 style={{
+        fontSize: '1.5rem',
+        fontWeight: '700',
+        color: '#1e293b',
+        marginBottom: '8px'
+      }}>
+        Pro Monthly
+      </h3>
+      <div style={{
+        fontSize: '3rem',
+        fontWeight: '800',
+        background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+        marginBottom: '4px'
+      }}>
+       {"£"}6.99
+      </div>
+      <div style={{ color: '#64748b', fontSize: '14px' }}>per month</div>
+    </div>
 
-                <div style={{ marginBottom: '32px' }}>
-                  <FeatureItem highlighted icon={<Sparkles size={18} style={{ color: '#10b981' }} />}>
-                    Unlimited simplification
-                  </FeatureItem>
-                  <FeatureItem highlighted icon={<Volume2 size={18} style={{ color: '#10b981' }} />}>
-                    All voices (Bella, Thomas, etc.)
-                  </FeatureItem>
-                  <FeatureItem highlighted icon={<Download size={18} style={{ color: '#10b981' }} />}>
-                    Export as MP3
-                  </FeatureItem>
-                  <FeatureItem highlighted icon={<Palette size={18} style={{ color: '#10b981' }} />}>
-                    Font & color tools
-                  </FeatureItem>
-                </div>
+    <div style={{ marginBottom: '32px' }}>
+      <FeatureItem highlighted icon={<Sparkles size={18} style={{ color: '#10b981' }} />}>
+        Unlimited Simplifications
+      </FeatureItem>
+      <FeatureItem highlighted icon={<Volume2 size={18} style={{ color: '#10b981' }} />}>
+        All voices (Molli, Liam, etc.)
+      </FeatureItem>
+      <FeatureItem highlighted icon={<Download size={18} style={{ color: '#10b981' }} />}>
+        Export as MP3
+      </FeatureItem>
+      <FeatureItem highlighted icon={<Palette size={18} style={{ color: '#10b981' }} />}>
+        Font & color tools
+      </FeatureItem>
+    </div>
 
-                <ModernButton
-                  variant="primary"
-                  size="lg"
-                  style={{ width: '100%' }}
-                  onClick={() => handleGetPro('pro_monthly')}
-                >
-                  Get Pro Monthly
-                </ModernButton>
-              </div>
-            </PricingCard>
+    <ModernButton
+      variant="primary"
+      size="lg"
+      style={{ width: '100%' }}
+      onClick={() => handleGetPro('pro_monthly')}
+    >
+      Get Pro Monthly
+    </ModernButton>
+  </div>
+</PricingCard>
+
+{/* Pro Monthly TEST */}
+<PricingCard featured={true}>
+  <div style={{ padding: '32px' }}>
+    <div style={{
+      position: 'absolute',
+      top: '20px',
+      right: '20px',
+      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+      color: 'white',
+      padding: '6px 12px',
+      borderRadius: '20px',
+      fontSize: '12px',
+      fontWeight: '600',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '4px'
+    }}>
+      <Star size={12} />
+      Most Popular
+    </div>
+
+    <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+      <h3 style={{
+        fontSize: '1.5rem',
+        fontWeight: '700',
+        color: '#1e293b',
+        marginBottom: '8px'
+      }}>
+        Pro Monthly TEST
+      </h3>
+      <div style={{
+        fontSize: '3rem',
+        fontWeight: '800',
+        background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+        marginBottom: '4px'
+      }}>
+       {"£"}1.00
+      </div>
+      <div style={{ color: '#64748b', fontSize: '14px' }}>per month</div>
+    </div>
+
+    <div style={{ marginBottom: '32px' }}>
+      <FeatureItem highlighted icon={<Sparkles size={18} style={{ color: '#10b981' }} />}>
+        Unlimited Simplifications
+      </FeatureItem>
+      <FeatureItem highlighted icon={<Volume2 size={18} style={{ color: '#10b981' }} />}>
+        All voices (Molli, Liam, etc.)
+      </FeatureItem>
+      <FeatureItem highlighted icon={<Download size={18} style={{ color: '#10b981' }} />}>
+        Export as MP3
+      </FeatureItem>
+      <FeatureItem highlighted icon={<Palette size={18} style={{ color: '#10b981' }} />}>
+        Font & color tools
+      </FeatureItem>
+    </div>
+
+    <ModernButton
+      variant="primary"
+      size="lg"
+      style={{ width: '100%' }}
+      onClick={() => handleGetPro('pro_test')}
+    >
+      Get Pro Monthly
+    </ModernButton>
+  </div>
+</PricingCard>
+
 
             {/* Pro Annual */}
             <PricingCard>
