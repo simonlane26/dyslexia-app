@@ -1,5 +1,4 @@
-﻿// app/api/checkout/route.ts
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { auth } from "@clerk/nextjs/server";
 
@@ -24,10 +23,11 @@ const PLAN_TO_PRICE_ENV: Record<PlanKey, string> = {
   school_full: "STRIPE_SCHOOL_FULL_PRICE_ID",
 };
 
-function getPriceIdOrNull(plan: PlanKey) {
+function getPriceId(plan: PlanKey) {
   const envKey = PLAN_TO_PRICE_ENV[plan];
   const priceId = process.env[envKey];
-  return priceId ? { envKey, priceId } : { envKey, priceId: null as string | null };
+  if (!priceId) throw new Error(`Missing env var: ${envKey}`);
+  return priceId;
 }
 
 export async function POST(req: Request) {
@@ -42,37 +42,38 @@ export async function POST(req: Request) {
 
     if (!plan || !(plan in PLAN_TO_PRICE_ENV)) {
       return NextResponse.json(
-        { error: "Invalid plan. Use one of: pro_test, pro_monthly, pro_annual, school_starter, school_mid, school_full" },
+        { error: "Invalid plan. Use: pro_test, pro_monthly, pro_annual, school_starter, school_mid, school_full" },
         { status: 400 }
       );
     }
 
-    const { envKey, priceId } = getPriceIdOrNull(plan);
-    if (!priceId) {
-      return NextResponse.json(
-        { error: `Plan temporarily unavailable (missing ${envKey} in server config)` },
-        { status: 400 }
-      );
-    }
+    const priceId = getPriceId(plan);
+    const price = await stripe.prices.retrieve(priceId);
+
+    // Decide checkout mode from price
+    const isRecurring = !!price.recurring;
+    const mode: "subscription" | "payment" = isRecurring ? "subscription" : "payment";
 
     const successUrl = `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/upgrade`;
 
     const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
+      mode,
       payment_method_types: ["card"],
-      line_items: [{ price: priceId, quantity: 1 }],
       allow_promotion_codes: true,
       automatic_tax: { enabled: true },
+      line_items: [{ price: price.id, quantity: 1 }],
       success_url: successUrl,
       cancel_url: cancelUrl,
-      metadata: { userId, plan },
+      client_reference_id: userId,
+      metadata: { userId, plan, mode },
     });
 
     return NextResponse.json({ url: session.url });
   } catch (err: any) {
     console.error("Error creating checkout session:", err);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    const msg = process.env.NODE_ENV === "development" ? err?.message : "Internal Server Error";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
 
