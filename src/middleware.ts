@@ -1,28 +1,45 @@
-// middleware.ts (PROJECT ROOT)
+// src/middleware.ts
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// 👇 Match your auth pages
 const isAuthPage = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
 
-export default clerkMiddleware(async (auth, req) => {
-  console.log("🔐 clerkMiddleware hit:", req.nextUrl.pathname);
+export default clerkMiddleware(async (mwAuth, req) => {
+  const { pathname } = req.nextUrl;
 
-  // If the user is signed in and visits /sign-in or /sign-up → redirect them
-  if ((await auth()).userId && isAuthPage(req)) {
-    // Decide where to send them:
-    //   - after sign-up → /success
-    //   - after sign-in → /
-    const target =
-      req.nextUrl.pathname.startsWith("/sign-up") ? "/success" : "/";
+  // Never touch Stripe webhooks
+  if (pathname.startsWith("/api/webhooks/stripe")) return;
+
+  // Require auth on selected APIs (await the async mwAuth())
+  if (
+    pathname.startsWith("/api/simplify") ||
+    pathname.startsWith("/api/text-to-speech")
+  ) {
+    const { userId } = await mwAuth();
+    if (!userId) {
+      return Response.redirect(new URL("/sign-in", req.url));
+    }
+  }
+
+  // Redirect signed-in users away from auth pages
+  const { userId } = await mwAuth();
+  if (userId && isAuthPage(req)) {
+    const target = pathname.startsWith("/sign-up") ? "/success" : "/";
     return Response.redirect(new URL(target, req.url));
   }
 
-  // Otherwise let the request through
+  // Continue
+  return;
 });
 
 export const config = {
   matcher: [
-    "/api/(.*)",                   // all API routes (e.g., /api/whoami, /api/checkout)
-    "/((?!.+\\.[\\w]+$|_next).*)", // all pages; exclude _next/* and static assets
+    // All pages (exclude static files and Next internals)
+    "/((?!.+\\.[\\w]+$|_next).*)",
+    "/",
+    // All API routes
+    "/(api|trpc)(.*)",
   ],
 };
+
+
+
