@@ -9,8 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.46.2",
     "@clerk/clerk-sdk-node": "^5.1.6",
-    "@clerk/nextjs": "^6.31.1",
+    "@clerk/nextjs": "^6.31.10",
+    "@clerk/types": "^4.85.0",
     "@headlessui/react": "^2",
     "@heroicons/react": "^2",
     "@tailwindcss/postcss": "^4.1.11",

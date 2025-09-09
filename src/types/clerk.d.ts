@@ -1,11 +1,18 @@
 // types/clerk.d.ts
-declare namespace Clerk {
-  interface User {
-    publicMetadata?: {
-      isPro?: boolean;
-      subscriptionStatus?: string;
-      proSince?: string;
-      stripeCustomerId?: string;
-    };
+import "@clerk/types";
+
+declare module "@clerk/types" {
+  interface UserPublicMetadata {
+    isPro?: boolean;
+    plan?: string | null;
+    mode?: string | null;
+    schoolTier?: string | null;
+  }
+  interface UserPrivateMetadata {
+    isPro?: boolean;
+    proSince?: string;
+    stripeCustomerId?: string;
+    schoolTier?: string | null;
   }
 }
+
