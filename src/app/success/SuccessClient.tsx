@@ -1,7 +1,7 @@
 // src/app/success/SuccessClient.tsx
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 
@@ -12,92 +12,113 @@ export default function SuccessClient(): JSX.Element {
 
   const { user, isLoaded, isSignedIn } = useUser();
   const [status, setStatus] = useState<'checking' | 'ready' | 'error'>('checking');
-  const [tries, setTries] = useState(0);
+  const triesRef = useRef(0);
+  const redirectedRef = useRef(false);
 
-  // Poll Clerk for updated metadata (handles slight webhook delay)
+  const goHome = () => {
+    if (redirectedRef.current) return;
+    redirectedRef.current = true;
+    router.replace('/'); // change if your post-success destination differs
+  };
+
+  // Poll Clerk for updated metadata; hard-stop + redirect even if metadata lags
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return;
 
     let cancelled = false;
-    let timer: any;
 
-    const check = async () => {
+    const isProFromClient = () =>
+      // Client-side: rely on PUBLIC metadata (webhook mirrors isPro here)
+      (user?.publicMetadata as Record<string, unknown> | undefined)?.['isPro'] === true;
+
+    const tick = async () => {
       try {
-        await user?.reload(); // pull latest privateMetadata
-        const isPro = (user as any)?.privateMetadata?.isPro === true;
-        if (isPro) {
+        await user?.reload?.();                // refresh Clerk user
+        await new Promise((r) => setTimeout(r, 150)); // let hook state settle
+
+        if (isProFromClient()) {
           if (!cancelled) setStatus('ready');
-          // small pause so the UI shows the success briefly, then go home
-          setTimeout(() => {
-            if (!cancelled) router.replace('/');
-          }, 700);
+          setTimeout(() => !cancelled && goHome(), 600); // short “success” pause
           return;
         }
       } catch {
         // ignore and keep polling
       }
 
-      // try up to ~10 seconds total
-      if (!cancelled && tries < 10) {
-        timer = setTimeout(() => setTries((t) => t + 1), 1000);
+      if (triesRef.current < 10 && !cancelled) {
+        triesRef.current += 1;
+        setTimeout(() => !cancelled && tick(), 1000); // ~10s total
       } else if (!cancelled) {
-        setStatus('error'); // webhook hasn’t landed yet
+        setStatus('error');
+        // safety: still take user back to app shortly
+        setTimeout(() => !cancelled && goHome(), 3000);
       }
     };
 
-    check();
+    // Immediate check (covers case where webhook already updated publicMetadata)
+    if (isProFromClient()) {
+      setStatus('ready');
+      setTimeout(() => !cancelled && goHome(), 600);
+    } else {
+      tick();
+    }
+
+    // Absolute safety timeout
+    const absolute = setTimeout(() => !cancelled && goHome(), 8000);
+
     return () => {
       cancelled = true;
-      if (timer) clearTimeout(timer);
+      clearTimeout(absolute);
     };
-  }, [isLoaded, isSignedIn, user, tries, router]);
+  }, [isLoaded, isSignedIn, user, router]);
 
+  // UI
   const body = (() => {
-    if (!isLoaded) {
-      return <div>Loading…</div>;
-    }
-    if (!isSignedIn) {
-      return <div>Please sign in to view your subscription status.</div>;
-    }
+    if (!isLoaded) return <div>Loading…</div>;
+    if (!isSignedIn) return <div>Please sign in to view your subscription status.</div>;
+
     if (status === 'checking') {
       return <div>Activating your Pro features…</div>;
     }
-    if (status === 'error') {
+    if (status === 'ready') {
       return (
         <div>
-          We’re still finalizing your upgrade. This can take a few seconds.
-          <br />
-          <button
-            onClick={() => setTries(0)}
-            style={{
-              marginTop: 12,
-              background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-              color: '#fff',
-              border: 'none',
-              padding: '10px 16px',
-              borderRadius: 10,
-              cursor: 'pointer',
-            }}
-          >
-            Try again
-          </button>
+          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎉</div>
+          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1rem' }}>
+            Subscription Activated!
+          </h1>
+          <p style={{ color: '#64748b' }}>Redirecting to your app…</p>
+          {sessionId && (
+            <p style={{ color: '#94a3b8', fontSize: '0.75rem', marginTop: '0.5rem' }}>
+              Checkout session: {sessionId}
+            </p>
+          )}
         </div>
       );
     }
-    // status === 'ready'
+    // status === 'error'
     return (
       <div>
-        <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎉</div>
-        <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1rem' }}>
-          Subscription Activated!
-        </h1>
-        <p style={{ color: '#64748b', fontSize: '1.125rem', marginBottom: '1rem', lineHeight: 1.6 }}>
-          Welcome to Pro! You now have access to premium features.
-        </p>
+        We’re still finalizing your upgrade. This can take a few seconds.
+        <br />
+        <button
+          onClick={goHome}
+          style={{
+            marginTop: 12,
+            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+            color: '#fff',
+            border: 'none',
+            padding: '10px 16px',
+            borderRadius: 10,
+            cursor: 'pointer',
+          }}
+        >
+          Go to app now
+        </button>
         {sessionId && (
-          <p style={{ color: '#94a3b8', fontSize: '0.75rem', marginTop: '0.5rem' }}>
+          <div style={{ color: '#94a3b8', fontSize: '0.75rem', marginTop: 8 }}>
             Checkout session: {sessionId}
-          </p>
+          </div>
         )}
       </div>
     );
@@ -137,4 +158,5 @@ export default function SuccessClient(): JSX.Element {
     </div>
   );
 }
+
 
