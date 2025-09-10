@@ -3,11 +3,10 @@ import Stripe from "stripe";
 import { auth } from "@clerk/nextjs/server";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2024-06-20" as any,
 });
 
 type PlanKey =
-  | "pro_test"
   | "pro_monthly"
   | "pro_annual"
   | "school_starter"
@@ -15,7 +14,6 @@ type PlanKey =
   | "school_full";
 
 const PLAN_TO_PRICE_ENV: Record<PlanKey, string> = {
-  pro_test: "STRIPE_PRO_TEST_PRICE_ID",
   pro_monthly: "STRIPE_PRO_PRICE_ID",
   pro_annual: "STRIPE_PRO_PRICE_ANNUAL_ID",
   school_starter: "STRIPE_SCHOOL_STARTER_PRICE_ID",
@@ -37,25 +35,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const APP_URL = process.env.NEXT_PUBLIC_APP_URL;
+    if (!APP_URL) {
+      return NextResponse.json({ error: "Server misconfig: NEXT_PUBLIC_APP_URL missing" }, { status: 500 });
+    }
+
     const body = await req.json().catch(() => ({}));
     const plan = body?.plan as PlanKey | undefined;
-
     if (!plan || !(plan in PLAN_TO_PRICE_ENV)) {
       return NextResponse.json(
-        { error: "Invalid plan. Use: pro_test, pro_monthly, pro_annual, school_starter, school_mid, school_full" },
+        { error: "Invalid plan. Use: pro_monthly, pro_annual, school_starter, school_mid, school_full" },
         { status: 400 }
       );
     }
 
     const priceId = getPriceId(plan);
     const price = await stripe.prices.retrieve(priceId);
-
-    // Decide checkout mode from price
     const isRecurring = !!price.recurring;
     const mode: "subscription" | "payment" = isRecurring ? "subscription" : "payment";
 
-    const successUrl = `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/upgrade`;
+    const successUrl = `${APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${APP_URL}/upgrade`;
 
     const session = await stripe.checkout.sessions.create({
       mode,
@@ -67,6 +67,11 @@ export async function POST(req: Request) {
       cancel_url: cancelUrl,
       client_reference_id: userId,
       metadata: { userId, plan, mode },
+
+      // 🔗 carry userId/plan into underlying objects so your webhook can always find the user
+      ...(isRecurring
+        ? { subscription_data: { metadata: { userId, plan } } }
+        : { payment_intent_data: { metadata: { userId, plan } } }),
     });
 
     return NextResponse.json({ url: session.url });
@@ -76,4 +81,5 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
+
 
