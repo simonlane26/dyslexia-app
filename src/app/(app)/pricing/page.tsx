@@ -410,7 +410,7 @@ export default function ModernPricingPage() {
         Unlimited Simplifications
       </FeatureItem>
       <FeatureItem highlighted icon={<Volume2 size={18} style={{ color: '#10b981' }} />}>
-        All voices (Molli, Liam, etc.)
+        All voices (MollY, Liam, etc.)
       </FeatureItem>
       <FeatureItem highlighted icon={<Download size={18} style={{ color: '#10b981' }} />}>
         Export as MP3
@@ -430,62 +430,6 @@ export default function ModernPricingPage() {
     </ModernButton>
   </div>
 </PricingCard>
-
-{/* Pro Test (£1) */}
-<PricingCard>
-  <div style={{ padding: '32px' }}>
-    <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-      <h3 style={{
-        fontSize: '1.5rem',
-        fontWeight: '700',
-        color: '#1e293b',
-        marginBottom: '8px'
-      }}>
-        Pro Test
-      </h3>
-      <div style={{
-        fontSize: '3rem',
-        fontWeight: '800',
-        color: '#3b82f6',
-        marginBottom: '4px'
-      }}>
-        £1
-      </div>
-      <div style={{ color: '#64748b', fontSize: '14px' }}>one-time (testing)</div>
-    </div>
-
-    <div style={{ marginBottom: '32px' }}>
-      <FeatureItem highlighted>Unlock Pro features (test)</FeatureItem>
-      <FeatureItem>Good for flow validation</FeatureItem>
-      <FeatureItem>Auto-upgrades your account</FeatureItem>
-    </div>
-
-    <SignedIn>
-      <ModernButton
-        variant="primary"
-        size="lg"
-        style={{ width: '100%' }}
-        onClick={() => handleGetPro('pro_test')}
-      >
-        Buy Test Pro (£1)
-      </ModernButton>
-    </SignedIn>
-    <SignedOut>
-      <SignInButton mode="modal">
-        <ModernButton variant="primary" size="lg" style={{ width: '100%' }}>
-          Sign in to buy
-        </ModernButton>
-      </SignInButton>
-    </SignedOut>
-
-    {/* Helper: Stripe test card details */}
-    <div style={{ marginTop: '12px', fontSize: '12px', color: '#64748b', lineHeight: 1.6 }}>
-      Test card: <strong>4242 4242 4242 4242</strong><br/>
-      Any future date • Any CVC • Any postcode
-    </div>
-  </div>
-</PricingCard>
-
 
             {/* Pro Annual */}
             <PricingCard>

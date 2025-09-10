@@ -6,12 +6,11 @@ import Stripe from "stripe";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// ✅ Stripe SDK
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-06-20" as any,
 });
 
-/* ---------------------------------- Utils --------------------------------- */
+/* ---------- helpers ---------- */
 
 function getUserIdFromLines(inv: Stripe.Invoice): string | undefined {
   for (const line of inv.lines?.data ?? []) {
@@ -38,23 +37,14 @@ async function getUserIdFromInvoice(inv: Stripe.Invoice): Promise<string | undef
       const sub = await stripe.subscriptions.retrieve((inv as any).subscription as string);
       const uid = (sub.metadata as any)?.userId as string | undefined;
       if (uid) return uid;
-    } catch {
-      // ignore
-    }
+    } catch {}
   }
   return undefined;
 }
 
-/** Clerk REST helper: patch BOTH private & public metadata in one request */
 async function clerkPatchUserMetadata(
   userId: string,
-  {
-    privateData,
-    publicData,
-  }: {
-    privateData?: Record<string, unknown>;
-    publicData?: Record<string, unknown>;
-  }
+  { privateData, publicData }: { privateData?: Record<string, unknown>; publicData?: Record<string, unknown> }
 ) {
   const key = process.env.CLERK_SECRET_KEY;
   if (!key) throw new Error("Missing CLERK_SECRET_KEY");
@@ -78,7 +68,7 @@ async function clerkPatchUserMetadata(
   }
 }
 
-/* ---------------------------------- Route --------------------------------- */
+/* ---------- route ---------- */
 
 export async function POST(req: NextRequest) {
   const sig = req.headers.get("stripe-signature");
@@ -100,94 +90,74 @@ export async function POST(req: NextRequest) {
   try {
     console.log("[stripe] event:", event.type);
 
-    switch (event.type) {
-      // Fires for BOTH subscription and one-time checkout flows
-      case "checkout.session.completed": {
-        const s = event.data.object as Stripe.Checkout.Session;
-
-        const uid =
-          (s.metadata as any)?.userId || (s.client_reference_id as string | undefined);
-        if (!uid) {
-          console.warn("[stripe] checkout.session.completed without userId");
-          break;
-        }
-
-        const plan = (s.metadata as any)?.plan as string | undefined;
-        const mode = (s.metadata as any)?.mode as string | undefined;
-
-        const flags: Record<string, unknown> = {
-          isPro: true,
-          proSince: new Date().toISOString(),
-          stripeCustomerId: (s.customer as string) || undefined,
-        };
-
-        if (plan?.startsWith("school_")) {
-          flags.schoolTier = plan.replace("school_", ""); // starter|mid|full
-        }
-
-        // ✅ Write to private metadata (used by your app) and mirror minimal info to public for quick checks
-        await clerkPatchUserMetadata(uid, {
-          privateData: flags,
-          publicData: { isPro: true, plan: plan || null, mode: mode || null },
-        });
-
-        console.log("[stripe] set isPro=true for user", uid, "plan:", plan, "mode:", mode);
-        break;
+    if (event.type === "checkout.session.completed") {
+      const s = event.data.object as Stripe.Checkout.Session;
+      const uid = (s.metadata as any)?.userId || (s.client_reference_id as string | undefined);
+      if (!uid) {
+        console.warn("[stripe] checkout.session.completed without userId");
+        return new Response("ok", { status: 200 });
       }
 
-      // Keep Pro active after renewals or resume of subscription
-      case "invoice.payment_succeeded": {
-        const inv = event.data.object as Stripe.Invoice;
+      const plan = (s.metadata as any)?.plan as string | undefined;
+      const mode = (s.metadata as any)?.mode as string | undefined;
 
-        // Only relevant for subscription invoices
-        if (!inv.subscription) break;
-
-        const uid = await getUserIdFromInvoice(inv);
-        if (!uid) break;
-
-        await clerkPatchUserMetadata(uid, {
-          privateData: { isPro: true },
-          publicData: { isPro: true },
-        });
-
-        console.log("[stripe] invoice.payment_succeeded -> isPro=true for", uid);
-        break;
+      const flags: Record<string, unknown> = {
+        isPro: true,
+        proSince: new Date().toISOString(),
+        stripeCustomerId: (s.customer as string) || undefined,
+      };
+      if (plan?.startsWith("school_")) {
+        flags.schoolTier = plan.replace("school_", ""); // starter|mid|full
       }
 
-      // Turn off Pro if payment fails or subscription is canceled
-      case "invoice.payment_failed": {
-        const inv = event.data.object as Stripe.Invoice;
-        const uid = await getUserIdFromInvoice(inv);
-        if (!uid) break;
+      await clerkPatchUserMetadata(uid, {
+        privateData: flags,                           // <-- your app reads this
+        publicData: { isPro: true, plan: plan ?? null, mode: mode ?? null }, // handy for dashboard
+      });
 
+      console.log("[stripe] ✅ set isPro=true for", uid, "plan:", plan, "mode:", mode);
+    }
+
+    // Keep Pro after renewals
+    if (event.type === "invoice.payment_succeeded") {
+      const inv = event.data.object as Stripe.Invoice;
+      if (inv.subscription) {
+        const uid = await getUserIdFromInvoice(inv);
+        if (uid) {
+          await clerkPatchUserMetadata(uid, {
+            privateData: { isPro: true },
+            publicData: { isPro: true },
+          });
+          console.log("[stripe] ✅ invoice.payment_succeeded -> isPro=true for", uid);
+        }
+      }
+    }
+
+    // Turn Pro off on failure / cancel
+    if (event.type === "invoice.payment_failed") {
+      const inv = event.data.object as Stripe.Invoice;
+      const uid = await getUserIdFromInvoice(inv);
+      if (uid) {
         await clerkPatchUserMetadata(uid, {
           privateData: { isPro: false },
           publicData: { isPro: false },
         });
-
-        console.log("[stripe] invoice.payment_failed -> isPro=false for", uid);
-        break;
+        console.log("[stripe] ⚠️ invoice.payment_failed -> isPro=false for", uid);
       }
+    }
 
-      case "customer.subscription.deleted": {
-        const sub = event.data.object as Stripe.Subscription;
-        const uid =
-          (sub.metadata as any)?.userId ??
-          (sub.items?.data?.[0]?.price?.metadata as any)?.userId;
-        if (!uid) break;
-
+    if (event.type === "customer.subscription.deleted") {
+      const sub = event.data.object as Stripe.Subscription;
+      const uid =
+        (sub.metadata as any)?.userId ??
+        (sub.items?.data?.[0]?.price?.metadata as any)?.userId;
+      if (uid) {
         await clerkPatchUserMetadata(uid, {
           privateData: { isPro: false },
           publicData: { isPro: false },
         });
-
-        console.log("[stripe] subscription.deleted -> isPro=false for", uid);
-        break;
+        console.log("[stripe] ⚠️ subscription.deleted -> isPro=false for", uid);
       }
-
-      default:
-        // no-op
-        break;
     }
 
     return new Response("ok", { status: 200 });
@@ -196,4 +166,5 @@ export async function POST(req: NextRequest) {
     return new Response("Server error", { status: 500 });
   }
 }
+
 

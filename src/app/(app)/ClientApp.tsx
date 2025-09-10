@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { clerkClient } from '@clerk/nextjs/server';
 import { SettingsPanel } from '@/components/SettingsPanel';
-import {UpgradeButton} from '@/components/UpgradeButton';
 import { ModernButton } from '@/components/ModernButton';
 
 export function ClientApp() {
@@ -371,10 +370,6 @@ const handleReadAloudSimplified = async () => {
   </span>
 </h1>
 
-
-<div className="flex items-center gap-3">
-  <UpgradeButton />
-</div>
 
   <SettingsPanel
     bgColor={bgColor}

@@ -8,7 +8,7 @@ export default clerkMiddleware(async (mwAuth, req) => {
 
   // Never touch Stripe webhooks
   if (pathname.startsWith("/api/webhooks/stripe")) return;
-
+if (pathname.startsWith('/sso-callback')) return;
   // Require auth on selected APIs (await the async mwAuth())
   if (
     pathname.startsWith("/api/simplify") ||
