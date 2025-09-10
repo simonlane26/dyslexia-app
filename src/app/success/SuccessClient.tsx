@@ -5,44 +5,55 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 
+type Status = 'checking' | 'readyPro' | 'readyFree' | 'error';
+
 export default function SuccessClient(): JSX.Element {
   const params = useSearchParams();
   const router = useRouter();
   const sessionId = useMemo(() => params?.get('session_id') ?? null, [params]);
+  const planParam = useMemo(() => (params?.get('plan') ?? '').toLowerCase(), [params]); // optional hint: ?plan=free
 
   const { user, isLoaded, isSignedIn } = useUser();
-  const [status, setStatus] = useState<'checking' | 'ready' | 'error'>('checking');
+  const [status, setStatus] = useState<Status>('checking');
   const triesRef = useRef(0);
   const redirectedRef = useRef(false);
 
   const goHome = () => {
     if (redirectedRef.current) return;
     redirectedRef.current = true;
-    router.replace('/'); // change if your post-success destination differs
+    router.replace('/'); // change destination if you prefer
   };
 
-  // Poll Clerk for updated metadata; hard-stop + redirect even if metadata lags
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return;
 
+    // If there's NO Stripe session, assume Free flow (or generic success)
+    const isFreeFlow = !sessionId || planParam === 'free';
+
+    if (isFreeFlow) {
+      setStatus('readyFree');
+      const t = setTimeout(goHome, 800);
+      return () => clearTimeout(t);
+    }
+
+    // Otherwise, we came from Checkout → poll for Pro activation briefly
     let cancelled = false;
 
-    const isProFromClient = () =>
-      // Client-side: rely on PUBLIC metadata (webhook mirrors isPro here)
+    const isProFromPublic = () =>
       (user?.publicMetadata as Record<string, unknown> | undefined)?.['isPro'] === true;
 
     const tick = async () => {
       try {
-        await user?.reload?.();                // refresh Clerk user
-        await new Promise((r) => setTimeout(r, 150)); // let hook state settle
+        await user?.reload?.();
+        await new Promise((r) => setTimeout(r, 150));
 
-        if (isProFromClient()) {
-          if (!cancelled) setStatus('ready');
-          setTimeout(() => !cancelled && goHome(), 600); // short “success” pause
+        if (isProFromPublic()) {
+          if (!cancelled) setStatus('readyPro');
+          setTimeout(() => !cancelled && goHome(), 600);
           return;
         }
       } catch {
-        // ignore and keep polling
+        /* ignore */
       }
 
       if (triesRef.current < 10 && !cancelled) {
@@ -50,37 +61,49 @@ export default function SuccessClient(): JSX.Element {
         setTimeout(() => !cancelled && tick(), 1000); // ~10s total
       } else if (!cancelled) {
         setStatus('error');
-        // safety: still take user back to app shortly
         setTimeout(() => !cancelled && goHome(), 3000);
       }
     };
 
-    // Immediate check (covers case where webhook already updated publicMetadata)
-    if (isProFromClient()) {
-      setStatus('ready');
-      setTimeout(() => !cancelled && goHome(), 600);
-    } else {
-      tick();
+    // If already Pro, short-circuit
+    if (isProFromPublic()) {
+      setStatus('readyPro');
+      const t = setTimeout(goHome, 600);
+      return () => clearTimeout(t);
     }
+
+    tick();
 
     // Absolute safety timeout
     const absolute = setTimeout(() => !cancelled && goHome(), 8000);
-
     return () => {
       cancelled = true;
       clearTimeout(absolute);
     };
-  }, [isLoaded, isSignedIn, user, router]);
+  }, [isLoaded, isSignedIn, user, sessionId, planParam, router]);
 
-  // UI
   const body = (() => {
     if (!isLoaded) return <div>Loading…</div>;
     if (!isSignedIn) return <div>Please sign in to view your subscription status.</div>;
 
+    if (status === 'readyFree') {
+      return (
+        <div>
+          <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>✅</div>
+          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '0.5rem' }}>
+            You’re all set!
+          </h1>
+          <p style={{ color: '#64748b' }}>You’re on the Free plan. Taking you to the app…</p>
+        </div>
+      );
+    }
+
     if (status === 'checking') {
+      // This only shows for checkout flows now (not Free)
       return <div>Activating your Pro features…</div>;
     }
-    if (status === 'ready') {
+
+    if (status === 'readyPro') {
       return (
         <div>
           <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎉</div>
@@ -96,6 +119,7 @@ export default function SuccessClient(): JSX.Element {
         </div>
       );
     }
+
     // status === 'error'
     return (
       <div>
@@ -158,5 +182,6 @@ export default function SuccessClient(): JSX.Element {
     </div>
   );
 }
+
 
 
