@@ -93,6 +93,7 @@ export function SettingsPanel({
   <span aria-hidden>{isOpen ? "▾" : "▸"}</span>
 </button>
 
+
       {isOpen && (
         <div
           style={{
