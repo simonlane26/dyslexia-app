@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
+import { SignedOut, SignInButton } from "@clerk/nextjs";
 import { useRouter } from 'next/navigation';
-import { Settings, Volume2, Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play } from 'lucide-react';
+import { Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { ModernButton } from '@/components/ModernButton';
 import { SettingsPanel } from '@/components/SettingsPanel';
@@ -34,10 +34,27 @@ export default function HomePage() {
   const [highContrast, setHighContrast] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [voiceId, setVoiceId] = useState('21m00Tcm4TlvDq8ikWAM');
+
   const { user, isLoaded, isSignedIn } = useUser();
   const router = useRouter();
-  
- // 🔥 Add this here
+
+  // ✅ Static JSON-LD for SEO (don’t depend on client state)
+  const JSON_LD = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Dyslexia Writer",
+    applicationCategory: "EducationalApplication",
+    operatingSystem: "Web",
+    url: "https://www.dyslexiawrite.com/",
+    description: "Dyslexia-friendly writing app with dictation, text-to-speech, and one-tap simplification.",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" },
+    screenshot: [
+      "https://www.dyslexiawrite.com/og/shot1.jpg",
+      "https://www.dyslexiawrite.com/og/shot2.jpg"
+    ]
+  };
+
+  // 🔥 Warm up the TTS endpoint (cold start mitigation)
   useEffect(() => {
     const warmUp = async () => {
       try {
@@ -49,6 +66,7 @@ export default function HomePage() {
     };
     warmUp();
   }, []);
+
   // Debug logs (optional)
   useEffect(() => {
     console.log('🔄 usageCount state changed to:', usageCount);
@@ -65,14 +83,14 @@ export default function HomePage() {
       id: user?.id,
     });
   }, [user]);
-<AuthDebug />
-  // ✅ TOP-LEVEL effect to sync isPro from Clerk user
+
+  // ✅ Sync isPro from Clerk user
   useEffect(() => {
     if (!user) return;
-    const isPro =
+    const pro =
       (user.publicMetadata as any)?.isPro === true ||
       (user.unsafeMetadata as any)?.isPro === true;
-    setIsPro(isPro);
+    setIsPro(pro);
   }, [user]);
 
   // Settings load
@@ -84,7 +102,6 @@ export default function HomePage() {
       } catch {
         return defaultValue;
       }
-  
     };
 
     setBgColor(load('bgColor', '#f9f7ed'));
@@ -191,22 +208,21 @@ export default function HomePage() {
 
   // Simplify
   const simplifyText = async () => {
-  // ✅ use the top-level values, do not call hooks here
-  if (!isLoaded) return; // wait for Clerk to hydrate
+    if (!isLoaded) return; // wait for Clerk to hydrate
 
-  if (!isSignedIn) {
-    alert('Please sign in to use Simplify.');
-    router.push('/sign-in');
-    return;
-  }
+    if (!isSignedIn) {
+      alert('Please sign in to use Simplify.');
+      router.push('/sign-in');
+      return;
+    }
 
-  if (!text.trim()) {
-    alert("No text to simplify. Please write something first.");
-    return;
-  }
+    if (!text.trim()) {
+      alert("No text to simplify. Please write something first.");
+      return;
+    }
 
-  setError(null);
-  setLoading(true);
+    setError(null);
+    setLoading(true);
 
     try {
       const res = await fetch('/api/simplify', {
@@ -236,6 +252,7 @@ export default function HomePage() {
         setLoading(false);
         return;
       }
+
       const data = await res.json();
       console.log('✅ Full API Response:', data);
 
@@ -256,71 +273,70 @@ export default function HomePage() {
     }
   };
 
-// TTS: original text
-const handleReadAloud = async () => {
-  if (!text.trim()) {
-    alert('No text to read.');
-    return;
-  }
+  // TTS: original text
+  const handleReadAloud = async () => {
+    if (!text.trim()) {
+      alert('No text to read.');
+      return;
+    }
 
-  setIsReading(true);
+    setIsReading(true);
 
-  try {
-    // First attempt
-    let res = await fetch('/api/text-to-speech', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: text.trim(), voiceId }),
-    });
-
-    // Retry once if common first-hit errors
-    if (!res.ok && [401, 403, 408, 429, 500, 502, 503, 504].includes(res.status)) {
-      console.warn(`⚠️ First TTS request failed (${res.status}), retrying...`);
-      await new Promise((r) => setTimeout(r, 300)); // short delay
-      res = await fetch('/api/text-to-speech', {
+    try {
+      // First attempt
+      let res = await fetch('/api/text-to-speech', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: text.trim(), voiceId }),
       });
+
+      // Retry once if common first-hit errors
+      if (!res.ok && [401, 403, 408, 429, 500, 502, 503, 504].includes(res.status)) {
+        console.warn(`⚠️ First TTS request failed (${res.status}), retrying...`);
+        await new Promise((r) => setTimeout(r, 300)); // short delay
+        res = await fetch('/api/text-to-speech', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text.trim(), voiceId }),
+        });
+      }
+
+      // Still failed after retry
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('❌ API Error:', errorText);
+        alert(`API Error: ${res.status} - ${errorText}`);
+        setIsReading(false);
+        return;
+      }
+
+      // Success — handle audio
+      const audioBlob = await res.blob();
+      if (audioBlob.size === 0) {
+        alert('Empty audio data received');
+        setIsReading(false);
+        return;
+      }
+
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+        setIsReading(false);
+      };
+
+      audio.play().catch((err) => {
+        console.error('❌ Play failed:', err);
+        setIsReading(false);
+        alert('Playback failed. Please try again.');
+      });
+    } catch (err) {
+      console.error('❌ Unexpected error:', err);
+      setIsReading(false);
+      alert('Network error: ' + (err instanceof Error ? err.message : String(err)));
     }
-
-    // Still failed after retry
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error('❌ API Error:', errorText);
-      alert(`API Error: ${res.status} - ${errorText}`);
-      setIsReading(false);
-      return;
-    }
-
-    // Success — handle audio
-    const audioBlob = await res.blob();
-    if (audioBlob.size === 0) {
-      alert('Empty audio data received');
-      setIsReading(false);
-      return;
-    }
-
-    const audioUrl = URL.createObjectURL(audioBlob);
-    const audio = new Audio(audioUrl);
-
-    audio.onended = () => {
-      URL.revokeObjectURL(audioUrl);
-      setIsReading(false);
-    };
-
-    audio.play().catch((err) => {
-      console.error('❌ Play failed:', err);
-      setIsReading(false);
-      alert('Playback failed. Please try again.');
-    });
-  } catch (err) {
-    console.error('❌ Unexpected error:', err);
-    setIsReading(false);
-    alert('Network error: ' + (err instanceof Error ? err.message : String(err)));
-  }
-};
-
+  };
 
   // TTS: simplified text
   const handleReadAloudSimplified = async () => {
@@ -373,6 +389,7 @@ const handleReadAloud = async () => {
       alert('Error playing simplified text: ' + (e?.message || 'Unknown error'));
     }
   };
+
   const resetSettings = () => {
     setBgColor('#f9f7ed');
     setFont('Lexend');
@@ -394,28 +411,43 @@ const handleReadAloud = async () => {
         color: theme.text,
       }}
     >
+  {/* ✅ JSON-LD for rich results */}
+  <script
+    type="application/ld+json"
+    dangerouslySetInnerHTML={{ __html: JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Dyslexia Writer",
+    applicationCategory: "EducationalApplication",
+    operatingSystem: "Web",
+    url: "https://www.dyslexiawrite.com/",
+    description: "Dyslexia-friendly writing app with dictation, text-to-speech, and one-tap simplification.",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" }
+  })}}
+/>
+ 
       <div className="max-w-4xl px-4 py-8 mx-auto">
         <div className="mb-8 text-center">
           <h1 className="flex items-center justify-center gap-3 mb-6 text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-  {/* Solid emoji (forced color) */}
-  <span
-    aria-hidden
-    style={{
-      color: darkMode ? '#f9fafb' : '#1e293b',
-      WebkitTextFillColor: darkMode ? '#f9fafb' : '#1e293b', // hard override for Safari/WebKit
-      backgroundImage: 'none', // ensure no background-clip leaks
-      lineHeight: 1,
-      display: 'inline-block',
-    }}
-  >
-    ✍️
-  </span>
+            {/* Solid emoji (forced color) */}
+            <span
+              aria-hidden
+              style={{
+                color: darkMode ? '#f9fafb' : '#1e293b',
+                WebkitTextFillColor: darkMode ? '#f9fafb' : '#1e293b', // hard override for Safari/WebKit
+                backgroundImage: 'none',
+                lineHeight: 1,
+                display: 'inline-block',
+              }}
+            >
+              ✍️
+            </span>
 
-  {/* Gradient text ONLY on this span */}
-  <span className="text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
-    Dyslexia-Friendly Writing App
-  </span>
-</h1>
+            {/* Gradient text ONLY on this span */}
+            <span className="text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
+              Dyslexia-Friendly Writing App
+            </span>
+          </h1>
 
           <p
             className="max-w-2xl mx-auto text-lg"
@@ -424,11 +456,15 @@ const handleReadAloud = async () => {
             Write, simplify, and listen to your text with dyslexia-friendly tools
           </p>
         </div>
+
+        {/* Auth debug moved inside the tree */}
+        <AuthDebug />
+
+        <div className="flex items-center gap-3">
+          <UpgradeButton />
+        </div>
       </div>
 
-      <div className="flex items-center gap-3">
-  <UpgradeButton />
-</div>
       <SettingsPanel
         bgColor={bgColor}
         setBgColor={setBgColor}
@@ -508,7 +544,7 @@ const handleReadAloud = async () => {
 
             <ModernButton
               onClick={simplifyText}
-              disabled={loading || (!isPro && usageCount >= usageLimit)} // ✅ use usageCount
+              disabled={loading || (!isPro && usageCount >= usageLimit)}
               variant="primary"
             >
               <Sparkles size={18} />
@@ -533,54 +569,56 @@ const handleReadAloud = async () => {
               Clear All
             </ModernButton>
 
-  {isPro ? (
-    <div className="flex flex-wrap gap-3">
-      {/* ✅ Pro user gets both buttons */}
-      <ExportPDFButton text={text} simplifiedText={simplifiedText} />
-      <ExportMP3Button text={simplifiedText?.trim() ? simplifiedText : text} />
-    </div>
-  ) : (
-    <div className="flex flex-wrap gap-3">
-      {/* ✅ Free user gets "upgrade" alerts */}
-      <ModernButton
-        onClick={() => alert("Upgrade to Pro to export as PDF!")}
-        variant="success"
-        className="text-gray-500 hover:text-gray-700 opacity-70"
-      >
-        <Download size={16} /> Export PDF (Pro)
-      </ModernButton>
+            {isPro ? (
+              <div className="flex flex-wrap gap-3">
+                {/* ✅ Pro user gets both buttons */}
+                <ExportPDFButton text={text} simplifiedText={simplifiedText} />
+                <ExportMP3Button text={simplifiedText?.trim() ? simplifiedText : text} />
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-3">
+                {/* ✅ Free user gets "upgrade" alerts */}
+                <ModernButton
+                  onClick={() => alert("Upgrade to Pro to export as PDF!")}
+                  variant="success"
+                  className="text-gray-500 hover:text-gray-700 opacity-70"
+                >
+                  <Download size={16} /> Export PDF (Pro)
+                </ModernButton>
 
-      <ModernButton
-        onClick={() => alert("Upgrade to Pro to export as MP3!")}
-        className="text-white transition-all shadow-md bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-lg hover:scale-105"
-      >
-        🎵 Export MP3 (Pro)
-      </ModernButton>
-    </div>
-  )}
+                <ModernButton
+                  onClick={() => alert("Upgrade to Pro to export as MP3!")}
+                  className="text-white transition-all shadow-md bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-lg hover:scale-105"
+                >
+                  🎵 Export MP3 (Pro)
+                </ModernButton>
+              </div>
+            )}
 
-  {/* 🔒 Add Clerk gating for logged-out users */}
-  <SignedOut>
-    <div className="flex flex-wrap gap-3 mt-4">
-      <SignInButton mode="modal">
-        <ModernButton
-          variant="secondary"
-          className="text-white transition-all shadow-md bg-gradient-to-r from-indigo-500 to-blue-500 hover:shadow-lg hover:scale-105"
-        >
-          🔑 Sign up for Basic Features
-        </ModernButton>
-      </SignInButton>
-    </div>
-  </SignedOut>
-</div>
+            {/* 🔒 Clerk gating for logged-out users */}
+            <SignedOut>
+              <div className="flex flex-wrap gap-3 mt-4">
+                <SignInButton mode="modal">
+                  <ModernButton
+                    variant="secondary"
+                    className="text-white transition-all shadow-md bg-gradient-to-r from-indigo-500 to-blue-500 hover:shadow-lg hover:scale-105"
+                  >
+                    🔑 Sign up for Basic Features
+                  </ModernButton>
+                </SignInButton>
+              </div>
+            </SignedOut>
+          </div>
         </div>
       </Card>
-<footer className="py-8 mt-16 text-sm text-center border-t border-slate-200 text-slate-500 dark:border-slate-800">
-  <a href="/privacy" className="mx-2 hover:underline">Privacy Policy</a> |
-  <a href="/terms" className="mx-2 hover:underline">Terms of Service</a> |
-  <a href="/cookies" className="mx-2 hover:underline">Cookie Policy</a>
-</footer>
-      {/* Force Tailwind keep classes */}
+
+      <footer className="py-8 mt-16 text-sm text-center border-t border-slate-200 text-slate-500 dark:border-slate-800">
+        <a href="/privacy" className="mx-2 hover:underline">Privacy Policy</a> |
+        <a href="/terms" className="mx-2 hover:underline">Terms of Service</a> |
+        <a href="/cookies" className="mx-2 hover:underline">Cookie Policy</a>
+      </footer>
+
+      {/* Force Tailwind keep classes (safelist) */}
       <div
         className="transition transform from-green-500 to-emerald-600 hover:scale-105"
         style={{ display: 'none' }}
@@ -626,8 +664,8 @@ const handleReadAloud = async () => {
             </div>
           </div>
         </Card>
-              )}
+      )}
     </div>
-          );
+  );
 }
 

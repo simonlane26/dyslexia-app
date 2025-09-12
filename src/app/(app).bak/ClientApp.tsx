@@ -355,20 +355,16 @@ const handleReadAloudSimplified = async () => {
     // border: '5px solid red',          // debug only
   }}
 >
-  <h1 className="flex items-center justify-center gap-3 mb-6 text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-  {/* Solid emoji — uses theme-aware text colour */}
-  <span
-    aria-hidden
-    style={{ color: darkMode ? '#f9fafb' : '#1e293b', lineHeight: 1 }}
-  >
-    ✍️
-  </span>
-
-  {/* Gradient text — applied ONLY to the words */}
+  <h1 className="flex items-center justify-center gap-3 mb-3 text-4xl font-bold leading-tight tracking-tight md:text-5xl">
+  <span aria-hidden className="text-slate-800 dark:text-slate-50" style={{ lineHeight: 1 }}>✍️</span>
   <span className="text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
-    Dyslexia-Friendly Writing App
+    Dyslexia Writer — Dyslexia-friendly writing app
   </span>
 </h1>
+
+<p className="max-w-2xl mx-auto mb-8 text-lg md:text-xl text-slate-600 dark:text-slate-300">
+  Dictate, simplify complex text, and listen back. Designed for students, adults, and schools.
+</p>
 
 
   <SettingsPanel

@@ -35,7 +35,7 @@ interface SettingsPanelProps {
   getFontFamily?: () => string;
 }
 
-const FREE_COLOR = '#f9f7ed';
+const FREE_COLORS = ['#f9f7ed','#f0f0f0','#fff9db','#eef4ff','#fff0f5','#ffffff'];
 
 const COLOR_SWATCHES = [
   { name: 'Cream', value: '#f9f7ed' },
@@ -44,6 +44,16 @@ const COLOR_SWATCHES = [
   { name: 'Pale Blue', value: '#eef4ff' },
   { name: 'Pink', value: '#fff0f5' },
   { name: 'White', value: '#ffffff' },
+  { name: 'Mint', value: '#ECFDF5' },
+  { name: 'Aqua', value: '#ECFEFF' },
+  { name: 'Sage', value: '#F1F8F5' },
+  { name: 'Lavender', value: '#F5F3FF' },
+  { name: 'Lilac', value: '#EEF2FF' },
+  { name: 'Peach', value: '#FFF4E6' },
+  { name: 'Buff', value: '#F3E7C9' },
+  { name: 'Sepia Light', value: '#F5E6C8' },
+  { name: 'Off-White Warm', value: '#FAFAF7' },
+  { name: 'Pale Teal', value: '#E6FAF5' },
 ] as const;
 
 export function SettingsPanel({
@@ -68,15 +78,15 @@ export function SettingsPanel({
 
   // ✅ If user is Free and a non-free color is loaded from localStorage, force it to FREE_COLOR
   useEffect(() => {
-    if (!isPro && bgColor !== FREE_COLOR) {
-      setBgColor(FREE_COLOR);
+    if (!isPro && !FREE_COLORS.includes(bgColor)) {
+      setBgColor(FREE_COLORS[0]);
     }
   }, [isPro, bgColor, setBgColor]);
 
   // ✅ Only render the free swatch for Free users
   const COLORS_TO_RENDER = isPro
     ? COLOR_SWATCHES
-    : COLOR_SWATCHES.filter(c => c.value === FREE_COLOR);
+    : COLOR_SWATCHES.filter(c => FREE_COLORS.includes(c.value));
 
   return (
     <div className="mb-6">
@@ -109,33 +119,50 @@ export function SettingsPanel({
           }}
         >
           {/* Background Color */}
-          <label className="block mb-2 font-semibold" style={{ color: theme.text }}>
-            🎨 Background Color
-          </label>
-          <div className={`grid gap-2 ${isPro ? 'grid-cols-3 sm:grid-cols-6' : 'grid-cols-1 sm:grid-cols-1'}`}>
-            {COLORS_TO_RENDER.map((color) => (
-              <button
-                key={color.value}
-                onClick={() => setBgColor(color.value)}
-                className={`p-3 rounded-lg border-2 transition-all ${
-                  bgColor === color.value
-                    ? 'border-blue-500 scale-105'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-                style={{ backgroundColor: color.value }}
-                aria-label={`Set background to ${color.name}`}
-              >
-                {bgColor === color.value && (
-                  <span className="text-xs font-bold text-gray-700">✓</span>
-                )}
-              </button>
-            ))}
-          </div>
-          {!isPro && (
-            <p className="mt-2 text-xs text-slate-500">
-              More background colors available with Pro ✨
-            </p>
-          )}
+<label className="block mb-2 font-semibold" style={{ color: theme.text }}>
+  🎨 Background Color
+</label>
+
+<div
+  className={`grid gap-2 ${
+    isPro ? 'grid-cols-6 sm:grid-cols-8 md:grid-cols-10' : 'grid-cols-4 sm:grid-cols-6'
+  }`}
+>
+  {COLORS_TO_RENDER.map((color) => {
+    const selected = bgColor === color.value;
+    return (
+      <button
+        key={color.value}
+        type="button"
+        onClick={() => setBgColor(color.value)}
+        aria-label={`Set background to ${color.name}`}
+        aria-pressed={selected}
+        className={`relative h-9 w-9 rounded-lg border-2 transition-transform duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+          selected
+            ? 'border-blue-500 scale-105'
+            : 'border-gray-200 hover:border-gray-300'
+        }`}
+        style={{ backgroundColor: color.value }}
+      >
+        {/* Visually-hidden name for SR users */}
+        <span className="sr-only">{color.name}</span>
+
+        {/* Selection indicator (always visible on any tint) */}
+        {selected && (
+          <span className="absolute inset-0 flex items-center justify-center">
+            <span className="h-3.5 w-3.5 rounded-full bg-white/90 ring-2 ring-blue-500" />
+          </span>
+        )}
+      </button>
+    );
+  })}
+</div>
+
+{!isPro && (
+  <p className="mt-2 text-xs text-slate-500">
+    More background colors available with Pro ✨
+  </p>
+)}
 
           {/* Font */}
           <div className="flex flex-col gap-3 mt-4 sm:flex-row sm:items-center">

@@ -6,6 +6,8 @@ const isAuthPage = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
 export default clerkMiddleware(async (mwAuth, req) => {
   const { pathname } = req.nextUrl;
 
+if (process.env.NODE_ENV !== "production") return; // 👈 skip everythin
+
   // Never touch Stripe webhooks
   if (pathname.startsWith("/api/webhooks/stripe")) return;
 if (pathname.startsWith('/sso-callback')) return;
