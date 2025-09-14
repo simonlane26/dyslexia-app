@@ -1,129 +1,79 @@
-// src/app/success/SuccessClient.tsx
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 
 type Status = 'checking' | 'readyPro' | 'readyFree' | 'error';
 
 export default function SuccessClient(): JSX.Element {
-  const params = useSearchParams();
-  const router = useRouter();
-  const sessionId = useMemo(() => params?.get('session_id') ?? null, [params]);
-  const planParam = useMemo(() => (params?.get('plan') ?? '').toLowerCase(), [params]); // optional hint: ?plan=free
-
-  const { user, isLoaded, isSignedIn } = useUser();
+  const { user, isLoaded } = useUser();
   const [status, setStatus] = useState<Status>('checking');
-  const triesRef = useRef(0);
   const redirectedRef = useRef(false);
 
   const goHome = () => {
     if (redirectedRef.current) return;
     redirectedRef.current = true;
-    router.replace('/'); // change destination if you prefer
+    window.location.replace('/'); // or '/pricing'
   };
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn) return;
+    if (!isLoaded) return;
 
-    // If there's NO Stripe session, assume Free flow (or generic success)
-    const isFreeFlow = !sessionId || planParam === 'free';
-
-    if (isFreeFlow) {
-      setStatus('readyFree');
-      const t = setTimeout(goHome, 800);
-      return () => clearTimeout(t);
-    }
-
-    // Otherwise, we came from Checkout → poll for Pro activation briefly
     let cancelled = false;
 
-    const isProFromPublic = () =>
-      (user?.publicMetadata as Record<string, unknown> | undefined)?.['isPro'] === true;
-
-    const tick = async () => {
+    const check = async () => {
       try {
         await user?.reload?.();
         await new Promise((r) => setTimeout(r, 150));
 
-        if (isProFromPublic()) {
-          if (!cancelled) setStatus('readyPro');
-          setTimeout(() => !cancelled && goHome(), 600);
-          return;
-        }
-      } catch {
-        /* ignore */
-      }
+        const isPro =
+          (user?.publicMetadata as any)?.isPro === true ||
+          (user as any)?.unsafeMetadata?.isPro === true;
 
-      if (triesRef.current < 10 && !cancelled) {
-        triesRef.current += 1;
-        setTimeout(() => !cancelled && tick(), 1000); // ~10s total
-      } else if (!cancelled) {
+        setStatus(isPro ? 'readyPro' : 'readyFree');
+
+        // brief pause to show success/ready, then send home
+        setTimeout(() => !cancelled && goHome(), 600);
+      } catch {
         setStatus('error');
-        setTimeout(() => !cancelled && goHome(), 3000);
+        setTimeout(() => !cancelled && goHome(), 2000);
       }
     };
 
-    // If already Pro, short-circuit
-    if (isProFromPublic()) {
-      setStatus('readyPro');
-      const t = setTimeout(goHome, 600);
-      return () => clearTimeout(t);
-    }
+    check();
 
-    tick();
-
-    // Absolute safety timeout
-    const absolute = setTimeout(() => !cancelled && goHome(), 8000);
+    // absolute timeout safety
+    const t = setTimeout(() => !cancelled && goHome(), 8000);
     return () => {
       cancelled = true;
-      clearTimeout(absolute);
+      clearTimeout(t);
     };
-  }, [isLoaded, isSignedIn, user, sessionId, planParam, router]);
+  }, [isLoaded, user]);
 
   const body = (() => {
-    if (!isLoaded) return <div>Loading…</div>;
-    if (!isSignedIn) return <div>Please sign in to view your subscription status.</div>;
-
-    if (status === 'readyFree') {
-      return (
-        <div>
-          <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>✅</div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '0.5rem' }}>
-            You’re all set!
-          </h1>
-          <p style={{ color: '#64748b' }}>You’re on the Free plan. Taking you to the app…</p>
-        </div>
-      );
-    }
-
-    if (status === 'checking') {
-      // This only shows for checkout flows now (not Free)
-      return <div>Activating your Pro features…</div>;
-    }
-
-    if (status === 'readyPro') {
+    if (!isLoaded || status === 'checking') return <div>Activating your account…</div>;
+    if (status === 'readyPro')
       return (
         <div>
           <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎉</div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1rem' }}>
+          <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem' }}>
             Subscription Activated!
           </h1>
           <p style={{ color: '#64748b' }}>Redirecting to your app…</p>
-          {sessionId && (
-            <p style={{ color: '#94a3b8', fontSize: '0.75rem', marginTop: '0.5rem' }}>
-              Checkout session: {sessionId}
-            </p>
-          )}
         </div>
       );
-    }
-
-    // status === 'error'
+    if (status === 'readyFree')
+      return (
+        <div>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+            You’re all set.
+          </h1>
+          <p style={{ color: '#64748b' }}>Redirecting…</p>
+        </div>
+      );
     return (
       <div>
-        We’re still finalizing your upgrade. This can take a few seconds.
+        We’re still finalizing things. This can take a few seconds.
         <br />
         <button
           onClick={goHome}
@@ -139,11 +89,6 @@ export default function SuccessClient(): JSX.Element {
         >
           Go to app now
         </button>
-        {sessionId && (
-          <div style={{ color: '#94a3b8', fontSize: '0.75rem', marginTop: 8 }}>
-            Checkout session: {sessionId}
-          </div>
-        )}
       </div>
     );
   })();

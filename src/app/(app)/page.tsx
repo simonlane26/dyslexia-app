@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
-import { SignedOut, SignInButton } from "@clerk/nextjs";
+import { useState, useEffect, Suspense } from 'react';
+import { useUser, SignedOut, SignInButton } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText } from 'lucide-react';
 import { Card } from '@/components/Card';
@@ -14,7 +13,9 @@ import { ExportMP3Button } from '@/components/ExportMP3Button';
 import { ExportDOCXButton } from '@/components/ExportDOCXButton';
 import AuthDebug from '@/components/AuthDebug';
 
-export default function HomePage() {
+export const dynamic = 'force-dynamic';
+
+function PageBody() {
   // Core state
   const [text, setText] = useState('');
   const [simplifiedText, setSimplifiedText] = useState('');
@@ -39,30 +40,14 @@ export default function HomePage() {
   const { user, isLoaded, isSignedIn } = useUser();
   const router = useRouter();
 
-  // ✅ Static JSON-LD for SEO (don’t depend on client state)
-  const JSON_LD = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "Dyslexia Writer",
-    applicationCategory: "EducationalApplication",
-    operatingSystem: "Web",
-    url: "https://www.dyslexiawrite.com/",
-    description: "Dyslexia-friendly writing app with dictation, text-to-speech, and one-tap simplification.",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" },
-    screenshot: [
-      "https://www.dyslexiawrite.com/og/shot1.jpg",
-      "https://www.dyslexiawrite.com/og/shot2.jpg"
-    ]
-  };
-
   // 🔥 Warm up the TTS endpoint (cold start mitigation)
   useEffect(() => {
     const warmUp = async () => {
       try {
-        const res = await fetch("/api/text-to-speech", { method: "GET" });
-        console.log("🔄 TTS warm-up:", res.status);
+        const res = await fetch('/api/text-to-speech', { method: 'GET' });
+        console.log('🔄 TTS warm-up:', res.status);
       } catch (err) {
-        console.warn("⚠️ TTS warm-up failed:", err);
+        console.warn('⚠️ TTS warm-up failed:', err);
       }
     };
     warmUp();
@@ -127,7 +112,7 @@ export default function HomePage() {
     save('voiceId', voiceId);
   }, [bgColor, font, fontSize, highContrast, darkMode, voiceId]);
 
-  // ----- Contrast helpers (replace brittle isLightBackground) -----
+  // ----- Contrast helpers (WCAG) -----
   function hexToRgb(hex: string) {
     const h = hex.trim().replace('#', '');
     const v = h.length === 3 ? h.split('').map((c) => c + c).join('') : h.padStart(6, '0');
@@ -192,7 +177,7 @@ export default function HomePage() {
     }
   };
 
-  // Compute editor text color (auto-contrast) once per render
+  // Compute editor text color (auto-contrast)
   const editorTextColor = darkMode ? '#ffffff' : pickTextColor(bgColor);
 
   // Dictation
@@ -239,7 +224,7 @@ export default function HomePage() {
     }
 
     if (!text.trim()) {
-      alert("No text to simplify. Please write something first.");
+      alert('No text to simplify. Please write something first.');
       return;
     }
 
@@ -259,14 +244,8 @@ export default function HomePage() {
           console.log('❌ API Error:', errorData);
 
           if (errorData.usage) {
-            console.log('📊 BEFORE update - usageCount:', usageCount);
-            console.log('📊 Setting usageCount to:', errorData.usage.count);
             setUsageCount(errorData.usage.count);
-            setTimeout(() => {
-              console.log('📊 AFTER update - usageCount should be:', errorData.usage.count);
-            }, 100);
           }
-
           setError(errorData.error || 'Simplification failed');
         } catch {
           setError(`Server error (${res.status}). Please try again.`);
@@ -276,13 +255,9 @@ export default function HomePage() {
       }
 
       const data = await res.json();
-      console.log('✅ Full API Response:', data);
-
       if (data.simplifiedText) {
         setSimplifiedText(data.simplifiedText);
-
         if (data.usage) {
-          console.log('📊 Updating usage from API:', data.usage);
           setUsageCount(data.usage.count);
           setIsPro(!!data.usage.isPro);
         }
@@ -315,7 +290,7 @@ export default function HomePage() {
       // Retry once if common first-hit errors
       if (!res.ok && [401, 403, 408, 429, 500, 502, 503, 504].includes(res.status)) {
         console.warn(`⚠️ First TTS request failed (${res.status}), retrying...`);
-        await new Promise((r) => setTimeout(r, 300)); // short delay
+        await new Promise((r) => setTimeout(r, 300));
         res = await fetch('/api/text-to-speech', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -323,7 +298,6 @@ export default function HomePage() {
         });
       }
 
-      // Still failed after retry
       if (!res.ok) {
         const errorText = await res.text();
         console.error('❌ API Error:', errorText);
@@ -332,7 +306,6 @@ export default function HomePage() {
         return;
       }
 
-      // Success — handle audio
       const audioBlob = await res.blob();
       if (audioBlob.size === 0) {
         alert('Empty audio data received');
@@ -436,27 +409,29 @@ export default function HomePage() {
       {/* ✅ JSON-LD for rich results */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          name: "Dyslexia Writer",
-          applicationCategory: "EducationalApplication",
-          operatingSystem: "Web",
-          url: "https://www.dyslexiawrite.com/",
-          description: "Dyslexia-friendly writing app with dictation, text-to-speech, and one-tap simplification.",
-          offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" }
-        })}}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareApplication',
+            name: 'Dyslexia Writer',
+            applicationCategory: 'EducationalApplication',
+            operatingSystem: 'Web',
+            url: 'https://www.dyslexiawrite.com/',
+            description:
+              'Dyslexia-friendly writing app with dictation, text-to-speech, and one-tap simplification.',
+            offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
+          }),
+        }}
       />
 
       <div className="max-w-4xl px-4 py-8 mx-auto">
         <div className="mb-8 text-center">
           <h1 className="flex items-center justify-center gap-3 mb-6 text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-            {/* Solid emoji (forced color) */}
             <span
               aria-hidden
               style={{
                 color: darkMode ? '#f9fafb' : '#1e293b',
-                WebkitTextFillColor: darkMode ? '#f9fafb' : '#1e293b', // hard override for Safari/WebKit
+                WebkitTextFillColor: darkMode ? '#f9fafb' : '#1e293b',
                 backgroundImage: 'none',
                 lineHeight: 1,
                 display: 'inline-block',
@@ -465,7 +440,6 @@ export default function HomePage() {
               ✍️
             </span>
 
-            {/* Gradient text ONLY on this span */}
             <span className="text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
               Dyslexia-Friendly Writing App
             </span>
@@ -479,11 +453,14 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Auth debug moved inside the tree */}
+        {/* Debug block (hidden unless ?debug=1) */}
         <AuthDebug />
 
         <div className="flex items-center gap-3">
-          <UpgradeButton />
+          {/* Wrap any child that might use router search params */}
+          <Suspense fallback={null}>
+            <UpgradeButton />
+          </Suspense>
         </div>
       </div>
 
@@ -579,76 +556,75 @@ export default function HomePage() {
             </ModernButton>
           </div>
 
-<div className="flex flex-wrap gap-3 mt-4">
-  <ModernButton
-    onClick={() => {
-      setText('');
-      setSimplifiedText('');
-    }}
-    variant="danger"
-    size="sm"
-  >
-    <Trash2 size={16} />
-    Clear All
-  </ModernButton>
+          <div className="flex flex-wrap gap-3 mt-4">
+            <ModernButton
+              onClick={() => {
+                setText('');
+                setSimplifiedText('');
+              }}
+              variant="danger"
+              size="sm"
+            >
+              <Trash2 size={16} />
+              Clear All
+            </ModernButton>
 
-  {isPro ? (
-    <div className="flex flex-wrap gap-3">
-      {/* ✅ Pro user gets all exports */}
-      <ExportPDFButton text={text} simplifiedText={simplifiedText} />
-      <ExportMP3Button text={simplifiedText?.trim() ? simplifiedText : text} />
-      <ExportDOCXButton
-        text={text}
-        simplifiedText={simplifiedText}
-        bgColor={darkMode ? '#374151' : bgColor}
-        fontFamily={getFontFamily()}
-        fontSize={fontSize}
-        enabled={isSignedIn && isPro}
-      />
-    </div>
-  ) : (
-    <div className="flex flex-wrap gap-3">
-      {/* 🔒 Free: show upgrade CTAs */}
-      <ModernButton
-        onClick={() => alert('Upgrade to Pro to export as PDF!')}
-        variant="success"
-        className="text-gray-500 hover:text-gray-700 opacity-70"
-      >
-        <Download size={16} /> Export PDF (Pro)
-      </ModernButton>
+            {isPro ? (
+              <div className="flex flex-wrap gap-3">
+                {/* ✅ Pro user gets all exports */}
+                <ExportPDFButton text={text} simplifiedText={simplifiedText} />
+                <ExportMP3Button text={simplifiedText?.trim() ? simplifiedText : text} />
+                <ExportDOCXButton
+                  text={text}
+                  simplifiedText={simplifiedText}
+                  bgColor={darkMode ? '#374151' : bgColor}
+                  fontFamily={getFontFamily()}
+                  fontSize={fontSize}
+                  enabled={isSignedIn && isPro}
+                />
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-3">
+                {/* 🔒 Free: show upgrade CTAs */}
+                <ModernButton
+                  onClick={() => alert('Upgrade to Pro to export as PDF!')}
+                  variant="success"
+                  className="text-gray-500 hover:text-gray-700 opacity-70"
+                >
+                  <Download size={16} /> Export PDF (Pro)
+                </ModernButton>
 
-      <ModernButton
-        onClick={() => alert('Upgrade to Pro to export as MP3!')}
-        className="text-white transition-all shadow-md bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-lg hover:scale-105"
-      >
-        🎵 Export MP3 (Pro)
-      </ModernButton>
+                <ModernButton
+                  onClick={() => alert('Upgrade to Pro to export as MP3!')}
+                  className="text-white transition-all shadow-md bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-lg hover:scale-105"
+                >
+                  🎵 Export MP3 (Pro)
+                </ModernButton>
 
-      <ModernButton
-        onClick={() => alert('Upgrade to Pro to export to Word!')}
-        variant="secondary"
-        className="opacity-70"
-      >
-        <FileText size={16} /> Export Word (Pro)
-      </ModernButton>
-    </div>
-  )}
+                <ModernButton
+                  onClick={() => alert('Upgrade to Pro to export to Word!')}
+                  variant="secondary"
+                  className="opacity-70"
+                >
+                  <FileText size={16} /> Export Word (Pro)
+                </ModernButton>
+              </div>
+            )}
 
-  {/* 🔒 Clerk gating for logged-out users */}
-  <SignedOut>
-    <div className="flex flex-wrap gap-3 mt-4">
-      <SignInButton mode="modal">
-        <ModernButton
-          variant="secondary"
-          className="text-white transition-all shadow-md bg-gradient-to-r from-indigo-500 to-blue-500 hover:shadow-lg hover:scale-105"
-        >
-          🔑 Sign up for Basic Features
-        </ModernButton>
-      </SignInButton>
-    </div>
-  </SignedOut>
-</div>
-
+            {/* 🔒 Clerk gating for logged-out users */}
+            <SignedOut>
+              <div className="flex flex-wrap gap-3 mt-4">
+                <SignInButton mode="modal">
+                  <ModernButton
+                    variant="secondary"
+                    className="text-white transition-all shadow-md bg-gradient-to-r from-indigo-500 to-blue-500 hover:shadow-lg hover:scale-105"
+                  >
+                    🔑 Sign up for Basic Features
+                  </ModernButton>
+                </SignInButton>
+              </div>
+            </SignedOut>
+          </div>
         </div>
       </Card>
 
@@ -686,25 +662,21 @@ export default function HomePage() {
       )}
 
       <footer className="py-8 mt-16 text-sm text-center border-t border-slate-200 text-slate-500 dark:border-slate-800">
-  <div className="mb-2">
-    © 2025 Dyslexia Writer Ltd. All rights reserved.
-  </div>
-  <div className="mb-2">
-    “Dyslexia Writer”<sup className="ml-0.5 align-super text-[0.7em]">™</sup> is a trademark of Dyslexia Writer Ltd.
-    All other trademarks are the property of their respective owners.
-  </div>
-  <div>
-    <a href="/privacy" className="mx-2 hover:underline">Privacy Policy</a> |
-    <a href="/terms" className="mx-2 hover:underline">Terms of Service</a> |
-    <a href="/cookies" className="mx-2 hover:underline">Cookie Policy</a>
-  </div>
-</footer>
+        <div className="mb-2">© 2025 Dyslexia Writer Ltd. All rights reserved.</div>
+        <div className="mb-2">
+          “Dyslexia Writer”
+          <sup className="ml-0.5 align-super text-[0.7em]">™</sup> is a trademark of Dyslexia Writer Ltd.
+          All other trademarks are the property of their respective owners.
+        </div>
+        <div>
+          <a href="/privacy" className="mx-2 hover:underline">Privacy Policy</a> |
+          <a href="/terms" className="mx-2 hover:underline">Terms of Service</a> |
+          <a href="/cookies" className="mx-2 hover:underline">Cookie Policy</a>
+        </div>
+      </footer>
 
       {/* Force Tailwind keep classes (safelist) */}
-      <div
-        className="transition transform from-green-500 to-emerald-600 hover:scale-105"
-        style={{ display: 'none' }}
-      />
+      <div className="transition transform from-green-500 to-emerald-600 hover:scale-105" style={{ display: 'none' }} />
 
       {loading && (
         <div className="mt-6 text-center">
@@ -715,5 +687,14 @@ export default function HomePage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function HomePage() {
+  // Root Suspense: satisfies Next’s rule for any child using router/search hooks
+  return (
+    <Suspense fallback={<div className="max-w-4xl px-4 py-8 mx-auto">Loading…</div>}>
+      <PageBody />
+    </Suspense>
   );
 }
