@@ -1,54 +1,49 @@
 // src/middleware.ts
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
+// Public (no auth required)
+const isPublic = createRouteMatcher([
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+  '/success(.*)',
+  '/cookies(.*)',
+  '/privacy(.*)',
+  '/terms(.*)',
+  '/api/webhooks/(.*)', // webhooks must be public
+]);
 
-const isAuthPage = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
+// Auth pages (we'll redirect signed-in users away)
+const isAuthPage = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)']);
 
+// NOTE: handler is async so we can await auth()
+export default clerkMiddleware(async (auth, req) => {
+  // If signed in and on auth pages, send them home
+  const { userId, redirectToSignIn } = await auth();
 
-export default clerkMiddleware(async (mwAuth, req) => {
-  const { pathname } = req.nextUrl;
-
-
-if (process.env.NODE_ENV !== "production") return; // 👈 skip everythin
-
-
-  // Never touch Stripe webhooks
-  if (pathname.startsWith("/api/webhooks/stripe")) return;
-if (pathname.startsWith('/sso-callback')) return;
-  // Require auth on selected APIs (await the async mwAuth())
-  if (
-    pathname.startsWith("/api/simplify") ||
-    pathname.startsWith("/api/text-to-speech")
-  ) {
-    const { userId } = await mwAuth();
-    if (!userId) {
-      return Response.redirect(new URL("/sign-in", req.url));
-    }
-  }
-
-
-  // Redirect signed-in users away from auth pages
-  const { userId } = await mwAuth();
   if (userId && isAuthPage(req)) {
-    const target = pathname.startsWith("/sign-up") ? "/success" : "/";
-    return Response.redirect(new URL(target, req.url));
+    return NextResponse.redirect(new URL('/', req.url));
   }
 
+  // If route is public, allow through
+  if (isPublic(req)) return NextResponse.next();
 
-  // Continue
-  return;
+  // Route is protected → if not signed in, redirect to sign-in
+  if (!userId) {
+    return redirectToSignIn({ returnBackUrl: req.url });
+  }
+
+  // Signed in → continue
+  return NextResponse.next();
 });
-
 
 export const config = {
   matcher: [
-    // All pages (exclude static files and Next internals)
-    "/((?!.+\\.[\\w]+$|_next).*)",
-    "/",
-    // All API routes
-    "/(api|trpc)(.*)",
+    '/((?!.+\\.[\\w]+$|_next).*)', // all pages except static
+    '/api/(.*)',                   // all API routes
   ],
 };
+
 
 
 
