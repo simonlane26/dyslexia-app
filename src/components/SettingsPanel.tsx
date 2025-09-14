@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Settings } from "lucide-react";
+import { useRouter } from 'next/navigation';
+import { Settings, Lock } from "lucide-react";
 import { ModernButton } from './ModernButton';
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 
@@ -35,7 +36,15 @@ interface SettingsPanelProps {
   getFontFamily?: () => string;
 }
 
-const FREE_COLORS = ['#f9f7ed','#f0f0f0','#fff9db','#eef4ff','#fff0f5','#ffffff'];
+
+const FREE_COLOR_HEXES = new Set<string>([
+  "#f9f7ed", // Cream
+  "#f0f0f0", // Light Gray
+  "#fff9db", // Soft Yellow
+  "#eef4ff", // Pale Blue
+  "#fff0f5", // Pink
+  "#ffffff", // White
+]);
 
 const COLOR_SWATCHES = [
   { name: 'Cream', value: '#f9f7ed' },
@@ -75,18 +84,21 @@ export function SettingsPanel({
   getFontFamily,
 }: SettingsPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+  
 
   // ✅ If user is Free and a non-free color is loaded from localStorage, force it to FREE_COLOR
   useEffect(() => {
-    if (!isPro && !FREE_COLORS.includes(bgColor)) {
-      setBgColor(FREE_COLORS[0]);
-    }
-  }, [isPro, bgColor, setBgColor]);
+  if (!isPro && !FREE_COLOR_HEXES.has(bgColor)) {
+    setBgColor("#f9f7ed");
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [isPro]);
 
   // ✅ Only render the free swatch for Free users
   const COLORS_TO_RENDER = isPro
     ? COLOR_SWATCHES
-    : COLOR_SWATCHES.filter(c => FREE_COLORS.includes(c.value));
+    : COLOR_SWATCHES.filter(c => FREE_COLOR_HEXES.has(c.value));
 
   return (
     <div className="mb-6">
@@ -123,34 +135,44 @@ export function SettingsPanel({
   🎨 Background Color
 </label>
 
-<div
-  className={`grid gap-2 ${
-    isPro ? 'grid-cols-6 sm:grid-cols-8 md:grid-cols-10' : 'grid-cols-4 sm:grid-cols-6'
-  }`}
->
+<div className="grid grid-cols-6 gap-2 sm:grid-cols-8 md:grid-cols-10">
   {COLORS_TO_RENDER.map((color) => {
-    const selected = bgColor === color.value;
+    const proOnly = !FREE_COLOR_HEXES.has(color.value);
+    const active = bgColor === color.value;
+
     return (
       <button
         key={color.value}
         type="button"
-        onClick={() => setBgColor(color.value)}
-        aria-label={`Set background to ${color.name}`}
-        aria-pressed={selected}
-        className={`relative h-9 w-9 rounded-lg border-2 transition-transform duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-          selected
-            ? 'border-blue-500 scale-105'
-            : 'border-gray-200 hover:border-gray-300'
-        }`}
-        style={{ backgroundColor: color.value }}
+        onClick={() => {
+          if (proOnly && !isPro) {
+            router.push("/pricing"); // upsell instead of applying
+            return;
+          }
+          setBgColor(color.value);
+        }}
+        aria-label={`Set background to ${color.name}${proOnly && !isPro ? " (Pro only)" : ""}`}
+        aria-disabled={proOnly && !isPro}
+        title={proOnly && !isPro ? "Pro only — Upgrade to use this color" : color.name}
+        className={[
+          "relative h-8 w-8 rounded-md border transition",
+          active ? "ring-2 ring-blue-500 scale-105" : "hover:scale-105",
+          proOnly && !isPro ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
+        ].join(" ")}
+        style={{
+          backgroundColor: color.value,
+          borderColor: active ? "#3b82f6" : "#e5e7eb",
+        }}
       >
-        {/* Visually-hidden name for SR users */}
-        <span className="sr-only">{color.name}</span>
+        {active && (
+          <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold">
+            ✓
+          </span>
+        )}
 
-        {/* Selection indicator (always visible on any tint) */}
-        {selected && (
-          <span className="absolute inset-0 flex items-center justify-center">
-            <span className="h-3.5 w-3.5 rounded-full bg-white/90 ring-2 ring-blue-500" />
+        {proOnly && !isPro && (
+          <span className="absolute -right-1 -top-1 inline-flex items-center justify-center rounded-full bg-white/90 border border-slate-200 p-[2px] shadow">
+            <Lock className="w-3 h-3 text-slate-500" />
           </span>
         )}
       </button>
@@ -163,6 +185,8 @@ export function SettingsPanel({
     More background colors available with Pro ✨
   </p>
 )}
+
+
 
           {/* Font */}
           <div className="flex flex-col gap-3 mt-4 sm:flex-row sm:items-center">
