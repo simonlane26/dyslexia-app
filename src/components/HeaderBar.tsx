@@ -14,16 +14,23 @@ export function HeaderBar() {
   const isPro = useMemo(() => user?.publicMetadata?.isPro === true, [user?.publicMetadata]);
 
   return (
-    <header className="sticky top-0 z-30 w-full border-b bg-white/70 backdrop-blur border-slate-200 dark:bg-slate-900/70 dark:border-slate-800">
-      <div className="flex items-center justify-between max-w-5xl px-4 py-3 mx-auto">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl" aria-hidden>✍️</span>
-          <span className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-            Dyslexia Writer
-          </span>
-        </div>
+  <header className="sticky top-0 z-30 w-full border-b bg-white/70 backdrop-blur border-slate-200 dark:bg-slate-900/70 dark:border-slate-800">
+    <div className="flex items-center justify-between max-w-5xl px-4 py-3 mx-auto">
+<div className="flex items-center gap-2">
+  <span className="text-2xl" aria-hidden>✍️</span>
+  <span className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+    Dyslexia Writer
+    <sup
+      className="ml-0.5 align-super text-[0.65em]"
+      aria-label="Trademark"
+      title="Trademark"
+    >
+      ™
+    </sup>
+  </span>
+</div>
 
-        <div className="flex items-center gap-3">
+  <div className="flex items-center gap-3">
           {/* Fallback UI while Clerk loads — prevents an empty right side */}
           {!isLoaded && (
             <a

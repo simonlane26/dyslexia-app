@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
+
+export const dynamic = "force-static";
 
 export const metadata: Metadata = {
   title: "Dyslexia Writer — Dyslexia-friendly Writing App",
@@ -21,3 +24,9 @@ export const metadata: Metadata = {
     images: ["https://www.dyslexiawrite.com/og/cover.jpg"],
   },
 };
+
+// ✅ required default export
+export default function MarketingLayout({ children }: { children: ReactNode }) {
+  // nested layouts should NOT include <html> or <body>
+  return <div className="min-h-screen">{children}</div>;
+}

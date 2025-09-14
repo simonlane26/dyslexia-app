@@ -4,13 +4,14 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { SignedOut, SignInButton } from "@clerk/nextjs";
 import { useRouter } from 'next/navigation';
-import { Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play } from 'lucide-react';
+import { Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { ModernButton } from '@/components/ModernButton';
 import { SettingsPanel } from '@/components/SettingsPanel';
 import { UpgradeButton } from '@/components/UpgradeButton';
 import { ExportPDFButton } from '@/components/ExportPDFButton';
 import { ExportMP3Button } from '@/components/ExportMP3Button';
+import { ExportDOCXButton } from '@/components/ExportDOCXButton';
 import AuthDebug from '@/components/AuthDebug';
 
 export default function HomePage() {
@@ -109,7 +110,7 @@ export default function HomePage() {
     setFontSize(load('fontSize', 18));
     setHighContrast(load('highContrast', false));
     setDarkMode(load('darkMode', false));
-    setVoiceId(load('voiceId', '21m00Tcm4TlvDq8ikWAM'));
+    setVoiceId(load('voiceId', 'ZT9u07TYPVl83ejeLakq'));
   }, []);
 
   // Settings save
@@ -126,11 +127,29 @@ export default function HomePage() {
     save('voiceId', voiceId);
   }, [bgColor, font, fontSize, highContrast, darkMode, voiceId]);
 
-  // Helpers
-  const isLightBackground = (color: string) => {
-    const lightColors = ['#f9f7ed', '#f0f0f0', '#fff9db', '#eef4ff', '#fff0f5', '#ffffff'];
-    return lightColors.includes(color);
-  };
+  // ----- Contrast helpers (replace brittle isLightBackground) -----
+  function hexToRgb(hex: string) {
+    const h = hex.trim().replace('#', '');
+    const v = h.length === 3 ? h.split('').map((c) => c + c).join('') : h.padStart(6, '0');
+    const int = parseInt(v, 16);
+    return { r: (int >> 16) & 255, g: (int >> 8) & 255, b: int & 255 };
+  }
+  function srgbToLinear(c: number) {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  }
+  function relLuminance(hex: string) {
+    const { r, g, b } = hexToRgb(hex);
+    const R = srgbToLinear(r), G = srgbToLinear(g), B = srgbToLinear(b);
+    return 0.2126 * R + 0.7152 * G + 0.0722 * B;
+  }
+  /** Choose #000 or #fff to maximize contrast against any background */
+  function pickTextColor(bgHex: string) {
+    const L = relLuminance(bgHex);
+    const contrastBlack = (L + 0.05) / 0.05; // vs black
+    const contrastWhite = 1.05 / (L + 0.05); // vs white
+    return contrastBlack >= contrastWhite ? '#000000' : '#ffffff';
+  }
 
   const theme = darkMode
     ? {
@@ -172,6 +191,9 @@ export default function HomePage() {
         return `'Lexend', sans-serif`;
     }
   };
+
+  // Compute editor text color (auto-contrast) once per render
+  const editorTextColor = darkMode ? '#ffffff' : pickTextColor(bgColor);
 
   // Dictation
   const handleDictation = () => {
@@ -411,21 +433,21 @@ export default function HomePage() {
         color: theme.text,
       }}
     >
-  {/* ✅ JSON-LD for rich results */}
-  <script
-    type="application/ld+json"
-    dangerouslySetInnerHTML={{ __html: JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "Dyslexia Writer",
-    applicationCategory: "EducationalApplication",
-    operatingSystem: "Web",
-    url: "https://www.dyslexiawrite.com/",
-    description: "Dyslexia-friendly writing app with dictation, text-to-speech, and one-tap simplification.",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" }
-  })}}
-/>
- 
+      {/* ✅ JSON-LD for rich results */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "Dyslexia Writer",
+          applicationCategory: "EducationalApplication",
+          operatingSystem: "Web",
+          url: "https://www.dyslexiawrite.com/",
+          description: "Dyslexia-friendly writing app with dictation, text-to-speech, and one-tap simplification.",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" }
+        })}}
+      />
+
       <div className="max-w-4xl px-4 py-8 mx-auto">
         <div className="mb-8 text-center">
           <h1 className="flex items-center justify-center gap-3 mb-6 text-4xl font-bold leading-tight tracking-tight md:text-5xl">
@@ -504,7 +526,8 @@ export default function HomePage() {
               backgroundColor: darkMode ? '#374151' : bgColor,
               fontFamily: getFontFamily(),
               fontSize: `${fontSize}px`,
-              color: darkMode ? '#ffffff' : isLightBackground(bgColor) ? '#000000' : '#ffffff',
+              color: editorTextColor,
+              caretColor: editorTextColor,
               border: `2px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : '#e5e7eb'}`,
             }}
           />
@@ -556,67 +579,126 @@ export default function HomePage() {
             </ModernButton>
           </div>
 
-          <div className="flex flex-wrap gap-3 mt-4">
-            <ModernButton
-              onClick={() => {
-                setText('');
-                setSimplifiedText('');
-              }}
-              variant="danger"
-              size="sm"
-            >
-              <Trash2 size={16} />
-              Clear All
-            </ModernButton>
+<div className="flex flex-wrap gap-3 mt-4">
+  <ModernButton
+    onClick={() => {
+      setText('');
+      setSimplifiedText('');
+    }}
+    variant="danger"
+    size="sm"
+  >
+    <Trash2 size={16} />
+    Clear All
+  </ModernButton>
 
-            {isPro ? (
-              <div className="flex flex-wrap gap-3">
-                {/* ✅ Pro user gets both buttons */}
-                <ExportPDFButton text={text} simplifiedText={simplifiedText} />
-                <ExportMP3Button text={simplifiedText?.trim() ? simplifiedText : text} />
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-3">
-                {/* ✅ Free user gets "upgrade" alerts */}
-                <ModernButton
-                  onClick={() => alert("Upgrade to Pro to export as PDF!")}
-                  variant="success"
-                  className="text-gray-500 hover:text-gray-700 opacity-70"
-                >
-                  <Download size={16} /> Export PDF (Pro)
-                </ModernButton>
+  {isPro ? (
+    <div className="flex flex-wrap gap-3">
+      {/* ✅ Pro user gets all exports */}
+      <ExportPDFButton text={text} simplifiedText={simplifiedText} />
+      <ExportMP3Button text={simplifiedText?.trim() ? simplifiedText : text} />
+      <ExportDOCXButton
+        text={text}
+        simplifiedText={simplifiedText}
+        bgColor={darkMode ? '#374151' : bgColor}
+        fontFamily={getFontFamily()}
+        fontSize={fontSize}
+        enabled={isSignedIn && isPro}
+      />
+    </div>
+  ) : (
+    <div className="flex flex-wrap gap-3">
+      {/* 🔒 Free: show upgrade CTAs */}
+      <ModernButton
+        onClick={() => alert('Upgrade to Pro to export as PDF!')}
+        variant="success"
+        className="text-gray-500 hover:text-gray-700 opacity-70"
+      >
+        <Download size={16} /> Export PDF (Pro)
+      </ModernButton>
 
-                <ModernButton
-                  onClick={() => alert("Upgrade to Pro to export as MP3!")}
-                  className="text-white transition-all shadow-md bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-lg hover:scale-105"
-                >
-                  🎵 Export MP3 (Pro)
-                </ModernButton>
-              </div>
-            )}
+      <ModernButton
+        onClick={() => alert('Upgrade to Pro to export as MP3!')}
+        className="text-white transition-all shadow-md bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-lg hover:scale-105"
+      >
+        🎵 Export MP3 (Pro)
+      </ModernButton>
 
-            {/* 🔒 Clerk gating for logged-out users */}
-            <SignedOut>
-              <div className="flex flex-wrap gap-3 mt-4">
-                <SignInButton mode="modal">
-                  <ModernButton
-                    variant="secondary"
-                    className="text-white transition-all shadow-md bg-gradient-to-r from-indigo-500 to-blue-500 hover:shadow-lg hover:scale-105"
-                  >
-                    🔑 Sign up for Basic Features
-                  </ModernButton>
-                </SignInButton>
-              </div>
-            </SignedOut>
-          </div>
+      <ModernButton
+        onClick={() => alert('Upgrade to Pro to export to Word!')}
+        variant="secondary"
+        className="opacity-70"
+      >
+        <FileText size={16} /> Export Word (Pro)
+      </ModernButton>
+    </div>
+  )}
+
+  {/* 🔒 Clerk gating for logged-out users */}
+  <SignedOut>
+    <div className="flex flex-wrap gap-3 mt-4">
+      <SignInButton mode="modal">
+        <ModernButton
+          variant="secondary"
+          className="text-white transition-all shadow-md bg-gradient-to-r from-indigo-500 to-blue-500 hover:shadow-lg hover:scale-105"
+        >
+          🔑 Sign up for Basic Features
+        </ModernButton>
+      </SignInButton>
+    </div>
+  </SignedOut>
+</div>
+
         </div>
       </Card>
 
+      {simplifiedText && (
+        <Card style={{ marginBottom: '24px' }}>
+          <div style={{ padding: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <Sparkles size={24} style={{ color: '#8b5cf6' }} />
+              <h2
+                style={{
+                  fontSize: '1.25rem',
+                  fontWeight: '600',
+                  color: editorTextColor,
+                }}
+              >
+                Simplified Text
+              </h2>
+            </div>
+            <div
+              style={{
+                padding: '20px',
+                backgroundColor: darkMode ? '#374151' : bgColor,
+                borderRadius: '12px',
+                border: `2px solid ${highContrast ? '#000000' : '#e9d5ff'}`,
+                fontSize: `${fontSize}px`,
+                fontFamily: getFontFamily(),
+                lineHeight: 1.6,
+                color: editorTextColor,
+              }}
+            >
+              {simplifiedText}
+            </div>
+          </div>
+        </Card>
+      )}
+
       <footer className="py-8 mt-16 text-sm text-center border-t border-slate-200 text-slate-500 dark:border-slate-800">
-        <a href="/privacy" className="mx-2 hover:underline">Privacy Policy</a> |
-        <a href="/terms" className="mx-2 hover:underline">Terms of Service</a> |
-        <a href="/cookies" className="mx-2 hover:underline">Cookie Policy</a>
-      </footer>
+  <div className="mb-2">
+    © 2025 Dyslexia Writer Ltd. All rights reserved.
+  </div>
+  <div className="mb-2">
+    “Dyslexia Writer”<sup className="ml-0.5 align-super text-[0.7em]">™</sup> is a trademark of Dyslexia Writer Ltd.
+    All other trademarks are the property of their respective owners.
+  </div>
+  <div>
+    <a href="/privacy" className="mx-2 hover:underline">Privacy Policy</a> |
+    <a href="/terms" className="mx-2 hover:underline">Terms of Service</a> |
+    <a href="/cookies" className="mx-2 hover:underline">Cookie Policy</a>
+  </div>
+</footer>
 
       {/* Force Tailwind keep classes (safelist) */}
       <div
@@ -632,40 +714,6 @@ export default function HomePage() {
           </div>
         </div>
       )}
-
-      {simplifiedText && (
-        <Card style={{ marginBottom: '24px' }}>
-          <div style={{ padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <Sparkles size={24} style={{ color: '#8b5cf6' }} />
-              <h2
-                style={{
-                  fontSize: '1.25rem',
-                  fontWeight: '600',
-                  color: darkMode ? '#ffffff' : isLightBackground(bgColor) ? '#000000' : '#ffffff',
-                }}
-              >
-                Simplified Text
-              </h2>
-            </div>
-            <div
-              style={{
-                padding: '20px',
-                backgroundColor: darkMode ? '#374151' : bgColor,
-                borderRadius: '12px',
-                border: `2px solid ${highContrast ? '#000000' : '#e9d5ff'}`,
-                fontSize: `${fontSize}px`,
-                fontFamily: getFontFamily(),
-                lineHeight: 1.6,
-                color: darkMode ? '#ffffff' : isLightBackground(bgColor) ? '#000000' : '#ffffff',
-              }}
-            >
-              {simplifiedText}
-            </div>
-          </div>
-        </Card>
-      )}
     </div>
   );
 }
-

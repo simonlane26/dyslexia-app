@@ -248,10 +248,12 @@ export function SettingsPanel({
                 }}
               >
                 {/* Ensure IDs match your ElevenLabs voices */}
-                <option value="21m00Tcm4TlvDq8ikWAM">Rachel</option>
+                <option value="ZT9u07TYPVl83ejeLakq">Rachelle</option>
                 <option value="jkSXBeN4g5pNelNQ3YWw">Molly</option>
                 <option value="EXAVITQu4vr4xnSDxMaL">Elli</option>
                 <option value="wUwsnXivqGrDWuz1Fc89">Liam</option>
+                <option value="NFG5qt843uXKj4pFvR7C">Adam</option>
+                <option value="BL7YSL1bAkmW8U0JnU8o">Jen</option>
               </select>
             </SignedIn>
 

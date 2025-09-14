@@ -21,11 +21,10 @@ const PLAN_TO_PRICE_ENV: Record<PlanKey, string> = {
   school_full: "STRIPE_SCHOOL_FULL_PRICE_ID",
 };
 
-function getPriceId(plan: PlanKey) {
-  const envKey = PLAN_TO_PRICE_ENV[plan];
-  const priceId = process.env[envKey];
-  if (!priceId) throw new Error(`Missing env var: ${envKey}`);
-  return priceId;
+function requireEnv(name: string) {
+  const v = process.env[name];
+  if (!v) throw new Error(`Missing env var: ${name}`);
+  return v;
 }
 
 export async function POST(req: Request) {
@@ -35,10 +34,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const APP_URL = process.env.NEXT_PUBLIC_APP_URL;
-    if (!APP_URL) {
-      return NextResponse.json({ error: "Server misconfig: NEXT_PUBLIC_APP_URL missing" }, { status: 500 });
-    }
+    const APP_URL = requireEnv("NEXT_PUBLIC_APP_URL");
 
     const body = await req.json().catch(() => ({}));
     const plan = body?.plan as PlanKey | undefined;
@@ -49,31 +45,42 @@ export async function POST(req: Request) {
       );
     }
 
-    const priceId = getPriceId(plan);
+    const priceId = requireEnv(PLAN_TO_PRICE_ENV[plan]);
     const price = await stripe.prices.retrieve(priceId);
+
     const isRecurring = !!price.recurring;
     const mode: "subscription" | "payment" = isRecurring ? "subscription" : "payment";
 
-    const successUrl = `${APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${APP_URL}/upgrade`;
+    // Optional trial via envs
+    const trialEnabled = (process.env.TRIAL_ENABLED ?? "false").toLowerCase() === "true";
+    const trialDays = Number(process.env.TRIAL_DAYS ?? "0");
+    const wantsTrial = isRecurring && trialEnabled && trialDays > 0 && plan === "pro_monthly";
 
-    const session = await stripe.checkout.sessions.create({
+    const params: Stripe.Checkout.SessionCreateParams = {
       mode,
       payment_method_types: ["card"],
+      payment_method_collection: "always", // ensure a PM on file (esp. with trials)
       allow_promotion_codes: true,
       automatic_tax: { enabled: true },
+      billing_address_collection: "auto",   // better VAT accuracy
+      tax_id_collection: { enabled: true }, // let orgs enter VAT number
       line_items: [{ price: price.id, quantity: 1 }],
-      success_url: successUrl,
-      cancel_url: cancelUrl,
+      success_url: `${APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${APP_URL}/pricing`,
       client_reference_id: userId,
-      metadata: { userId, plan, mode },
+      metadata: { userId, plan, mode, trial: wantsTrial ? "true" : "false" },
+    };
 
-      // 🔗 carry userId/plan into underlying objects so your webhook can always find the user
-      ...(isRecurring
-        ? { subscription_data: { metadata: { userId, plan } } }
-        : { payment_intent_data: { metadata: { userId, plan } } }),
-    });
+    if (isRecurring) {
+      params.subscription_data = {
+        metadata: { userId, plan },
+        ...(wantsTrial ? { trial_period_days: trialDays } : {}),
+      } as any;
+    } else {
+      params.payment_intent_data = { metadata: { userId, plan } };
+    }
 
+    const session = await stripe.checkout.sessions.create(params);
     return NextResponse.json({ url: session.url });
   } catch (err: any) {
     console.error("Error creating checkout session:", err);
@@ -81,5 +88,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
+
 
 

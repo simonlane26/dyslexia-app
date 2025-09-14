@@ -344,7 +344,7 @@ export default function ModernPricingPage() {
                 <div style={{ marginBottom: '32px' }}>
                   <FeatureItem>5 simplifications per day</FeatureItem>
                   <FeatureItem icon={<Volume2 size={18} style={{ color: '#6b7280' }} />}>
-                    Rachel voice only
+                    Rachelle voice only
                   </FeatureItem>
                   <FeatureItem>Basic writing tools</FeatureItem>
                   <FeatureItem>Dyslexia-friendly fonts</FeatureItem>
@@ -410,15 +410,21 @@ export default function ModernPricingPage() {
         Unlimited Simplifications
       </FeatureItem>
       <FeatureItem highlighted icon={<Volume2 size={18} style={{ color: '#10b981' }} />}>
-        All voices (MollY, Liam, etc.)
+        All voices (Molly, Liam, etc.)
       </FeatureItem>
       <FeatureItem highlighted icon={<Download size={18} style={{ color: '#10b981' }} />}>
-        Export as MP3
+        Export as MP3,PDF,DOC
       </FeatureItem>
       <FeatureItem highlighted icon={<Palette size={18} style={{ color: '#10b981' }} />}>
         Font & color tools
       </FeatureItem>
     </div>
+<div style={{ position: 'absolute', top: 180, left: 20 }} className="px-3 py-1 text-xs font-semibold text-white rounded-full bg-emerald-600">
+  1st Month 75% Off! - Use Code Trial25
+</div>
+<div className="mt-2 text-xs text-slate-500">
+  Then £6.99 / month. Cancel anytime.
+</div>
 
     <ModernButton
       variant="primary"
@@ -484,7 +490,7 @@ export default function ModernPricingPage() {
                     All voices (Molly, Liam, etc.)
                   </FeatureItem>
                   <FeatureItem highlighted icon={<Download size={18} style={{ color: '#10b981' }} />}>
-                    Export as MP3
+                    Export as MP3,PDF,DOC
                   </FeatureItem>
                   <FeatureItem highlighted icon={<Palette size={18} style={{ color: '#10b981' }} />}>
                     Font & color tools
@@ -647,8 +653,18 @@ export default function ModernPricingPage() {
           >
             Contact Support
           </ModernButton>
-        </div>
+          </div>
+          {/* ---- VAT notice (add this) ---- */}
+<p style={{
+  textAlign: 'center',
+  marginTop: '16px',
+  color: '#64748b',
+  fontSize: '12px'
+}}>
+  All prices are subject to VAT.
+</p>
       </div>
     </div>
   );
+  
 }

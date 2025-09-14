@@ -1,12 +1,16 @@
 // src/middleware.ts
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
+
 const isAuthPage = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
+
 
 export default clerkMiddleware(async (mwAuth, req) => {
   const { pathname } = req.nextUrl;
 
+
 if (process.env.NODE_ENV !== "production") return; // 👈 skip everythin
+
 
   // Never touch Stripe webhooks
   if (pathname.startsWith("/api/webhooks/stripe")) return;
@@ -22,6 +26,7 @@ if (pathname.startsWith('/sso-callback')) return;
     }
   }
 
+
   // Redirect signed-in users away from auth pages
   const { userId } = await mwAuth();
   if (userId && isAuthPage(req)) {
@@ -29,9 +34,11 @@ if (pathname.startsWith('/sso-callback')) return;
     return Response.redirect(new URL(target, req.url));
   }
 
+
   // Continue
   return;
 });
+
 
 export const config = {
   matcher: [
@@ -42,6 +49,7 @@ export const config = {
     "/(api|trpc)(.*)",
   ],
 };
+
 
 
 

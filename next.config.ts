@@ -19,4 +19,6 @@ const nextConfig = {
 };
 console.log("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY in build:", process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
+
 module.exports = nextConfig;
+
