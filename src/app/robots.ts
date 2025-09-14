@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: "/",
         // Keep private/app-only stuff out of the index
-        disallow: ["/api/", "/app", "/app/*", "/sign-in", "/sign-up", "/dashboard"],
+        disallow: ["/api/", "/app", "/app/*", "/sign-in", "/sign-up"],
       },
     ],
     // Point crawlers to your sitemap

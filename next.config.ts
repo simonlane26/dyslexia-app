@@ -1,24 +1,22 @@
-// next.config.js
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  eslint: { ignoreDuringBuilds: true }, // unblock deploy; fix lint later
+// next.config.ts
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  // 👇 use the TOP-LEVEL flag in Next 15
+  typedRoutes: false,
+
+  eslint: { ignoreDuringBuilds: true },
+
+  // keep any rewrites you already had
   async rewrites() {
     return [
-      // Clerk webhook → /api/webhooks/clerk
-      {
-        source: "/api/webhooks/clerk",
-        destination: "/api/webhooks/clerk",
-      },
-      // Stripe webhook → /api/webhooks/stripe
-      {
-        source: "/api/webhooks/stripe",
-        destination: "/api/webhooks/stripe",
-      },
+      { source: "/api/webhooks/clerk", destination: "/api/webhooks/clerk" },
+      { source: "/api/webhooks/stripe", destination: "/api/webhooks/stripe" },
     ];
   },
+
+  // (optional escape hatch while you’re cleaning things up)
+  // typescript: { ignoreBuildErrors: true },
 };
-console.log("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY in build:", process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
-
-module.exports = nextConfig;
-
+export default nextConfig;
