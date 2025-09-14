@@ -454,7 +454,10 @@ function PageBody() {
         </div>
 
         {/* Debug block (hidden unless ?debug=1) */}
-        <AuthDebug />
+       <Suspense fallback={null}>
+  <AuthDebug />
+</Suspense>
+
 
         <div className="flex items-center gap-3">
           {/* Wrap any child that might use router search params */}

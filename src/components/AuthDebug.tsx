@@ -1,4 +1,3 @@
-// src/components/AuthDebug.tsx
 'use client';
 
 import { useUser } from '@clerk/nextjs';
@@ -6,16 +5,13 @@ import { useEffect, useState } from 'react';
 
 export default function AuthDebug() {
   const { isLoaded, isSignedIn, user } = useUser();
+
+  // Read ?debug=1 from window to avoid useSearchParams
   const [show, setShow] = useState(false);
-  const allow = process.env.NEXT_PUBLIC_SHOW_DEBUG === 'true';
-if (!allow || !show) return null;
-
-
-  // Only show when you add ?debug=1 to the URL
   useEffect(() => {
     try {
-      const v = new URLSearchParams(window.location.search).get('debug');
-      setShow(v === '1');
+      const params = new URLSearchParams(window.location.search);
+      setShow(params.get('debug') === '1');
     } catch {
       setShow(false);
     }
@@ -23,11 +19,18 @@ if (!allow || !show) return null;
 
   if (!show) return null;
 
-  const isPro = (user?.publicMetadata as any)?.isPro ?? null;
-
   return (
     <pre className="p-2 text-xs border rounded bg-slate-50">
-      {JSON.stringify({ isLoaded, isSignedIn, userId: user?.id, isPro }, null, 2)}
+      {JSON.stringify(
+        {
+          isLoaded,
+          isSignedIn,
+          userId: user?.id,
+          isPro: (user?.publicMetadata as any)?.isPro ?? null,
+        },
+        null,
+        2
+      )}
     </pre>
   );
 }
