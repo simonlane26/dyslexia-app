@@ -1,32 +1,18 @@
-// src/app/layout.tsx  (SERVER component)
-import "./globals.css";
-import { Inter } from "next/font/google";
-import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
-import { HeaderBar } from "@/components/HeaderBar";
-
-
-const inter = Inter({ subsets: ["latin"] });
-
+// src/app/layout.tsx
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Dyslexia Writer",
-  description: "Dyslexia-friendly writing and reading tools.",
+  title: 'Dyslexia Writer',
+  description: 'Write clearly, read easily',
+  metadataBase: new URL('https://www.dyslexiawrite.com'),
+  icons: { icon: '/favicon.ico' },
 };
-
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB">
-      <body className={inter.className}>
-        {/* Clerk auto-reads NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY */}
-        <ClerkProvider>
-          <HeaderBar />
-          {children}
-        </ClerkProvider>
-      </body>
+    <html lang="en">
+      <body>{children}</body>
     </html>
   );
 }
-
 
