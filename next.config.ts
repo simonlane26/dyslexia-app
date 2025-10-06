@@ -2,21 +2,23 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // 👇 use the TOP-LEVEL flag in Next 15
-  typedRoutes: false,
-
+  reactStrictMode: true,
+  typedRoutes: false,                 // Next 15 only; if on 14 use: experimental: { typedRoutes: false }
   eslint: { ignoreDuringBuilds: true },
 
-  // keep any rewrites you already had
+  // Remove identity rewrites; keep only if mapping to different paths.
+  // Example: expose cleaner incoming webhook URLs:
   async rewrites() {
     return [
-      { source: "/api/webhooks/clerk", destination: "/api/webhooks/clerk" },
-      { source: "/api/webhooks/stripe", destination: "/api/webhooks/stripe" },
+      // { source: "/webhooks/clerk", destination: "/api/webhooks/clerk" },
+      // { source: "/webhooks/stripe", destination: "/api/webhooks/stripe" },
     ];
   },
 
-  // (optional escape hatch while you’re cleaning things up)
-  // typescript: { ignoreBuildErrors: true },
+  // If you’re on Next 14 instead of 15, uncomment this and remove the top-level typedRoutes:
+  // experimental: {
+  //   typedRoutes: false,
+  // },
 };
 
 export default nextConfig;
