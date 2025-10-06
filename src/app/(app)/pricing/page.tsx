@@ -130,6 +130,7 @@ const ModernButton = ({
 
 /* ---------- Pricing Card ---------- */
 
+// Modern Card Component (fixed typing)
 const PricingCard = ({
   children,
   featured = false,
@@ -138,29 +139,33 @@ const PricingCard = ({
 }: {
   children: React.ReactNode;
   featured?: boolean;
-  style?: React.CSSProperties;
+  style?: Partial<React.CSSProperties>;
   [key: string]: any;
 }) => {
   const defaultShadow = featured
     ? '0 20px 60px rgba(59, 130, 246, 0.15)'
     : '0 8px 32px rgba(0, 0, 0, 0.1)';
 
-  const cardBaseStyle: CSSProperties = {
+  const base: React.CSSProperties = {
     background: featured
       ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)'
       : 'rgba(255, 255, 255, 0.9)',
     backdropFilter: 'blur(10px)',
-    borderRadius: '24px',
+    borderRadius: 24,
     boxShadow: defaultShadow,
     border: featured
       ? '2px solid rgba(59, 130, 246, 0.2)'
       : '1px solid rgba(255, 255, 255, 0.2)',
     transition: 'all 0.3s ease',
-    position: 'relative',
+    position: 'relative' as React.CSSProperties['position'], // <- narrowed
     overflow: 'hidden',
   };
 
-  const cardStyle: CSSProperties = { ...cardBaseStyle, ...style };
+  // Merge while keeping the React CSS type, so keys like `position` don't widen to `string`
+  const cardStyle: React.CSSProperties = {
+    ...base,
+    ...(style as React.CSSProperties),
+  };
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     e.currentTarget.style.transform = 'translateY(-8px)';
@@ -184,11 +189,11 @@ const PricingCard = ({
       {featured && (
         <div
           style={{
-            position: 'absolute',
+            position: 'absolute' as React.CSSProperties['position'],
             top: 0,
             left: 0,
             right: 0,
-            height: '4px',
+            height: 4,
             background: 'linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%)',
           }}
         />
@@ -197,6 +202,7 @@ const PricingCard = ({
     </div>
   );
 };
+
 
 /* ---------- Feature Item ---------- */
 
