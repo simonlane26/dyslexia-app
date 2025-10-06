@@ -5,12 +5,15 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { HeaderBar } from "@/components/HeaderBar";
 
+
 const inter = Inter({ subsets: ["latin"] });
+
 
 export const metadata: Metadata = {
   title: "Dyslexia Writer",
   description: "Dyslexia-friendly writing and reading tools.",
 };
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

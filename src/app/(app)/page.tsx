@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useUser, SignedOut, SignInButton } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import { Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText } from 'lucide-react';
+import {
+  Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText, Square, Pause,
+} from 'lucide-react';
 import { Card } from '@/components/Card';
 import { ModernButton } from '@/components/ModernButton';
 import { SettingsPanel } from '@/components/SettingsPanel';
@@ -12,8 +14,11 @@ import { ExportPDFButton } from '@/components/ExportPDFButton';
 import { ExportMP3Button } from '@/components/ExportMP3Button';
 import { ExportDOCXButton } from '@/components/ExportDOCXButton';
 import AuthDebug from '@/components/AuthDebug';
+import dynamic from 'next/dynamic';
+import type { OCRProps } from '@/components/OCRImport';
+import CoachPanel from '@/components/CoachPanel';
 
-export const dynamic = 'force-dynamic';
+const OCRImport = dynamic<OCRProps>(() => import('@/components/OCRImport'), { ssr: false });
 
 function PageBody() {
   // Core state
@@ -22,12 +27,13 @@ function PageBody() {
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isReading, setIsReading] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Usage/quota
   const [usageCount, setUsageCount] = useState(0);
   const [usageLimit] = useState(5);
-  const [isPro, setIsPro] = useState(false); // ← React state for Pro
+  const [isPro, setIsPro] = useState(false);
 
   // UI settings
   const [bgColor, setBgColor] = useState('#f9f7ed');
@@ -35,42 +41,50 @@ function PageBody() {
   const [fontSize, setFontSize] = useState(18);
   const [highContrast, setHighContrast] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [voiceId, setVoiceId] = useState('21m00Tcm4TlvDq8ikWAM');
+
+  // 🔊 Voice settings (chosen in SettingsPanel)
+  const [voiceId, setVoiceId] = useState('21m00Tcm4TlvDq8ikWAM'); // ElevenLabs default
+
+  // Playback refs
+  const audioRef = useRef<HTMLAudioElement | null>(null);         // ElevenLabs <audio>
+  const currentEngineRef = useRef<'elevenlabs' | 'browser' | null>(null);
+  const utterRef = useRef<SpeechSynthesisUtterance | null>(null); // browser TTS
+  const isStoppingRef = useRef(false);
+  const currentObjectUrlRef = useRef<string | null>(null);
+  const playbackSessionRef = useRef(0); // increments each time we start playing
+
+  // Dictation refs/state (continuous)
+  const recRef = useRef<any>(null);
+  const keepListeningRef = useRef(false);
+  const interimRef = useRef<string>('');
 
   const { user, isLoaded, isSignedIn } = useUser();
   const router = useRouter();
 
-  // 🔥 Warm up the TTS endpoint (cold start mitigation)
+  // Warm up TTS route
   useEffect(() => {
-    const warmUp = async () => {
+    (async () => {
       try {
         const res = await fetch('/api/text-to-speech', { method: 'GET' });
         console.log('🔄 TTS warm-up:', res.status);
       } catch (err) {
         console.warn('⚠️ TTS warm-up failed:', err);
       }
-    };
-    warmUp();
+    })();
   }, []);
 
-  // Debug logs (optional)
+  // Debug (optional)
+  useEffect(() => { console.log('🔄 usageCount ->', usageCount); }, [usageCount]);
+  useEffect(() => { console.log('🔄 isPro ->', isPro); }, [isPro]);
   useEffect(() => {
-    console.log('🔄 usageCount state changed to:', usageCount);
-  }, [usageCount]);
-
-  useEffect(() => {
-    console.log('🔄 isPro state changed to:', isPro);
-  }, [isPro]);
-
-  useEffect(() => {
-    console.log('🔍 User metadata debug:', {
+    console.log('🔍 user meta ->', {
       public: user?.publicMetadata,
       unsafe: user?.unsafeMetadata,
       id: user?.id,
     });
   }, [user]);
 
-  // ✅ Sync isPro from Clerk user
+  // Sync isPro from Clerk
   useEffect(() => {
     if (!user) return;
     const pro =
@@ -79,31 +93,28 @@ function PageBody() {
     setIsPro(pro);
   }, [user]);
 
-  // Settings load
+  // Load settings
   useEffect(() => {
-    const load = (key: string, defaultValue: any) => {
+    const load = (key: string, def: any) => {
       try {
         const saved = localStorage.getItem(`dyslexia-${key}`);
-        return saved ? JSON.parse(saved) : defaultValue;
+        return saved ? JSON.parse(saved) : def;
       } catch {
-        return defaultValue;
+        return def;
       }
     };
-
     setBgColor(load('bgColor', '#f9f7ed'));
     setFont(load('font', 'Lexend'));
     setFontSize(load('fontSize', 18));
     setHighContrast(load('highContrast', false));
     setDarkMode(load('darkMode', false));
-    setVoiceId(load('voiceId', 'ZT9u07TYPVl83ejeLakq'));
+    setVoiceId(load('voiceId', '21m00Tcm4TlvDq8ikWAM'));
   }, []);
 
-  // Settings save
+  // Save settings
   useEffect(() => {
-    const save = (key: string, value: any) => {
+    const save = (key: string, value: any) =>
       localStorage.setItem(`dyslexia-${key}`, JSON.stringify(value));
-    };
-
     save('bgColor', bgColor);
     save('font', font);
     save('fontSize', fontSize);
@@ -128,11 +139,10 @@ function PageBody() {
     const R = srgbToLinear(r), G = srgbToLinear(g), B = srgbToLinear(b);
     return 0.2126 * R + 0.7152 * G + 0.0722 * B;
   }
-  /** Choose #000 or #fff to maximize contrast against any background */
   function pickTextColor(bgHex: string) {
     const L = relLuminance(bgHex);
-    const contrastBlack = (L + 0.05) / 0.05; // vs black
-    const contrastWhite = 1.05 / (L + 0.05); // vs white
+    const contrastBlack = (L + 0.05) / 0.05;
+    const contrastWhite = 1.05 / (L + 0.05);
     return contrastBlack >= contrastWhite ? '#000000' : '#ffffff';
   }
 
@@ -169,60 +179,104 @@ function PageBody() {
       case 'Lexend':
         return `'Lexend', sans-serif`;
       case 'Arial':
-        return `'Arial', sans-serif`;
+        return `'Arial', Helvetica, sans-serif`;
       case 'Verdana':
-        return `'Verdana', sans-serif`;
+        return `'Verdana', Tahoma, sans-serif`;
+      case 'Comic Sans':
+        return `"Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif`;
       default:
         return `'Lexend', sans-serif`;
     }
   };
 
-  // Compute editor text color (auto-contrast)
   const editorTextColor = darkMode ? '#ffffff' : pickTextColor(bgColor);
 
-  // Dictation
-  const handleDictation = () => {
-    const SpeechRecognition =
+  /* -------------------- Dictation (continuous) -------------------- */
+  function startDictation(lang: string = 'en-GB') {
+    const SR: any =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
+    if (!SR) {
       alert("Your browser doesn't support speech recognition.");
       return;
     }
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
-    recognition.interimResults = false;
+    // stop any previous session cleanly
+    try { recRef.current?.abort(); } catch {}
+    try { recRef.current?.stop(); } catch {}
+
+    const recognition = new SR();
+    recRef.current = recognition;
+
+    recognition.lang = lang;
+    recognition.continuous = true;     // keep streaming
+    recognition.interimResults = true; // get partials
     recognition.maxAlternatives = 1;
 
+    keepListeningRef.current = true;
     setIsListening(true);
-    recognition.start();
+    interimRef.current = '';
 
-    recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      setText((prev) => prev + ' ' + transcript);
+    recognition.onresult = (e: any) => {
+      let finalChunk = '';
+      let interimChunk = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const res = e.results[i];
+        const str = res[0]?.transcript ?? '';
+        if (res.isFinal) finalChunk += str + ' ';
+        else interimChunk += str;
+      }
+      if (finalChunk) {
+        setText(prev => (prev ? prev + ' ' : '') + finalChunk.trim());
+        interimRef.current = '';
+      } else {
+        interimRef.current = interimChunk; // (optional) live preview
+      }
     };
 
-    recognition.onerror = (event: any) => {
-      console.error('Speech recognition error', event.error);
-      alert('Error: ' + event.error);
+    recognition.onerror = (e: any) => {
+      // common: 'no-speech' after brief silence
+      console.warn('Speech error:', e.error);
+      if (!keepListeningRef.current) return;
+      setTimeout(() => {
+        try { recognition.start(); } catch {}
+      }, 200);
     };
 
     recognition.onend = () => {
-      setIsListening(false);
+      if (!keepListeningRef.current) {
+        setIsListening(false);
+        return;
+      }
+      // auto-restart after silence
+      setTimeout(() => {
+        try { recognition.start(); }
+        catch {
+          // some browsers need a fresh instance after end
+          startDictation(lang);
+        }
+      }, 200);
     };
-  };
 
-  // Simplify
+    try { recognition.start(); } catch {}
+  }
+
+  function stopDictation() {
+    keepListeningRef.current = false;
+    setIsListening(false);
+    try { recRef.current?.abort(); } catch {}
+    try { recRef.current?.stop(); } catch {}
+    recRef.current = null;
+    interimRef.current = '';
+  }
+
+  /* -------------------- Simplify -------------------- */
   const simplifyText = async () => {
-    if (!isLoaded) return; // wait for Clerk to hydrate
-
+    if (!isLoaded) return;
     if (!isSignedIn) {
       alert('Please sign in to use Simplify.');
       router.push('/sign-in');
       return;
     }
-
     if (!text.trim()) {
       alert('No text to simplify. Please write something first.');
       return;
@@ -238,153 +292,311 @@ function PageBody() {
         body: JSON.stringify({ text: text.trim() }),
       });
 
-      if (!res.ok) {
-        try {
-          const errorData = await res.json();
-          console.log('❌ API Error:', errorData);
+      // 👇 Log debug headers from the route
+    const hdrs = {
+      status: res.status,
+      statusText: res.statusText,
+      'x-api-provider': res.headers.get('x-api-provider'),
+      'x-key-present': res.headers.get('x-key-present'),
+      'x-key-prefix': res.headers.get('x-key-prefix'),
+      'x-key-len': res.headers.get('x-key-len'),
+      'x-upstream-status': res.headers.get('x-upstream-status'),
+      'x-upstream-ok': res.headers.get('x-upstream-ok'),
+      'x-model': res.headers.get('x-model'),
+      'x-pro': res.headers.get('x-pro'),
+    };
+    console.log('🔎 /api/simplify headers →', hdrs);
 
-          if (errorData.usage) {
-            setUsageCount(errorData.usage.count);
-          }
-          setError(errorData.error || 'Simplification failed');
-        } catch {
-          setError(`Server error (${res.status}). Please try again.`);
-        }
-        setLoading(false);
-        return;
-      }
+    const ct = res.headers.get('content-type') || '';
+    const raw = await res.text();
+    const payload = ct.includes('application/json') ? (() => { try { return JSON.parse(raw); } catch { return null; } })() : null;
 
-      const data = await res.json();
-      if (data.simplifiedText) {
-        setSimplifiedText(data.simplifiedText);
-        if (data.usage) {
-          setUsageCount(data.usage.count);
-          setIsPro(!!data.usage.isPro);
-        }
-      }
-    } catch (e: any) {
-      console.error('❌ Network error:', e);
-      setError(`Network error: ${e?.message || 'Unknown error'}`);
-    } finally {
+    if (!res.ok) {
+      console.error('❌ Simplify failed', hdrs, payload || raw);
+      if (payload?.usage) setUsageCount(payload.usage.count ?? 0);
+      setError(payload?.error || `Server error (${res.status}).`);
       setLoading(false);
-    }
-  };
-
-  // TTS: original text
-  const handleReadAloud = async () => {
-    if (!text.trim()) {
-      alert('No text to read.');
       return;
     }
 
+    const data = payload || {};
+    if (data.simplifiedText) {
+      setSimplifiedText(data.simplifiedText);
+      if (data.usage) {
+        setUsageCount(data.usage.count ?? 0);
+        setIsPro(!!data.usage.isPro);
+      }
+    } else {
+      setError('No text returned.');
+    }
+  } catch (e: any) {
+    console.error('❌ Network error:', e);
+    setError(`Network error: ${e?.message || 'Unknown error'}`);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  /* -------------------- TTS logic -------------------- */
+
+  // ElevenLabs
+  const playWithElevenLabs = async (textToRead: string) => {
+    if (!textToRead.trim()) return;
+
+    const mySession = ++playbackSessionRef.current;
+
     setIsReading(true);
+    setIsPaused(false);
+    isStoppingRef.current = false;
+    currentEngineRef.current = 'elevenlabs';
 
     try {
-      // First attempt
       let res = await fetch('/api/text-to-speech', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text.trim(), voiceId }),
+        body: JSON.stringify({
+          text: textToRead.trim(),
+          voiceId,
+          __forcePro: process.env.NODE_ENV !== 'production', // dev convenience
+        }),
       });
-
-      // Retry once if common first-hit errors
-      if (!res.ok && [401, 403, 408, 429, 500, 502, 503, 504].includes(res.status)) {
-        console.warn(`⚠️ First TTS request failed (${res.status}), retrying...`);
-        await new Promise((r) => setTimeout(r, 300));
-        res = await fetch('/api/text-to-speech', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: text.trim(), voiceId }),
-        });
-      }
 
       if (!res.ok) {
-        const errorText = await res.text();
-        console.error('❌ API Error:', errorText);
-        alert(`API Error: ${res.status} - ${errorText}`);
+        const ct = res.headers.get('content-type') || '';
+        const hdrs = {
+          status: res.status,
+          statusText: res.statusText,
+          'x-pro': res.headers.get('x-pro'),
+          'x-voice-requested': res.headers.get('x-voice-requested'),
+          'x-voice-used': res.headers.get('x-voice-used'),
+          'x-model': res.headers.get('x-model'),
+          'content-type': ct,
+        };
+        const raw = await res.text();
+        let parsed: any = null;
+        if (ct.includes('application/json')) {
+          try { parsed = JSON.parse(raw); } catch {}
+        }
+        console.error('❌ TTS API error', hdrs, parsed || raw);
+        if (parsed?.error) {
+          alert(`TTS error: ${parsed.error}${parsed.providerStatus ? ` [${parsed.providerStatus}]` : ''}`);
+        } else {
+          alert(`TTS error ${res.status}: ${raw.slice(0, 200)}`);
+        }
         setIsReading(false);
+        setIsPaused(false);
+        currentEngineRef.current = null;
         return;
       }
 
-      const audioBlob = await res.blob();
-      if (audioBlob.size === 0) {
-        alert('Empty audio data received');
+      if (mySession !== playbackSessionRef.current) return; // guard
+
+      const blob = await res.blob();
+      if (mySession !== playbackSessionRef.current) return; // guard
+      if (blob.size === 0) {
         setIsReading(false);
+        setIsPaused(false);
+        currentEngineRef.current = null;
         return;
       }
 
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
+      const url = URL.createObjectURL(blob);
+      currentObjectUrlRef.current = url;
+
+      if (!audioRef.current) audioRef.current = new Audio();
+      const audio = audioRef.current;
+
+      audio.onended = null;
+      audio.onerror = null;
+
+      audio.src = url;
+      audio.volume = 0.9;
 
       audio.onended = () => {
-        URL.revokeObjectURL(audioUrl);
+        if (mySession !== playbackSessionRef.current) return;
+        if (currentObjectUrlRef.current) {
+          URL.revokeObjectURL(currentObjectUrlRef.current);
+          currentObjectUrlRef.current = null;
+        }
         setIsReading(false);
+        setIsPaused(false);
+        currentEngineRef.current = null;
       };
 
-      audio.play().catch((err) => {
-        console.error('❌ Play failed:', err);
+      audio.onerror = () => {
+        if (isStoppingRef.current || mySession !== playbackSessionRef.current) {
+          if (currentObjectUrlRef.current) {
+            URL.revokeObjectURL(currentObjectUrlRef.current);
+            currentObjectUrlRef.current = null;
+          }
+          setIsReading(false);
+          setIsPaused(false);
+          currentEngineRef.current = null;
+          return;
+        }
+        if (currentObjectUrlRef.current) {
+          URL.revokeObjectURL(currentObjectUrlRef.current);
+          currentObjectUrlRef.current = null;
+        }
         setIsReading(false);
-        alert('Playback failed. Please try again.');
-      });
-    } catch (err) {
-      console.error('❌ Unexpected error:', err);
+        setIsPaused(false);
+        currentEngineRef.current = null;
+        alert('Audio error');
+      };
+
+      await audio.play();
+    } catch (e) {
+      if (isStoppingRef.current) return;
+      console.error('❌ ElevenLabs play error:', e);
       setIsReading(false);
-      alert('Network error: ' + (err instanceof Error ? err.message : String(err)));
+      setIsPaused(false);
+      currentEngineRef.current = null;
     }
   };
 
-  // TTS: simplified text
-  const handleReadAloudSimplified = async () => {
-    if (!simplifiedText || !simplifiedText.trim()) {
-      alert('No simplified text to read. Click "Simplify" first.');
+  // Browser TTS
+  const playWithBrowserVoice = (textToRead: string) => {
+    if (!textToRead.trim()) return;
+    const synth = window.speechSynthesis;
+    if (!synth) {
+      alert('Browser speech synthesis is not supported here.');
       return;
     }
 
+    const mySession = ++playbackSessionRef.current;
+
+    try { synth.cancel(); } catch {}
+    try { synth.cancel(); } catch {}
+
+    const u = new SpeechSynthesisUtterance(textToRead);
+    utterRef.current = u;
+
     setIsReading(true);
-    try {
-      const res = await fetch('/api/text-to-speech', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: simplifiedText.trim(), voiceId }),
-      });
+    setIsPaused(false);
+    isStoppingRef.current = false;
+    currentEngineRef.current = 'browser';
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error('❌ API Error:', errorText);
-        alert(`API Error: ${res.status} - ${errorText}`);
-        setIsReading(false);
-        return;
-      }
-
-      const audioBlob = await res.blob();
-      if (audioBlob.size === 0) {
-        alert('Empty audio data received');
-        setIsReading(false);
-        return;
-      }
-
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      audio.volume = 0.8;
-
-      audio.addEventListener('ended', () => {
-        URL.revokeObjectURL(audioUrl);
-        setIsReading(false);
-      });
-      audio.addEventListener('error', () => {
-        URL.revokeObjectURL(audioUrl);
-        setIsReading(false);
-        alert('Audio error');
-      });
-
-      await audio.play();
-    } catch (e: any) {
-      console.error('❌ Simplified text error:', e);
+    u.onend = () => {
+      if (mySession !== playbackSessionRef.current) return;
       setIsReading(false);
-      alert('Error playing simplified text: ' + (e?.message || 'Unknown error'));
+      setIsPaused(false);
+      currentEngineRef.current = null;
+      utterRef.current = null;
+    };
+    u.onerror = () => {
+      if (isStoppingRef.current || mySession !== playbackSessionRef.current) return;
+      setIsReading(false);
+      setIsPaused(false);
+      currentEngineRef.current = null;
+      utterRef.current = null;
+    };
+
+    synth.speak(u);
+  };
+
+  // Prefer ElevenLabs for Pro, fallback to browser
+  const handleReadAloud = async () => {
+    const t = text.trim();
+    if (!t) return alert('No text to read.');
+    console.log('TTS path →', { isPro, voiceId, using: isPro && voiceId ? 'elevenlabs' : 'browser' });
+    setIsPaused(false);
+    if (isPro && voiceId) await playWithElevenLabs(t);
+    else playWithBrowserVoice(t);
+  };
+
+  const handleReadAloudSimplified = async () => {
+    const t = simplifiedText?.trim();
+    if (!t) return alert('No simplified text to read. Click "Simplify" first.');
+    console.log('TTS path →', { isPro, voiceId, using: isPro && voiceId ? 'elevenlabs' : 'browser' });
+    setIsPaused(false);
+    if (isPro && voiceId) await playWithElevenLabs(t);
+    else playWithBrowserVoice(t);
+  };
+
+  // Pause / resume / stop
+  const resumeReading = (e: any) => {
+    e.preventDefault();
+    if (!isReading || !isPaused) return;
+    setIsPaused(false);
+    if (currentEngineRef.current === 'elevenlabs' && audioRef.current) {
+      audioRef.current.play();
+    } else if (currentEngineRef.current === 'browser') {
+      window.speechSynthesis.resume();
     }
   };
 
+  const pauseReading = (e: any) => {
+    e.preventDefault();
+    if (!isReading) return;
+    setIsPaused(true);
+    if (currentEngineRef.current === 'elevenlabs' && audioRef.current) {
+      audioRef.current.pause();
+    } else if (currentEngineRef.current === 'browser') {
+      window.speechSynthesis.pause();
+    }
+  };
+
+  const stopReading = () => {
+    if (!isReading && !isPaused) return;
+
+    isStoppingRef.current = true;
+    playbackSessionRef.current++;
+
+    if (currentEngineRef.current === 'elevenlabs') {
+      const audio = audioRef.current;
+      if (audio) {
+        try {
+          audio.onended = null;
+          audio.onerror = null;
+          audio.pause();
+          audio.currentTime = 0;
+          audio.removeAttribute('src');
+          audio.load();
+          if (currentObjectUrlRef.current) {
+            URL.revokeObjectURL(currentObjectUrlRef.current);
+            currentObjectUrlRef.current = null;
+          }
+        } catch {}
+      }
+    } else {
+      const synth = window.speechSynthesis;
+      try { synth.cancel(); } catch {}
+      setTimeout(() => { try { synth.cancel(); } catch {} }, 0);
+      utterRef.current = null;
+    }
+
+    setIsReading(false);
+    setIsPaused(false);
+    currentEngineRef.current = null;
+    isStoppingRef.current = false;
+  };
+const coachBg = darkMode ? '#374151' : bgColor;
+const coachText = editorTextColor; // you already compute editorTextColor
+const coachBorder = darkMode ? '#6b7280' : (highContrast ? '#000000' : '#e5e7eb');
+
+  // Global speak helper for CoachPanel (no function props in client-entry)
+  // somewhere in page.tsx
+useEffect(() => {
+  (window as any).__dwSpeak = async (t: string) => {
+    if (!t?.trim()) return;
+    try {
+      if (isPro) {
+        await playWithElevenLabs(t);  // your existing function
+      } else {
+        playWithBrowserVoice(t);      // your existing function
+      }
+    } catch (e) {
+      console.warn('speak failed:', e);
+    }
+  };
+
+  return () => {
+    delete (window as any).__dwSpeak;
+  };
+}, [isPro, voiceId]);
+
+
+  // Reset settings
   const resetSettings = () => {
     setBgColor('#f9f7ed');
     setFont('Lexend');
@@ -406,7 +618,7 @@ function PageBody() {
         color: theme.text,
       }}
     >
-      {/* ✅ JSON-LD for rich results */}
+      {/* JSON-LD */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -439,7 +651,6 @@ function PageBody() {
             >
               ✍️
             </span>
-
             <span className="text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
               Dyslexia-Friendly Writing App
             </span>
@@ -453,14 +664,11 @@ function PageBody() {
           </p>
         </div>
 
-        {/* Debug block (hidden unless ?debug=1) */}
-       <Suspense fallback={null}>
-  <AuthDebug />
-</Suspense>
-
+        <Suspense fallback={null}>
+          <AuthDebug />
+        </Suspense>
 
         <div className="flex items-center gap-3">
-          {/* Wrap any child that might use router search params */}
           <Suspense fallback={null}>
             <UpgradeButton />
           </Suspense>
@@ -536,7 +744,10 @@ function PageBody() {
           )}
 
           <div className="grid grid-cols-2 gap-3 mt-6 md:grid-cols-4">
-            <ModernButton onClick={handleDictation} disabled={isListening} variant="secondary">
+            <ModernButton
+              onClick={() => (isListening ? stopDictation() : startDictation('en-GB'))}
+              variant="secondary"
+            >
               {isListening ? <MicOff size={18} /> : <Mic size={18} />}
               {isListening ? 'Stop' : 'Dictate'}
             </ModernButton>
@@ -574,7 +785,6 @@ function PageBody() {
 
             {isPro ? (
               <div className="flex flex-wrap gap-3">
-                {/* ✅ Pro user gets all exports */}
                 <ExportPDFButton text={text} simplifiedText={simplifiedText} />
                 <ExportMP3Button text={simplifiedText?.trim() ? simplifiedText : text} />
                 <ExportDOCXButton
@@ -588,7 +798,6 @@ function PageBody() {
               </div>
             ) : (
               <div className="flex flex-wrap gap-3">
-                {/* 🔒 Free: show upgrade CTAs */}
                 <ModernButton
                   onClick={() => alert('Upgrade to Pro to export as PDF!')}
                   variant="success"
@@ -614,7 +823,23 @@ function PageBody() {
               </div>
             )}
 
-            {/* 🔒 Clerk gating for logged-out users */}
+            <ModernButton
+              variant="secondary"
+              onClick={(e) => (isPaused ? resumeReading(e) : pauseReading(e))}
+              disabled={!isReading}
+            >
+              {isPaused ? <Play size={16} /> : <Pause size={16} />}
+              {isPaused ? 'Resume' : 'Pause'}
+            </ModernButton>
+
+            <ModernButton
+              variant="secondary"
+              onClick={stopReading}
+              disabled={!isReading && !isPaused}
+            >
+              <Square size={16} /> Stop
+            </ModernButton>
+
             <SignedOut>
               <div className="flex flex-wrap gap-3 mt-4">
                 <SignInButton mode="modal">
@@ -631,37 +856,65 @@ function PageBody() {
         </div>
       </Card>
 
+      {/* Coach Panel (PRO-aware) */}
+      <CoachPanel
+  sourceText={text}
+  isPro={isPro}
+  coachBg={coachBg}
+  coachText={coachText}
+  coachBorder={coachBorder}
+/>
+
+      {/* OCR Import */}
+      <div className="max-w-4xl px-4 mx-auto">
+        <OCRImport
+          onTextAction={(ocrText) => {
+            setText((prev) => (prev ? prev + '\n\n' : '') + ocrText);
+          }}
+        />
+      </div>
+
+      {/* Simplified Text card */}
       {simplifiedText && (
-        <Card style={{ marginBottom: '24px' }}>
-          <div style={{ padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <Sparkles size={24} style={{ color: '#8b5cf6' }} />
-              <h2
+        <div className="max-w-4xl px-4 mx-auto">
+          <Card style={{ marginBottom: '24px' }}>
+            <div style={{ padding: '24px' }}>
+              <div
                 style={{
-                  fontSize: '1.25rem',
-                  fontWeight: '600',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  marginBottom: '16px',
+                }}
+              >
+                <Sparkles size={24} style={{ color: '#8b5cf6' }} />
+                <h2
+                  style={{
+                    fontSize: '1.25rem',
+                    fontWeight: '600',
+                    color: editorTextColor,
+                  }}
+                >
+                  Simplified Text
+                </h2>
+              </div>
+              <div
+                style={{
+                  padding: '20px',
+                  backgroundColor: darkMode ? '#374151' : bgColor,
+                  borderRadius: '12px',
+                  border: `2px solid ${highContrast ? '#000000' : '#e9d5ff'}`,
+                  fontSize: `${fontSize}px`,
+                  fontFamily: getFontFamily(),
+                  lineHeight: 1.6,
                   color: editorTextColor,
                 }}
               >
-                Simplified Text
-              </h2>
+                {simplifiedText}
+              </div>
             </div>
-            <div
-              style={{
-                padding: '20px',
-                backgroundColor: darkMode ? '#374151' : bgColor,
-                borderRadius: '12px',
-                border: `2px solid ${highContrast ? '#000000' : '#e9d5ff'}`,
-                fontSize: `${fontSize}px`,
-                fontFamily: getFontFamily(),
-                lineHeight: 1.6,
-                color: editorTextColor,
-              }}
-            >
-              {simplifiedText}
-            </div>
-          </div>
-        </Card>
+          </Card>
+        </div>
       )}
 
       <footer className="py-8 mt-16 text-sm text-center border-t border-slate-200 text-slate-500 dark:border-slate-800">
@@ -678,8 +931,11 @@ function PageBody() {
         </div>
       </footer>
 
-      {/* Force Tailwind keep classes (safelist) */}
-      <div className="transition transform from-green-500 to-emerald-600 hover:scale-105" style={{ display: 'none' }} />
+      {/* hidden element to safelist some Tailwind classes */}
+      <div
+        className="transition transform from-green-500 to-emerald-600 hover:scale-105"
+        style={{ display: 'none' }}
+      />
 
       {loading && (
         <div className="mt-6 text-center">
@@ -693,8 +949,8 @@ function PageBody() {
   );
 }
 
+/* ===== Root page wrapper ===== */
 export default function HomePage() {
-  // Root Suspense: satisfies Next’s rule for any child using router/search hooks
   return (
     <Suspense fallback={<div className="max-w-4xl px-4 py-8 mx-auto">Loading…</div>}>
       <PageBody />

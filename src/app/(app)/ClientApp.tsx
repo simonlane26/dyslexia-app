@@ -112,6 +112,7 @@ useEffect(() => {
       case 'Lexend': return `'Lexend', sans-serif`;
       case 'Arial': return `'Arial', sans-serif`;
       case 'Verdana': return `'Verdana', sans-serif`;
+      case 'Comic Sans': return `'Comic Sans', sans-serif`;
       default: return `'Lexend', sans-serif`;
     }
   };
@@ -215,7 +216,7 @@ useEffect(() => {
       },
       body: JSON.stringify({ 
         text: text.trim(),
-        voiceId: voiceId // Make sure to send voiceId if your API uses it
+        voiceId: 'wUwsnXivqGrDWuz1Fc89', // Make sure to send voiceId if your API uses it
       }),
     });
 

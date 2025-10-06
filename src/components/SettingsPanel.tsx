@@ -40,8 +40,6 @@ interface SettingsPanelProps {
 const FREE_COLOR_HEXES = new Set<string>([
   "#f9f7ed", // Cream
   "#f0f0f0", // Light Gray
-  "#fff9db", // Soft Yellow
-  "#eef4ff", // Pale Blue
   "#fff0f5", // Pink
   "#ffffff", // White
 ]);
@@ -207,6 +205,7 @@ export function SettingsPanel({
               <option value="Open Dyslexic">Open Dyslexic</option>
               <option value="Arial">Arial</option>
               <option value="Verdana">Verdana</option>
+              <option value="Comic Sans">Comic Sans</option>
             </select>
           </div>
 

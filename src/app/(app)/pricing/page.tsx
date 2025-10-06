@@ -144,7 +144,7 @@ const PricingCard = ({
       ? '2px solid rgba(59, 130, 246, 0.2)' 
       : '1px solid rgba(255, 255, 255, 0.2)',
     transition: 'all 0.3s ease',
-    position: 'relative' as const,
+    position: 'relative',
     overflow: 'hidden',
     ...style
   };
