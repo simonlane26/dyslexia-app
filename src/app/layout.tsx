@@ -1,11 +1,9 @@
-// src/app/layout.tsx
 import type { Metadata } from 'next';
+import './globals.css'; // <-- must be here
 
 export const metadata: Metadata = {
   title: 'Dyslexia Writer',
   description: 'Write clearly, read easily',
-  metadataBase: new URL('https://www.dyslexiawrite.com'),
-  icons: { icon: '/favicon.ico' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -15,4 +13,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
-
