@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { useUser, SignedOut, SignInButton } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import {
-  Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText, Square, Pause,
+  Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText, Square, Pause, Lock,
 } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { ModernButton } from '@/components/ModernButton';
@@ -46,12 +46,12 @@ function PageBody() {
   const [voiceId, setVoiceId] = useState('21m00Tcm4TlvDq8ikWAM'); // ElevenLabs default
 
   // Playback refs
-  const audioRef = useRef<HTMLAudioElement | null>(null);         // ElevenLabs <audio>
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentEngineRef = useRef<'elevenlabs' | 'browser' | null>(null);
-  const utterRef = useRef<SpeechSynthesisUtterance | null>(null); // browser TTS
+  const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
   const isStoppingRef = useRef(false);
   const currentObjectUrlRef = useRef<string | null>(null);
-  const playbackSessionRef = useRef(0); // increments each time we start playing
+  const playbackSessionRef = useRef(0);
 
   // Dictation refs/state (continuous)
   const recRef = useRef<any>(null);
@@ -200,7 +200,6 @@ function PageBody() {
       return;
     }
 
-    // stop any previous session cleanly
     try { recRef.current?.abort(); } catch {}
     try { recRef.current?.stop(); } catch {}
 
@@ -208,8 +207,8 @@ function PageBody() {
     recRef.current = recognition;
 
     recognition.lang = lang;
-    recognition.continuous = true;     // keep streaming
-    recognition.interimResults = true; // get partials
+    recognition.continuous = true;
+    recognition.interimResults = true;
     recognition.maxAlternatives = 1;
 
     keepListeningRef.current = true;
@@ -229,12 +228,11 @@ function PageBody() {
         setText(prev => (prev ? prev + ' ' : '') + finalChunk.trim());
         interimRef.current = '';
       } else {
-        interimRef.current = interimChunk; // (optional) live preview
+        interimRef.current = interimChunk;
       }
     };
 
     recognition.onerror = (e: any) => {
-      // common: 'no-speech' after brief silence
       console.warn('Speech error:', e.error);
       if (!keepListeningRef.current) return;
       setTimeout(() => {
@@ -247,13 +245,9 @@ function PageBody() {
         setIsListening(false);
         return;
       }
-      // auto-restart after silence
       setTimeout(() => {
         try { recognition.start(); }
-        catch {
-          // some browsers need a fresh instance after end
-          startDictation(lang);
-        }
+        catch { startDictation(lang); }
       }, 200);
     };
 
@@ -292,53 +286,54 @@ function PageBody() {
         body: JSON.stringify({ text: text.trim() }),
       });
 
-      // 👇 Log debug headers from the route
-    const hdrs = {
-      status: res.status,
-      statusText: res.statusText,
-      'x-api-provider': res.headers.get('x-api-provider'),
-      'x-key-present': res.headers.get('x-key-present'),
-      'x-key-prefix': res.headers.get('x-key-prefix'),
-      'x-key-len': res.headers.get('x-key-len'),
-      'x-upstream-status': res.headers.get('x-upstream-status'),
-      'x-upstream-ok': res.headers.get('x-upstream-ok'),
-      'x-model': res.headers.get('x-model'),
-      'x-pro': res.headers.get('x-pro'),
-    };
-    console.log('🔎 /api/simplify headers →', hdrs);
+      const hdrs = {
+        status: res.status,
+        statusText: res.statusText,
+        'x-api-provider': res.headers.get('x-api-provider'),
+        'x-key-present': res.headers.get('x-key-present'),
+        'x-key-prefix': res.headers.get('x-key-prefix'),
+        'x-key-len': res.headers.get('x-key-len'),
+        'x-upstream-status': res.headers.get('x-upstream-status'),
+        'x-upstream-ok': res.headers.get('x-upstream-ok'),
+        'x-model': res.headers.get('x-model'),
+        'x-pro': res.headers.get('x-pro'),
+      };
+      console.log('🔎 /api/simplify headers →', hdrs);
 
-    const ct = res.headers.get('content-type') || '';
-    const raw = await res.text();
-    const payload = ct.includes('application/json') ? (() => { try { return JSON.parse(raw); } catch { return null; } })() : null;
+      const ct = res.headers.get('content-type') || '';
+      const raw = await res.text();
+      const payload = ct.includes('application/json')
+        ? (() => { try { return JSON.parse(raw); } catch { return null; } })()
+        : null;
 
-    if (!res.ok) {
-      console.error('❌ Simplify failed', hdrs, payload || raw);
-      if (payload?.usage) setUsageCount(payload.usage.count ?? 0);
-      setError(payload?.error || `Server error (${res.status}).`);
-      setLoading(false);
-      return;
-    }
-
-    const data = payload || {};
-    if (data.simplifiedText) {
-      setSimplifiedText(data.simplifiedText);
-      if (data.usage) {
-        setUsageCount(data.usage.count ?? 0);
-        setIsPro(!!data.usage.isPro);
+      if (!res.ok) {
+        console.error('❌ Simplify failed', hdrs, payload || raw);
+        if (payload?.usage) setUsageCount(payload.usage.count ?? 0);
+        setError(payload?.error || `Server error (${res.status}).`);
+        setLoading(false);
+        return;
       }
-    } else {
-      setError('No text returned.');
+
+      const data = payload || {};
+      if (data.simplifiedText) {
+        setSimplifiedText(data.simplifiedText);
+        if (data.usage) {
+          setUsageCount(data.usage.count ?? 0);
+          setIsPro(!!data.usage.isPro);
+        }
+      } else {
+        setError('No text returned.');
+      }
+    } catch (e: any) {
+      console.error('❌ Network error:', e);
+      setError(`Network error: ${e?.message || 'Unknown error'}`);
+    } finally {
+      setLoading(false);
     }
-  } catch (e: any) {
-    console.error('❌ Network error:', e);
-    setError(`Network error: ${e?.message || 'Unknown error'}`);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   /* -------------------- TTS logic -------------------- */
-
+  
   // ElevenLabs
   const playWithElevenLabs = async (textToRead: string) => {
     if (!textToRead.trim()) return;
@@ -357,7 +352,7 @@ function PageBody() {
         body: JSON.stringify({
           text: textToRead.trim(),
           voiceId,
-          __forcePro: process.env.NODE_ENV !== 'production', // dev convenience
+          __forcePro: process.env.NODE_ENV !== 'production',
         }),
       });
 
@@ -389,10 +384,10 @@ function PageBody() {
         return;
       }
 
-      if (mySession !== playbackSessionRef.current) return; // guard
+      if (mySession !== playbackSessionRef.current) return;
 
       const blob = await res.blob();
-      if (mySession !== playbackSessionRef.current) return; // guard
+      if (mySession !== playbackSessionRef.current) return;
       if (blob.size === 0) {
         setIsReading(false);
         setIsPaused(false);
@@ -570,31 +565,27 @@ function PageBody() {
     currentEngineRef.current = null;
     isStoppingRef.current = false;
   };
-const coachBg = darkMode ? '#374151' : bgColor;
-const coachText = editorTextColor; // you already compute editorTextColor
-const coachBorder = darkMode ? '#6b7280' : (highContrast ? '#000000' : '#e5e7eb');
 
-  // Global speak helper for CoachPanel (no function props in client-entry)
-  // somewhere in page.tsx
-useEffect(() => {
-  (window as any).__dwSpeak = async (t: string) => {
-    if (!t?.trim()) return;
-    try {
-      if (isPro) {
-        await playWithElevenLabs(t);  // your existing function
-      } else {
-        playWithBrowserVoice(t);      // your existing function
+  const coachBg = darkMode ? '#374151' : bgColor;
+  const coachText = editorTextColor;
+  const coachBorder = darkMode ? '#6b7280' : (highContrast ? '#000000' : '#e5e7eb');
+
+  // Global speak helper for CoachPanel
+  useEffect(() => {
+    (window as any).__dwSpeak = async (t: string) => {
+      if (!t?.trim()) return;
+      try {
+        if (isPro) {
+          await playWithElevenLabs(t);
+        } else {
+          playWithBrowserVoice(t);
+        }
+      } catch (e) {
+        console.warn('speak failed:', e);
       }
-    } catch (e) {
-      console.warn('speak failed:', e);
-    }
-  };
-
-  return () => {
-    delete (window as any).__dwSpeak;
-  };
-}, [isPro, voiceId]);
-
+    };
+    return () => { delete (window as any).__dwSpeak; };
+  }, [isPro, voiceId]);
 
   // Reset settings
   const resetSettings = () => {
@@ -823,22 +814,25 @@ useEffect(() => {
               </div>
             )}
 
-            <ModernButton
-              variant="secondary"
-              onClick={(e) => (isPaused ? resumeReading(e) : pauseReading(e))}
-              disabled={!isReading}
-            >
-              {isPaused ? <Play size={16} /> : <Pause size={16} />}
-              {isPaused ? 'Resume' : 'Pause'}
-            </ModernButton>
-
-            <ModernButton
-              variant="secondary"
-              onClick={stopReading}
-              disabled={!isReading && !isPaused}
-            >
-              <Square size={16} /> Stop
-            </ModernButton>
+            {false && (
+              <ModernButton
+                variant="secondary"
+                onClick={(e) => (isPaused ? resumeReading(e) : pauseReading(e))}
+                disabled={!isReading}
+              >
+                {isPaused ? <Play size={16} /> : <Pause size={16} />}
+                {isPaused ? 'Resume' : 'Pause'}
+              </ModernButton>
+            )}
+            {false && (
+              <ModernButton
+                variant="secondary"
+                onClick={stopReading}
+                disabled={!isReading && !isPaused}
+              >
+                <Square size={16} /> Stop
+              </ModernButton>
+            )}
 
             <SignedOut>
               <div className="flex flex-wrap gap-3 mt-4">
@@ -856,14 +850,50 @@ useEffect(() => {
         </div>
       </Card>
 
-      {/* Coach Panel (PRO-aware) */}
-      <CoachPanel
-  sourceText={text}
-  isPro={isPro}
-  coachBg={coachBg}
-  coachText={coachText}
-  coachBorder={coachBorder}
-/>
+      {/* Writing Coach — PRO gate */}
+      <div className="max-w-4xl px-4 mx-auto">
+        {isSignedIn ? (
+          isPro ? (
+            <CoachPanel
+              sourceText={text}
+              isPro={isPro}
+              coachBg={coachBg}
+              coachText={coachText}
+              coachBorder={coachBorder}
+            />
+          ) : (
+            <Card>
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Lock size={18} />
+                  <span className="font-semibold">Writing Coach (Pro)</span>
+                </div>
+                <p className="mb-4 text-sm text-slate-600">
+                  Writing Coach is available to Pro members. Unlock AI tips, structure, and guidance.
+                </p>
+                <ModernButton variant="primary" onClick={() => router.push('/pricing')}>
+                  Upgrade to Pro
+                </ModernButton>
+              </div>
+            </Card>
+          )
+        ) : (
+          <Card>
+            <div className="p-6">
+              <div className="flex items-center gap-2 mb-2">
+                <Lock size={18} />
+                <span className="font-semibold">Writing Coach</span>
+              </div>
+              <p className="mb-4 text-sm text-slate-600">
+                Please sign in to use Writing Coach, then upgrade to Pro to unlock it.
+              </p>
+              <SignInButton mode="modal">
+                <ModernButton variant="secondary">Sign in</ModernButton>
+              </SignInButton>
+            </div>
+          </Card>
+        )}
+      </div>
 
       {/* OCR Import */}
       <div className="max-w-4xl px-4 mx-auto">
