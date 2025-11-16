@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
 
     // 3) Rate limiting (IP-based for free tier)
     const today = todayStr();
-    const rateLimitKey = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || req.ip || 'anonymous';
+    const rateLimitKey = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'anonymous';
     const rec = dailyUsage.get(rateLimitKey);
     const current = rec && rec.date === today ? rec.count : 0;
     if (current >= 5) {
