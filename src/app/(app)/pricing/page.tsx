@@ -409,6 +409,9 @@ export default function ModernPricingPage() {
                   </FeatureItem>
                   <FeatureItem>Basic writing tools</FeatureItem>
                   <FeatureItem>Dyslexia-friendly fonts</FeatureItem>
+                  <FeatureItem>Reading progress tracker</FeatureItem>
+                  <FeatureItem>Export history tracking</FeatureItem>
+                  <FeatureItem>Keyboard shortcuts</FeatureItem>
                 </div>
 
                 <ModernButton
@@ -484,6 +487,12 @@ export default function ModernPricingPage() {
                   </FeatureItem>
                   <FeatureItem
                     highlighted
+                    icon={<Sparkles size={18} style={{ color: '#10b981' }} />}
+                  >
+                    AI Writing Coach with structured feedback
+                  </FeatureItem>
+                  <FeatureItem
+                    highlighted
                     icon={<Volume2 size={18} style={{ color: '#10b981' }} />}
                   >
                     All voices (Molly, Liam, etc.)
@@ -498,8 +507,10 @@ export default function ModernPricingPage() {
                     highlighted
                     icon={<Palette size={18} style={{ color: '#10b981' }} />}
                   >
-                    Font & color tools
+                    Advanced accessibility tools
                   </FeatureItem>
+                  <FeatureItem highlighted>Reading progress tracking</FeatureItem>
+                  <FeatureItem highlighted>Export history analytics</FeatureItem>
                 </div>
 
                 <div
@@ -592,6 +603,12 @@ export default function ModernPricingPage() {
                   </FeatureItem>
                   <FeatureItem
                     highlighted
+                    icon={<Sparkles size={18} style={{ color: '#10b981' }} />}
+                  >
+                    AI Writing Coach with structured feedback
+                  </FeatureItem>
+                  <FeatureItem
+                    highlighted
                     icon={<Volume2 size={18} style={{ color: '#10b981' }} />}
                   >
                     All voices (Molly, Liam, etc.)
@@ -606,8 +623,10 @@ export default function ModernPricingPage() {
                     highlighted
                     icon={<Palette size={18} style={{ color: '#10b981' }} />}
                   >
-                    Font & color tools
+                    Advanced accessibility tools
                   </FeatureItem>
+                  <FeatureItem highlighted>Reading progress tracking</FeatureItem>
+                  <FeatureItem highlighted>Export history analytics</FeatureItem>
                 </div>
 
                 <SignedIn>
@@ -691,6 +710,23 @@ export default function ModernPricingPage() {
             ].map((plan) => (
               <PricingCard key={plan.id}>
                 <div style={{ padding: '32px' }}>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '20px',
+                      right: '20px',
+                      background:
+                        'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                      color: 'white',
+                      padding: '6px 12px',
+                      borderRadius: '20px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Coming Soon
+                  </div>
+
                   <div style={{ textAlign: 'center', marginBottom: '32px' }}>
                     <h3
                       style={{
@@ -735,12 +771,12 @@ export default function ModernPricingPage() {
                   </div>
 
                   <ModernButton
-                    variant="success"
+                    variant="ghost"
                     size="lg"
                     style={{ width: '100%' }}
-                    onClick={() => handleGetPro(plan.id)}
+                    disabled
                   >
-                    Get {plan.name} Plan
+                    Coming Soon
                   </ModernButton>
                 </div>
               </PricingCard>

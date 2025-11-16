@@ -19,13 +19,34 @@ const SITE_URL = cleanEnv(process.env.NEXT_PUBLIC_SITE_URL) || 'http://localhost
 
 const SYSTEM_PROMPT =
   'You are a supportive WRITING COACH for dyslexic learners. ' +
-  'Use very plain, encouraging language. Keep outputs short. ' +
-  'Return these EXACT sections (no extra prose):\n\n' +
-  'Outline:\n- (3–5 short bullets)\n\n' +
-  'Strengths:\n- (2 bullets)\n\n' +
-  'Next steps:\n- (3 bullets, specific edits to try next)\n\n' +
-  'One-sentence rephrase:\n"(a single, clearer version of one tricky sentence from the draft)"\n\n' +
-  'Motivator:\n"(one friendly line that keeps the student going)"';
+  'Analyze text for:\n' +
+  '1. CLARITY: Complex sentences (>20 words), passive voice, unclear phrasing\n' +
+  '2. SIMPLICITY: Complex words that have simpler alternatives\n' +
+  '3. STRUCTURE: Paragraph organization, flow, transitions\n' +
+  '4. GRAMMAR: Basic errors (not nitpicky)\n\n' +
+  'Return JSON with this structure:\n' +
+  '{\n' +
+  '  "tips": [\n' +
+  '    {\n' +
+  '      "category": "clarity" | "simplicity" | "structure" | "grammar" | "strength",\n' +
+  '      "severity": "high" | "medium" | "low",\n' +
+  '      "message": "Brief, encouraging tip",\n' +
+  '      "suggestion": "Specific improvement to make",\n' +
+  '      "sentenceText": "The actual sentence with the issue (if applicable)",\n' +
+  '      "before": "Original problematic text",\n' +
+  '      "after": "Suggested replacement"\n' +
+  '    }\n' +
+  '  ],\n' +
+  '  "stats": {\n' +
+  '    "avgSentenceLength": number,\n' +
+  '    "longSentences": number,\n' +
+  '    "complexWords": number,\n' +
+  '    "readingLevel": "Easy" | "Medium" | "Hard"\n' +
+  '  },\n' +
+  '  "strengths": ["2-3 positive things"],\n' +
+  '  "motivation": "One encouraging sentence"\n' +
+  '}\n\n' +
+  'Focus on dyslexia-friendly improvements. Be encouraging!';
 
 type Provider = {
   provider: 'openai' | 'openrouter';

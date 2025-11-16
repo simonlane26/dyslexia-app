@@ -13,6 +13,8 @@ import {
   ShadingType,
   SectionType,
 } from 'docx';
+import { addExportRecord } from '@/lib/exportHistory';
+import { useUser } from '@clerk/nextjs';
 
 type Props = {
   text: string;
@@ -25,6 +27,8 @@ type Props = {
   enabled?: boolean;
   /** Optional custom CTA when disabled */
   onUpgradeAction?: () => void;
+  documentTitle?: string;
+  documentId?: string;
 };
 
 // --- helpers ---
@@ -69,7 +73,10 @@ export function ExportDOCXButton({
   fontSize = 18,
   enabled = true,
   onUpgradeAction,
+  documentTitle,
+  documentId,
 }: Props) {
+  const { user } = useUser();
   // 🔒 If not enabled, render a CTA-style button that cannot export
   if (!enabled) {
     return (
@@ -135,11 +142,24 @@ export function ExportDOCXButton({
 
     const blob = await Packer.toBlob(doc);
     saveAs(blob, filename);
+
+    // Track export
+    try {
+      addExportRecord({
+        documentId,
+        documentTitle: documentTitle || 'Untitled Document',
+        exportType: 'docx',
+        wordCount: text.trim().split(/\s+/).filter(w => w.length > 0).length,
+        userId: user?.id,
+      });
+    } catch (error) {
+      console.error('Failed to track export:', error);
+    }
   };
 
   return (
-    <ModernButton onClick={onExport} variant="secondary" type="button">
-      <FileText size={16} /> Export Word
+    <ModernButton onClick={onExport} variant="secondary" size="sm" type="button">
+      <FileText size={16} /> Word
     </ModernButton>
   );
 }

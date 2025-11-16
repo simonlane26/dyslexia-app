@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { useUser, SignedOut, SignInButton } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import {
-  Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText, Square, Pause, Lock,
+  Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText, Square, Pause, Lock, Save, Highlighter, Undo2, Redo2,
 } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { ModernButton } from '@/components/ModernButton';
@@ -17,10 +17,31 @@ import AuthDebug from '@/components/AuthDebug';
 import dynamic from 'next/dynamic';
 import type { OCRProps } from '@/components/OCRImport';
 import CoachPanel from '@/components/CoachPanel';
+import { DocumentManager } from '@/components/DocumentManager';
+import { KeyboardShortcutsHelp } from '@/components/KeyboardShortcutsHelp';
+import { WordCounter } from '@/components/WordCounter';
+import { WritingTemplates } from '@/components/WritingTemplates';
+import { AccessibilityPresets } from '@/components/AccessibilityPresets';
+import { SentenceHighlighter } from '@/components/SentenceHighlighter';
+import { OnboardingTutorial } from '@/components/OnboardingTutorial';
+import { FocusMode } from '@/components/FocusMode';
+import { TextComparison } from '@/components/TextComparison';
+import { useToast } from '@/components/ToastContainer';
+import { useKeyboardShortcuts, KeyboardShortcut } from '@/hooks/useKeyboardShortcuts';
+import {
+  saveLocalDocument,
+  getCurrentDocumentId,
+  setCurrentDocumentId,
+  getLocalDocument,
+  Document,
+} from '@/lib/documentStorage';
 
 const OCRImport = dynamic<OCRProps>(() => import('@/components/OCRImport'), { ssr: false });
 
 function PageBody() {
+  // Hydration fix - track if component is mounted
+  const [mounted, setMounted] = useState(false);
+
   // Core state
   const [text, setText] = useState('');
   const [simplifiedText, setSimplifiedText] = useState('');
@@ -30,10 +51,33 @@ function PageBody() {
   const [isPaused, setIsPaused] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Document management
+  const [currentDocId, setCurrentDocId] = useState<string | null>(null);
+  const [documentTitle, setDocumentTitle] = useState('Untitled Document');
+  const [lastSaved, setLastSaved] = useState<number | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Sentence highlighting
+  const [highlightMode, setHighlightMode] = useState(false);
+  const [currentSentenceIndex, setCurrentSentenceIndex] = useState(-1);
+
+  // Undo/Redo history
+  const [textHistory, setTextHistory] = useState<string[]>(['']);
+  const [historyIndex, setHistoryIndex] = useState(0);
+
+  // Reading progress tracker
+  const [readingProgress, setReadingProgress] = useState(0); // percentage of text read
+  const [lastReadPosition, setLastReadPosition] = useState(0); // character position
+
   // Usage/quota
   const [usageCount, setUsageCount] = useState(0);
   const [usageLimit] = useState(5);
   const [isPro, setIsPro] = useState(false);
+
+  // Hooks
+  const toast = useToast();
+  const { user, isLoaded, isSignedIn } = useUser();
+  const router = useRouter();
 
   // UI settings
   const [bgColor, setBgColor] = useState('#f9f7ed');
@@ -58,9 +102,6 @@ function PageBody() {
   const keepListeningRef = useRef(false);
   const interimRef = useRef<string>('');
 
-  const { user, isLoaded, isSignedIn } = useUser();
-  const router = useRouter();
-
   // Warm up TTS route
   useEffect(() => {
     (async () => {
@@ -84,6 +125,11 @@ function PageBody() {
     });
   }, [user]);
 
+  // Set mounted flag after hydration
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Sync isPro from Clerk
   useEffect(() => {
     if (!user) return;
@@ -93,8 +139,10 @@ function PageBody() {
     setIsPro(pro);
   }, [user]);
 
-  // Load settings
+  // Load settings (only after mounting to avoid hydration mismatch)
   useEffect(() => {
+    if (!mounted) return;
+
     const load = (key: string, def: any) => {
       try {
         const saved = localStorage.getItem(`dyslexia-${key}`);
@@ -109,7 +157,7 @@ function PageBody() {
     setHighContrast(load('highContrast', false));
     setDarkMode(load('darkMode', false));
     setVoiceId(load('voiceId', '21m00Tcm4TlvDq8ikWAM'));
-  }, []);
+  }, [mounted]);
 
   // Save settings
   useEffect(() => {
@@ -122,6 +170,174 @@ function PageBody() {
     save('darkMode', darkMode);
     save('voiceId', voiceId);
   }, [bgColor, font, fontSize, highContrast, darkMode, voiceId]);
+
+  // ----- Document Management -----
+
+  // Load current document on mount (only after hydration)
+  useEffect(() => {
+    if (!mounted) return;
+
+    const savedDocId = getCurrentDocumentId();
+    if (savedDocId) {
+      const doc = getLocalDocument(savedDocId);
+      if (doc) {
+        setText(doc.content);
+        setSimplifiedText(doc.simplifiedContent || '');
+        setDocumentTitle(doc.title);
+        setCurrentDocId(doc.id);
+        setLastSaved(doc.updatedAt);
+      }
+    }
+  }, [mounted]);
+
+  // Auto-save every 10 seconds when text changes
+  useEffect(() => {
+    if (!text && !simplifiedText) return; // Don't save empty docs
+
+    const timer = setTimeout(() => {
+      saveDocument();
+    }, 10000); // 10 second debounce
+
+    return () => clearTimeout(timer);
+  }, [text, simplifiedText, documentTitle]);
+
+  const saveDocument = () => {
+    if (!text.trim() && !simplifiedText.trim()) {
+      toast.warning('Cannot save empty document');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const doc = saveLocalDocument({
+        id: currentDocId || undefined,
+        title: documentTitle || 'Untitled Document',
+        content: text,
+        simplifiedContent: simplifiedText,
+        userId: user?.id,
+        readingProgress,
+        lastReadPosition,
+        lastReadAt: readingProgress > 0 ? Date.now() : undefined,
+      });
+
+      setCurrentDocId(doc.id);
+      setCurrentDocumentId(doc.id);
+      setLastSaved(doc.updatedAt);
+      toast.success('Document saved');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to save document');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const loadDocument = (doc: Document) => {
+    setText(doc.content);
+    setSimplifiedText(doc.simplifiedContent || '');
+    setDocumentTitle(doc.title);
+    setCurrentDocId(doc.id);
+    setCurrentDocumentId(doc.id);
+    setLastSaved(doc.updatedAt);
+    setReadingProgress(doc.readingProgress || 0);
+    setLastReadPosition(doc.lastReadPosition || 0);
+
+    if (doc.readingProgress && doc.readingProgress > 0) {
+      toast.success(`Loaded "${doc.title}" - ${Math.round(doc.readingProgress)}% read`);
+    } else {
+      toast.success(`Loaded "${doc.title}"`);
+    }
+  };
+
+  const newDocument = () => {
+    if (text.trim() || simplifiedText.trim()) {
+      if (!confirm('Create new document? Unsaved changes will be lost.')) {
+        return;
+      }
+    }
+    setText('');
+    setSimplifiedText('');
+    setDocumentTitle('Untitled Document');
+    setCurrentDocId(null);
+    setCurrentDocumentId(null);
+    setLastSaved(null);
+    toast.info('New document created');
+  };
+
+  // ----- Keyboard Shortcuts -----
+
+  const shortcuts: KeyboardShortcut[] = [
+    {
+      key: 's',
+      ctrl: true,
+      description: 'Save document',
+      action: () => saveDocument(),
+    },
+    {
+      key: 's',
+      ctrl: true,
+      shift: true,
+      description: 'Simplify text',
+      action: () => simplifyText(),
+    },
+    {
+      key: 'r',
+      ctrl: true,
+      shift: true,
+      description: 'Read aloud',
+      action: () => handleReadAloud(),
+    },
+    {
+      key: 'd',
+      ctrl: true,
+      shift: true,
+      description: 'Toggle dictation',
+      action: () => (isListening ? stopDictation() : startDictation('en-GB')),
+    },
+    {
+      key: 'p',
+      ctrl: true,
+      shift: true,
+      description: 'Pause/Resume reading',
+      action: () => (isPaused ? resumeReading({} as any) : pauseReading({} as any)),
+    },
+    {
+      key: 'e',
+      ctrl: true,
+      description: 'Clear all text',
+      action: () => {
+        if (confirm('Clear all text?')) {
+          setText('');
+          setSimplifiedText('');
+        }
+      },
+    },
+    {
+      key: 'n',
+      ctrl: true,
+      description: 'New document',
+      action: () => newDocument(),
+    },
+    {
+      key: '?',
+      shift: true,
+      description: 'Show keyboard shortcuts',
+      action: () => {}, // Handled by KeyboardShortcutsHelp component
+    },
+    {
+      key: 'z',
+      ctrl: true,
+      description: 'Undo',
+      action: () => handleUndo(),
+    },
+    {
+      key: 'y',
+      ctrl: true,
+      description: 'Redo',
+      action: () => handleRedo(),
+    },
+  ];
+
+  useKeyboardShortcuts(shortcuts);
 
   // ----- Contrast helpers (WCAG) -----
   function hexToRgb(hex: string) {
@@ -196,7 +412,7 @@ function PageBody() {
     const SR: any =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) {
-      alert("Your browser doesn't support speech recognition.");
+      toast.error("Your browser doesn't support speech recognition.");
       return;
     }
 
@@ -265,14 +481,8 @@ function PageBody() {
 
   /* -------------------- Simplify -------------------- */
   const simplifyText = async () => {
-    if (!isLoaded) return;
-    if (!isSignedIn) {
-      alert('Please sign in to use Simplify.');
-      router.push('/sign-in');
-      return;
-    }
     if (!text.trim()) {
-      alert('No text to simplify. Please write something first.');
+      toast.warning('No text to simplify. Please write something first.');
       return;
     }
 
@@ -374,9 +584,9 @@ function PageBody() {
         }
         console.error('❌ TTS API error', hdrs, parsed || raw);
         if (parsed?.error) {
-          alert(`TTS error: ${parsed.error}${parsed.providerStatus ? ` [${parsed.providerStatus}]` : ''}`);
+          toast.error(`TTS error: ${parsed.error}${parsed.providerStatus ? ` [${parsed.providerStatus}]` : ''}`);
         } else {
-          alert(`TTS error ${res.status}: ${raw.slice(0, 200)}`);
+          toast.error(`TTS error ${res.status}: ${raw.slice(0, 200)}`);
         }
         setIsReading(false);
         setIsPaused(false);
@@ -436,7 +646,7 @@ function PageBody() {
         setIsReading(false);
         setIsPaused(false);
         currentEngineRef.current = null;
-        alert('Audio error');
+        toast.error('Audio playback error');
       };
 
       await audio.play();
@@ -449,12 +659,12 @@ function PageBody() {
     }
   };
 
-  // Browser TTS
+  // Browser TTS with sentence highlighting
   const playWithBrowserVoice = (textToRead: string) => {
     if (!textToRead.trim()) return;
     const synth = window.speechSynthesis;
     if (!synth) {
-      alert('Browser speech synthesis is not supported here.');
+      toast.error('Browser speech synthesis is not supported here.');
       return;
     }
 
@@ -463,36 +673,102 @@ function PageBody() {
     try { synth.cancel(); } catch {}
     try { synth.cancel(); } catch {}
 
-    const u = new SpeechSynthesisUtterance(textToRead);
-    utterRef.current = u;
-
     setIsReading(true);
     setIsPaused(false);
     isStoppingRef.current = false;
     currentEngineRef.current = 'browser';
 
-    u.onend = () => {
-      if (mySession !== playbackSessionRef.current) return;
-      setIsReading(false);
-      setIsPaused(false);
-      currentEngineRef.current = null;
-      utterRef.current = null;
-    };
-    u.onerror = () => {
-      if (isStoppingRef.current || mySession !== playbackSessionRef.current) return;
-      setIsReading(false);
-      setIsPaused(false);
-      currentEngineRef.current = null;
-      utterRef.current = null;
-    };
+    // Split into sentences if highlight mode is enabled
+    if (highlightMode) {
+      const sentences = textToRead.split(/([.!?]+\s+|[.!?]+$)/).reduce((acc: string[], part, i, arr) => {
+        if (i % 2 === 0 && part.trim()) {
+          const sentence = part + (arr[i + 1] || '');
+          if (sentence.trim()) acc.push(sentence);
+        }
+        return acc;
+      }, []);
 
-    synth.speak(u);
+      let currentSentence = 0;
+      setCurrentSentenceIndex(0);
+
+      const speakNextSentence = () => {
+        if (currentSentence >= sentences.length || mySession !== playbackSessionRef.current) {
+          setIsReading(false);
+          setIsPaused(false);
+          setCurrentSentenceIndex(-1);
+          currentEngineRef.current = null;
+          utterRef.current = null;
+
+          // Update reading progress when finished
+          setReadingProgress(100);
+          const charPosition = textToRead.length;
+          setLastReadPosition(charPosition);
+          return;
+        }
+
+        const u = new SpeechSynthesisUtterance(sentences[currentSentence]);
+        utterRef.current = u;
+        setCurrentSentenceIndex(currentSentence);
+
+        u.onend = () => {
+          if (mySession !== playbackSessionRef.current) return;
+
+          // Update reading progress
+          const progress = Math.round(((currentSentence + 1) / sentences.length) * 100);
+          setReadingProgress(progress);
+
+          // Calculate character position
+          const charPosition = sentences.slice(0, currentSentence + 1).join('').length;
+          setLastReadPosition(charPosition);
+
+          currentSentence++;
+          setTimeout(() => speakNextSentence(), 100);
+        };
+
+        u.onerror = () => {
+          if (isStoppingRef.current || mySession !== playbackSessionRef.current) return;
+          setIsReading(false);
+          setIsPaused(false);
+          setCurrentSentenceIndex(-1);
+          currentEngineRef.current = null;
+          utterRef.current = null;
+        };
+
+        synth.speak(u);
+      };
+
+      speakNextSentence();
+    } else {
+      // Normal playback without highlighting
+      const u = new SpeechSynthesisUtterance(textToRead);
+      utterRef.current = u;
+
+      u.onend = () => {
+        if (mySession !== playbackSessionRef.current) return;
+        setIsReading(false);
+        setIsPaused(false);
+        currentEngineRef.current = null;
+        utterRef.current = null;
+      };
+      u.onerror = () => {
+        if (isStoppingRef.current || mySession !== playbackSessionRef.current) return;
+        setIsReading(false);
+        setIsPaused(false);
+        currentEngineRef.current = null;
+        utterRef.current = null;
+      };
+
+      synth.speak(u);
+    }
   };
 
   // Prefer ElevenLabs for Pro, fallback to browser
   const handleReadAloud = async () => {
     const t = text.trim();
-    if (!t) return alert('No text to read.');
+    if (!t) {
+      toast.warning('No text to read.');
+      return;
+    }
     console.log('TTS path →', { isPro, voiceId, using: isPro && voiceId ? 'elevenlabs' : 'browser' });
     setIsPaused(false);
     if (isPro && voiceId) await playWithElevenLabs(t);
@@ -501,7 +777,10 @@ function PageBody() {
 
   const handleReadAloudSimplified = async () => {
     const t = simplifiedText?.trim();
-    if (!t) return alert('No simplified text to read. Click "Simplify" first.');
+    if (!t) {
+      toast.warning('No simplified text to read. Click "Simplify" first.');
+      return;
+    }
     console.log('TTS path →', { isPro, voiceId, using: isPro && voiceId ? 'elevenlabs' : 'browser' });
     setIsPaused(false);
     if (isPro && voiceId) await playWithElevenLabs(t);
@@ -562,6 +841,7 @@ function PageBody() {
 
     setIsReading(false);
     setIsPaused(false);
+    setCurrentSentenceIndex(-1);
     currentEngineRef.current = null;
     isStoppingRef.current = false;
   };
@@ -596,6 +876,69 @@ function PageBody() {
     setDarkMode(false);
     setVoiceId('21m00Tcm4TlvDq8ikWAM');
   };
+
+  // Apply accessibility preset
+  const applyPreset = (settings: {
+    bgColor: string;
+    font: string;
+    fontSize: number;
+    highContrast: boolean;
+    darkMode: boolean;
+  }) => {
+    setBgColor(settings.bgColor);
+    setFont(settings.font);
+    setFontSize(settings.fontSize);
+    setHighContrast(settings.highContrast);
+    setDarkMode(settings.darkMode);
+    toast.success('Preset applied successfully!');
+  };
+
+  // Load template
+  const loadTemplate = (content: string) => {
+    if (text.trim() && !confirm('Load template? Current text will be replaced.')) {
+      return;
+    }
+    setText(content);
+    toast.success('Template loaded!');
+  };
+
+  // Undo/Redo functions
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      setText(textHistory[newIndex]);
+      toast.info('Undo');
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndex < textHistory.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      setText(textHistory[newIndex]);
+      toast.info('Redo');
+    }
+  };
+
+  // Update history when text changes (debounced)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (text !== textHistory[historyIndex]) {
+        const newHistory = textHistory.slice(0, historyIndex + 1);
+        newHistory.push(text);
+        // Limit history to 50 entries
+        if (newHistory.length > 50) {
+          newHistory.shift();
+        } else {
+          setHistoryIndex(historyIndex + 1);
+        }
+        setTextHistory(newHistory);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [text]);
 
   return (
     <div
@@ -685,163 +1028,345 @@ function PageBody() {
         isPro={isPro}
       />
 
+      {/* Top Toolbar */}
+      <div
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
+          backgroundColor: theme.bg,
+          borderBottom: `2px solid ${theme.border}`,
+          padding: '12px 0',
+          marginBottom: '20px',
+        }}
+      >
+        <div className="max-w-6xl px-4 mx-auto">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', justifyContent: 'space-between' }}>
+            {/* Left: Quick actions */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              <ModernButton
+                onClick={saveDocument}
+                variant="success"
+                size="sm"
+                disabled={isSaving}
+              >
+                <Save size={16} />
+                {isSaving ? 'Saving...' : 'Save'}
+              </ModernButton>
+
+              <ModernButton
+                onClick={handleUndo}
+                variant="secondary"
+                size="sm"
+                disabled={historyIndex === 0}
+              >
+                <Undo2 size={16} />
+              </ModernButton>
+
+              <ModernButton
+                onClick={handleRedo}
+                variant="secondary"
+                size="sm"
+                disabled={historyIndex >= textHistory.length - 1}
+              >
+                <Redo2 size={16} />
+              </ModernButton>
+
+              <WritingTemplates onSelectTemplate={loadTemplate} theme={theme} />
+              <AccessibilityPresets onApplyPreset={applyPreset} theme={theme} />
+              <FocusMode
+                text={text}
+                onTextChange={setText}
+                theme={theme}
+                fontSize={fontSize}
+                fontFamily={getFontFamily()}
+                bgColor={bgColor}
+                darkMode={darkMode}
+                editorTextColor={editorTextColor}
+              />
+            </div>
+
+            {/* Right: Word counter and status */}
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              {lastSaved && (
+                <span
+                  style={{
+                    fontSize: '12px',
+                    color: theme.text,
+                    opacity: 0.6,
+                  }}
+                >
+                  Saved {new Date(lastSaved).toLocaleTimeString()}
+                </span>
+              )}
+              {readingProgress > 0 && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '4px 10px',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(34, 197, 94, 0.2)',
+                  }}
+                >
+                  <BookOpen size={14} style={{ color: '#22c55e' }} />
+                  <span style={{ fontSize: '12px', color: theme.text, fontWeight: '500' }}>
+                    {Math.round(readingProgress)}% read
+                  </span>
+                </div>
+              )}
+              <WordCounter text={text} theme={theme} />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <Card className="mb-6">
         <div className="p-6">
+          {/* Document Title */}
+          <div style={{ marginBottom: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <label
+                htmlFor="docTitle"
+                className="text-sm font-medium"
+                style={{ color: theme.text, opacity: 0.8 }}
+              >
+                Document Title
+              </label>
+              {currentDocId && (
+                <span style={{ fontSize: '12px', color: theme.primary, fontWeight: 500 }}>
+                  ✓ Editing existing document
+                </span>
+              )}
+            </div>
+            <input
+              id="docTitle"
+              type="text"
+              value={documentTitle}
+              onChange={(e) => setDocumentTitle(e.target.value)}
+              placeholder="Untitled Document"
+              className="w-full p-3 transition-all duration-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              style={{
+                backgroundColor: darkMode ? '#374151' : bgColor,
+                fontFamily: getFontFamily(),
+                fontSize: '16px',
+                fontWeight: 600,
+                color: editorTextColor,
+                border: `2px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : '#e5e7eb'}`,
+              }}
+            />
+          </div>
+
           <label
             htmlFor="text"
-            className="block mb-4 text-lg font-semibold"
+            className="block mb-3 text-lg font-semibold"
             style={{ color: theme.text }}
           >
             ✨ Your Writing
           </label>
 
-          <textarea
-            id="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Start writing here..."
-            className="w-full h-48 p-4 transition-all duration-200 resize-none rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            style={{
-              backgroundColor: darkMode ? '#374151' : bgColor,
-              fontFamily: getFontFamily(),
-              fontSize: `${fontSize}px`,
-              color: editorTextColor,
-              caretColor: editorTextColor,
-              border: `2px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : '#e5e7eb'}`,
-            }}
-          />
-
-          {!isPro && (
-            <div
+          {highlightMode && isReading ? (
+            <SentenceHighlighter
+              text={text}
+              currentSentenceIndex={currentSentenceIndex}
+              theme={theme}
+              fontSize={fontSize}
+              fontFamily={getFontFamily()}
+              editorTextColor={editorTextColor}
+              bgColor={bgColor}
+              darkMode={darkMode}
+              highContrast={highContrast}
+            />
+          ) : (
+            <textarea
+              id="text"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Start writing here..."
+              className="w-full p-4 transition-all duration-200 resize-none rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               style={{
+                backgroundColor: darkMode ? '#374151' : bgColor,
+                fontFamily: getFontFamily(),
+                fontSize: `${fontSize}px`,
+                color: editorTextColor,
+                caretColor: editorTextColor,
+                border: `2px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : '#e5e7eb'}`,
+                minHeight: '60vh',
+                maxHeight: '70vh',
+              }}
+            />
+          )}
+
+          {/* Bottom Action Bar */}
+          <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: `2px solid ${theme.border}` }}>
+            {/* Primary Actions Row */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+              <ModernButton
+                onClick={() => (isListening ? stopDictation() : startDictation('en-GB'))}
+                variant={isListening ? 'primary' : 'secondary'}
+              >
+                {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+                {isListening ? 'Stop Dictation' : 'Dictate'}
+              </ModernButton>
+
+              <ModernButton
+                onClick={simplifyText}
+                disabled={loading || (!isPro && usageCount >= usageLimit)}
+                variant="primary"
+              >
+                <Sparkles size={18} />
+                {loading ? 'Simplifying...' : 'Simplify'}
+              </ModernButton>
+
+              <ModernButton variant="secondary" onClick={handleReadAloud}>
+                <Play size={16} /> Read Aloud
+              </ModernButton>
+
+              <ModernButton variant="secondary" onClick={handleReadAloudSimplified} disabled={!simplifiedText}>
+                <BookOpen size={16} /> Read Simplified
+              </ModernButton>
+
+              <ModernButton
+                variant={highlightMode ? 'primary' : 'secondary'}
+                onClick={() => setHighlightMode(!highlightMode)}
+                size="sm"
+              >
+                <Highlighter size={16} />
+                {highlightMode ? 'ON' : 'OFF'}
+              </ModernButton>
+            </div>
+
+            {/* Secondary Actions Row */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
+              <TextComparison
+                originalText={text}
+                simplifiedText={simplifiedText}
+                theme={theme}
+                fontSize={fontSize}
+                fontFamily={getFontFamily()}
+                bgColor={bgColor}
+                darkMode={darkMode}
+                editorTextColor={editorTextColor}
+              />
+
+              <ModernButton
+                onClick={() => {
+                  if (confirm('Clear all text?')) {
+                    setText('');
+                    setSimplifiedText('');
+                  }
+                }}
+                variant="danger"
+                size="sm"
+              >
+                <Trash2 size={16} />
+                Clear
+              </ModernButton>
+
+              {/* Export Buttons */}
+              {isPro ? (
+                <>
+                  <ExportPDFButton
+                    text={text}
+                    simplifiedText={simplifiedText}
+                    documentTitle={documentTitle}
+                    documentId={currentDocId || undefined}
+                  />
+                  <ExportMP3Button
+                    text={simplifiedText?.trim() ? simplifiedText : text}
+                    documentTitle={documentTitle}
+                    documentId={currentDocId || undefined}
+                  />
+                  <ExportDOCXButton
+                    text={text}
+                    simplifiedText={simplifiedText}
+                    bgColor={darkMode ? '#374151' : bgColor}
+                    fontFamily={getFontFamily()}
+                    fontSize={fontSize}
+                    enabled={isSignedIn && isPro}
+                    documentTitle={documentTitle}
+                    documentId={currentDocId || undefined}
+                  />
+                </>
+              ) : (
+                <>
+                  <ModernButton
+                    onClick={() => {
+                      toast.info('Upgrade to Pro to export as PDF!');
+                      router.push('/pricing');
+                    }}
+                    variant="secondary"
+                    size="sm"
+                  >
+                    <Download size={16} /> PDF (Pro)
+                  </ModernButton>
+
+                  <ModernButton
+                    onClick={() => {
+                      toast.info('Upgrade to Pro to export as MP3!');
+                      router.push('/pricing');
+                    }}
+                    variant="secondary"
+                    size="sm"
+                  >
+                    🎵 MP3 (Pro)
+                  </ModernButton>
+
+                  <ModernButton
+                    onClick={() => {
+                      toast.info('Upgrade to Pro to export as Word!');
+                      router.push('/pricing');
+                    }}
+                    variant="secondary"
+                    size="sm"
+                  >
+                    <FileText size={16} /> Word (Pro)
+                  </ModernButton>
+                </>
+              )}
+
+              {/* Usage counter for non-pro */}
+              {!isPro && (
+                <div
+                  style={{
+                    marginLeft: 'auto',
+                    padding: '6px 12px',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(59, 130, 246, 0.2)',
+                  }}
+                >
+                  <span style={{ fontSize: '13px', color: theme.text, fontWeight: '500' }}>
+                    {usageCount}/{usageLimit} today
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Error display */}
+            {error && (
+              <div style={{
                 marginTop: '12px',
-                padding: '8px 12px',
-                textAlign: 'center',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                padding: '12px',
                 borderRadius: '8px',
-                border: '1px solid rgba(59, 130, 246, 0.2)',
-              }}
-            >
-              <span style={{ fontSize: '14px', color: theme.text, fontWeight: '500' }}>
-                Simplifications today: {usageCount}/{usageLimit}
-              </span>
-            </div>
-          )}
-
-          {error && (
-            <div className="p-4 mt-4 border border-red-200 bg-red-50 rounded-xl">
-              <p className="text-center text-red-700">{error}</p>
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 gap-3 mt-6 md:grid-cols-4">
-            <ModernButton
-              onClick={() => (isListening ? stopDictation() : startDictation('en-GB'))}
-              variant="secondary"
-            >
-              {isListening ? <MicOff size={18} /> : <Mic size={18} />}
-              {isListening ? 'Stop' : 'Dictate'}
-            </ModernButton>
-
-            <ModernButton variant="secondary" onClick={handleReadAloud}>
-              <Play size={16} /> Read Aloud
-            </ModernButton>
-
-            <ModernButton
-              onClick={simplifyText}
-              disabled={loading || (!isPro && usageCount >= usageLimit)}
-              variant="primary"
-            >
-              <Sparkles size={18} />
-              {loading ? 'Simplifying...' : 'Simplify'}
-            </ModernButton>
-
-            <ModernButton variant="secondary" onClick={handleReadAloudSimplified}>
-              <BookOpen size={16} /> Read Simplified
-            </ModernButton>
-          </div>
-
-          <div className="flex flex-wrap gap-3 mt-4">
-            <ModernButton
-              onClick={() => {
-                setText('');
-                setSimplifiedText('');
-              }}
-              variant="danger"
-              size="sm"
-            >
-              <Trash2 size={16} />
-              Clear All
-            </ModernButton>
-
-            {isPro ? (
-              <div className="flex flex-wrap gap-3">
-                <ExportPDFButton text={text} simplifiedText={simplifiedText} />
-                <ExportMP3Button text={simplifiedText?.trim() ? simplifiedText : text} />
-                <ExportDOCXButton
-                  text={text}
-                  simplifiedText={simplifiedText}
-                  bgColor={darkMode ? '#374151' : bgColor}
-                  fontFamily={getFontFamily()}
-                  fontSize={fontSize}
-                  enabled={isSignedIn && isPro}
-                />
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-3">
-                <ModernButton
-                  onClick={() => alert('Upgrade to Pro to export as PDF!')}
-                  variant="success"
-                  className="text-gray-500 hover:text-gray-700 opacity-70"
-                >
-                  <Download size={16} /> Export PDF (Pro)
-                </ModernButton>
-
-                <ModernButton
-                  onClick={() => alert('Upgrade to Pro to export as MP3!')}
-                  className="text-white transition-all shadow-md bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-lg hover:scale-105"
-                >
-                  🎵 Export MP3 (Pro)
-                </ModernButton>
-
-                <ModernButton
-                  onClick={() => alert('Upgrade to Pro to export to Word!')}
-                  variant="secondary"
-                  className="opacity-70"
-                >
-                  <FileText size={16} /> Export Word (Pro)
-                </ModernButton>
+                backgroundColor: '#fee2e2',
+                border: '1px solid #fca5a5',
+              }}>
+                <p style={{ color: '#991b1b', margin: 0, fontSize: '14px' }}>{error}</p>
               </div>
             )}
 
-            {false && (
-              <ModernButton
-                variant="secondary"
-                onClick={(e) => (isPaused ? resumeReading(e) : pauseReading(e))}
-                disabled={!isReading}
-              >
-                {isPaused ? <Play size={16} /> : <Pause size={16} />}
-                {isPaused ? 'Resume' : 'Pause'}
-              </ModernButton>
-            )}
-            {false && (
-              <ModernButton
-                variant="secondary"
-                onClick={stopReading}
-                disabled={!isReading && !isPaused}
-              >
-                <Square size={16} /> Stop
-              </ModernButton>
-            )}
-
+            {/* Sign up prompt for non-signed-in users */}
             <SignedOut>
-              <div className="flex flex-wrap gap-3 mt-4">
+              <div style={{ marginTop: '16px' }}>
                 <SignInButton mode="modal">
                   <ModernButton
-                    variant="secondary"
-                    className="text-white transition-all shadow-md bg-gradient-to-r from-indigo-500 to-blue-500 hover:shadow-lg hover:scale-105"
+                    variant="primary"
+                    size="sm"
                   >
-                    🔑 Sign up for Basic Features
+                    🔑 Sign In to Save Your Work
                   </ModernButton>
                 </SignInButton>
               </div>
@@ -860,6 +1385,12 @@ function PageBody() {
               coachBg={coachBg}
               coachText={coachText}
               coachBorder={coachBorder}
+              onApplySuggestion={(before, after) => {
+                // Replace the first occurrence of 'before' with 'after'
+                const updated = text.replace(before, after);
+                setText(updated);
+                toast.success('Applied suggestion!');
+              }}
             />
           ) : (
             <Card>
@@ -947,10 +1478,24 @@ function PageBody() {
         </div>
       )}
 
+      {/* Document Manager */}
+      <DocumentManager
+        onLoadDocument={loadDocument}
+        onNewDocument={newDocument}
+        currentDocId={currentDocId}
+        theme={theme}
+      />
+
+      {/* Keyboard Shortcuts Help */}
+      <KeyboardShortcutsHelp shortcuts={shortcuts} theme={theme} />
+
+      {/* Onboarding Tutorial */}
+      <OnboardingTutorial theme={theme} />
+
       <footer className="py-8 mt-16 text-sm text-center border-t border-slate-200 text-slate-500 dark:border-slate-800">
         <div className="mb-2">© 2025 Dyslexia Writer Ltd. All rights reserved.</div>
         <div className="mb-2">
-          “Dyslexia Writer”
+          "Dyslexia Writer"
           <sup className="ml-0.5 align-super text-[0.7em]">™</sup> is a trademark of Dyslexia Writer Ltd.
           All other trademarks are the property of their respective owners.
         </div>

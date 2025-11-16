@@ -1,18 +1,12 @@
 import 'server-only';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { auth, clerkClient } from '@clerk/nextjs/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 type Provider = 'openai' | 'openrouter' | 'none';
-// compat shim: works with both shapes of clerkClient
-async function getClerkClient() {
-  const anyClient = clerkClient as unknown as any;
-  return typeof anyClient === 'function' ? await anyClient() : anyClient;
-}
 
 const SYSTEM_PROMPT =
   'You simplify text for dyslexic readers. Keep meaning the same; prefer short sentences and simple words. Remove filler. Keep names and facts. Output only the simplified text.';
@@ -65,13 +59,7 @@ export async function POST(req: NextRequest) {
   const H: Record<string, string> = { 'Cache-Control': 'no-store', 'x-runtime': 'node' };
 
   try {
-    // 1) auth (401 JSON, never redirect)
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: H });
-    }
-
-    // 2) body
+    // 1) body
     if (!(req.headers.get('content-type') || '').includes('application/json')) {
       return NextResponse.json({ error: 'Send JSON: { "text": "..." }' }, { status: 415, headers: H });
     }
@@ -81,7 +69,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing 'text' string" }, { status: 400, headers: H });
     }
 
-    // 3) provider + key
+    // 2) provider + key
     const sel = pickProvider();
     H['x-api-provider'] = sel.provider;
     H['x-key-present'] = String(Boolean(sel.key));
@@ -95,34 +83,20 @@ export async function POST(req: NextRequest) {
     }
     H['x-model'] = sel.model!;
 
-    // 4) pro check (non-fatal if fails)
-    let isPro = false;
-    try {
-      const client = await getClerkClient();
-      const user = await client.users.getUser(userId);
-      isPro =
-        (user.publicMetadata as any)?.isPro === true ||
-        (user.unsafeMetadata as any)?.isPro === true;
-    } catch {
-      /* ignore */
+    // 3) Rate limiting (IP-based for free tier)
+    const today = todayStr();
+    const rateLimitKey = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || req.ip || 'anonymous';
+    const rec = dailyUsage.get(rateLimitKey);
+    const current = rec && rec.date === today ? rec.count : 0;
+    if (current >= 5) {
+      return NextResponse.json(
+        { error: 'Daily limit reached (5/5). Try again tomorrow or upgrade to Pro for unlimited use.', usage: { count: current, limit: 5, isPro: false } },
+        { status: 429, headers: H }
+      );
     }
-    H['x-pro'] = String(isPro);
-
-    // 5) free quota
-    let newCount = 0;
-    if (!isPro) {
-      const today = todayStr();
-      const rec = dailyUsage.get(userId);
-      const current = rec && rec.date === today ? rec.count : 0;
-      if (current >= 5) {
-        return NextResponse.json(
-          { error: 'Daily limit reached (5/5). Upgrade to Pro for unlimited use.' },
-          { status: 429, headers: H }
-        );
-      }
-      newCount = current + 1;
-      dailyUsage.set(userId, { count: newCount, date: today });
-    }
+    const newCount = current + 1;
+    dailyUsage.set(rateLimitKey, { count: newCount, date: today });
+    H['x-usage-count'] = String(newCount);
 
     // 6) upstream call (fetch)
     const payload = {
@@ -178,7 +152,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         simplifiedText: String(simplified).trim(),
-        usage: { count: isPro ? 0 : newCount, limit: isPro ? 'Unlimited' : 5, isPro },
+        usage: { count: newCount, limit: 5, isPro: false },
       },
       { headers: H }
     );

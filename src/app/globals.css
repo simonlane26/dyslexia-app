@@ -1,3 +1,7 @@
+/* src/app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* your globals */
+html, body { height: 100%; }

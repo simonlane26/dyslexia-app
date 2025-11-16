@@ -5,8 +5,14 @@ import { NextResponse } from 'next/server';
 // Public pages (add/remove as needed)
 const PUBLIC_PATHS = [
   '/',
+  '/pricing',
+  '/privacy',
+  '/terms',
+  '/cookies',
+  '/success',
   '/sign-in(.*)',
   '/sign-up(.*)',
+  '/sso-callback(.*)',
   '/favicon.ico',
   '/robots.txt',
   '/sitemap.xml',
@@ -31,7 +37,11 @@ export default clerkMiddleware(async (auth, req) => {
   const session = await auth();
 
   if (pathname.startsWith('/api/')) {
-    // APIs: never redirect; return JSON 401 if unauthenticated
+    // Allow anonymous access to /api/simplify (with IP-based rate limiting)
+    if (pathname === '/api/simplify') {
+      return NextResponse.next();
+    }
+    // Other APIs: never redirect; return JSON 401 if unauthenticated
     if (!session.userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

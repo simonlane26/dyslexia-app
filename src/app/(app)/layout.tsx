@@ -1,9 +1,10 @@
-// src/app/layout.tsx  (SERVER component)
+// src/app/(app)/layout.tsx  (SERVER component)
 
 import { Inter } from "next/font/google";
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { HeaderBar } from "@/components/HeaderBar";
+import { ToastProvider } from "@/components/ToastContainer";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -21,8 +22,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={inter.className}>
         {/* Clerk auto-reads NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY */}
         <ClerkProvider>
-          <HeaderBar />
-          {children}
+          <ToastProvider>
+            <HeaderBar />
+            {children}
+          </ToastProvider>
         </ClerkProvider>
       </body>
     </html>
