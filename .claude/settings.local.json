@@ -14,7 +14,11 @@
       "Bash(git commit:*)",
       "Bash(dir:*)",
       "Bash(timeout /t 1)",
-      "Bash(del nul)"
+      "Bash(del nul)",
+      "Bash(npm audit:*)",
+      "Bash(npm install)",
+      "Bash(npm show:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

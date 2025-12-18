@@ -31,6 +31,9 @@ import { useKeyboardShortcuts, KeyboardShortcut } from '@/hooks/useKeyboardShort
 import { GrammarCheck } from '@/components/GrammarCheck';
 import { SentenceRewriteModal } from '@/components/SentenceRewriteModal';
 import { CoachIntent } from '@/components/CoachIntentModal';
+import { HeroSection } from '@/components/HeroSection';
+import { FeaturesSection } from '@/components/FeaturesSection';
+import { TestimonialsSection } from '@/components/TestimonialsSection';
 import {
   saveLocalDocument,
   getCurrentDocumentId,
@@ -1049,9 +1052,37 @@ function PageBody() {
         }}
       />
 
+      {/* Hero Section */}
+      <HeroSection
+        onGetStarted={() => {
+          const editor = document.getElementById('text');
+          if (editor) {
+            editor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => editor.focus(), 500);
+          }
+        }}
+        onSeeFeatures={() => {
+          const features = document.getElementById('features-section');
+          if (features) {
+            features.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }}
+        isSignedIn={isSignedIn}
+        theme={theme}
+        darkMode={darkMode}
+      />
+
+      {/* Features Section */}
+      <div id="features-section">
+        <FeaturesSection theme={theme} darkMode={darkMode} />
+      </div>
+
+      {/* Testimonials Section */}
+      <TestimonialsSection theme={theme} darkMode={darkMode} />
+
       <div className="max-w-4xl px-4 py-8 mx-auto">
         <div className="mb-8 text-center">
-          <h1 className="flex items-center justify-center gap-3 mb-6 text-4xl font-bold leading-tight tracking-tight md:text-5xl">
+          <h2 className="flex items-center justify-center gap-3 mb-6 text-3xl font-bold leading-tight tracking-tight md:text-4xl">
             <span
               aria-hidden
               style={{
@@ -1065,15 +1096,15 @@ function PageBody() {
               ✍️
             </span>
             <span className="text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
-              Dyslexia-Friendly Writing App
+              Start Writing Now
             </span>
-          </h1>
+          </h2>
 
           <p
             className="max-w-2xl mx-auto text-lg"
             style={{ color: darkMode ? '#cbd5e1' : '#64748b' }}
           >
-            Write, simplify, and listen to your text with dyslexia-friendly tools
+            Use the editor below or sign in to save your work and access pro features
           </p>
         </div>
 
