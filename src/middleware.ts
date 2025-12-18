@@ -37,10 +37,17 @@ export default clerkMiddleware(async (auth, req) => {
   const session = await auth();
 
   if (pathname.startsWith('/api/')) {
-    // Allow anonymous access to /api/simplify (with IP-based rate limiting)
-    if (pathname === '/api/simplify') {
+    // Allow anonymous access to these endpoints
+    const publicApis = [
+      '/api/simplify',
+      '/api/coach/rewrite-sentence',
+      '/api/coach', // Writing coach
+    ];
+
+    if (publicApis.includes(pathname)) {
       return NextResponse.next();
     }
+
     // Other APIs: never redirect; return JSON 401 if unauthenticated
     if (!session.userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
