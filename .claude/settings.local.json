@@ -8,7 +8,13 @@
       "Bash(npm run build:*)",
       "Bash(npm run dev:*)",
       "Bash(taskkill:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: Phase 3 features + Writing Coach improvements + pricing updates\n\n- Add reading progress tracker with percentage and character position\n- Add export history tracking with analytics (PDF, MP3, DOCX)\n- Add keyboard shortcuts help modal\n- Implement comprehensive Writing Coach improvements:\n  - Structured JSON response with categorized tips\n  - Category icons (clarity, simplicity, structure, grammar, strength)\n  - Severity badges (high/medium/low)\n  - Stats dashboard (avg sentence length, long sentences, complex words, reading level)\n  - Expandable tips with before/after examples\n  - One-click \"Apply This Change\" button\n  - Strengths and motivation sections\n- Update Simplify API to support anonymous users with IP-based rate limiting (5/day)\n- Update pricing page with new features\n- Add \"Coming Soon\" badges to school plans\n- Add new Phase 3 components: DocumentManager, FocusMode, Toast system\n- Add accessibility presets and improved UI components\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push)",
+      "Bash(git commit:*)",
+      "Bash(dir:*)",
+      "Bash(timeout /t 1)",
+      "Bash(del nul)"
     ],
     "deny": [],
     "ask": []

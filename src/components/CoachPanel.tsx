@@ -3,6 +3,7 @@
 
 import React, { useState } from 'react';
 import { Sparkles, Volume2, RotateCcw, Loader2, AlertTriangle, Lightbulb, Edit3, List, CheckCircle, Star, ChevronDown, ChevronUp } from 'lucide-react';
+import { CoachIntentModal, CoachIntent } from './CoachIntentModal';
 
 type Props = {
   /** Raw text from the editor */
@@ -17,6 +18,10 @@ type Props = {
 
   /** Callback to apply suggestion to editor */
   onApplySuggestion?: (before: string, after: string) => void;
+
+  /** Theme for modals */
+  theme?: any;
+  darkMode?: boolean;
 };
 
 type TipCategory = 'clarity' | 'simplicity' | 'structure' | 'grammar' | 'strength';
@@ -59,24 +64,82 @@ export default function CoachPanel({
   coachText,
   coachBorder,
   onApplySuggestion,
+  theme,
+  darkMode = false,
 }: Props) {
   const [state, setState] = useState<CoachState>({ kind: 'idle' });
   const [expandedTips, setExpandedTips] = useState<Set<number>>(new Set());
+  const [showIntentModal, setShowIntentModal] = useState(false);
+  const [currentIntent, setCurrentIntent] = useState<CoachIntent | null>(null);
+  const [progressMessage, setProgressMessage] = useState<string | null>(null);
 
-  async function askCoach() {
+  function trackProgress(stats: Stats) {
+    try {
+      const history = JSON.parse(localStorage.getItem('coach-history') || '[]');
+      const currentSession = {
+        avgSentenceLength: stats.avgSentenceLength,
+        longSentences: stats.longSentences,
+        complexWords: stats.complexWords,
+        timestamp: Date.now(),
+      };
+
+      history.push(currentSession);
+      // Keep last 10 sessions
+      const recentHistory = history.slice(-10);
+      localStorage.setItem('coach-history', JSON.stringify(recentHistory));
+
+      // Check for improvement
+      if (recentHistory.length > 1) {
+        const previous = recentHistory[recentHistory.length - 2];
+        const current = recentHistory[recentHistory.length - 1];
+
+        const sentenceImprovement = previous.avgSentenceLength - current.avgSentenceLength;
+        const complexWordsImprovement = previous.complexWords - current.complexWords;
+
+        if (sentenceImprovement > 2) {
+          setProgressMessage(
+            `📈 Your sentences are ${Math.round(sentenceImprovement)} words shorter than last time! Keep it up!`
+          );
+        } else if (complexWordsImprovement > 2) {
+          setProgressMessage(
+            `📈 You're using ${complexWordsImprovement} fewer complex words! Your writing is getting clearer!`
+          );
+        } else if (sentenceImprovement > 0 || complexWordsImprovement > 0) {
+          setProgressMessage(`📈 You're making progress! Your writing is getting clearer.`);
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to track progress:', e);
+    }
+  }
+
+  function startCoaching() {
     const text = sourceText?.trim() || '';
     if (!text) {
       setState({ kind: 'error', message: 'Write something first so I can help.' });
       return;
     }
 
+    // Show intent modal first
+    setShowIntentModal(true);
+  }
+
+  async function askCoach(intent: CoachIntent) {
+    const text = sourceText?.trim() || '';
+    if (!text) {
+      setState({ kind: 'error', message: 'Write something first so I can help.' });
+      return;
+    }
+
+    setCurrentIntent(intent);
+    setShowIntentModal(false);
     setState({ kind: 'loading' });
 
     try {
       const res = await fetch('/api/coach', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, intent }),
       });
 
       if (!res.ok) {
@@ -107,6 +170,9 @@ export default function CoachPanel({
       // Validate structured response
       if (data && Array.isArray(data.tips)) {
         setState({ kind: 'ok', data: data as CoachResponse });
+
+        // Track progress in localStorage
+        trackProgress(data.stats);
       } else {
         setState({
           kind: 'error',
@@ -171,26 +237,29 @@ export default function CoachPanel({
   }
 
   function getSeverityBadge(severity: TipSeverity) {
-    const colors = {
-      high: { bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.3)', text: '#ef4444' },
-      medium: { bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.3)', text: '#f59e0b' },
-      low: { bg: 'rgba(59, 130, 246, 0.1)', border: 'rgba(59, 130, 246, 0.3)', text: '#3b82f6' },
+    const badges = {
+      high: { icon: '⭐', label: 'Quick win', bg: 'rgba(34, 197, 94, 0.1)', border: 'rgba(34, 197, 94, 0.3)', text: '#22c55e' },
+      medium: { icon: '💡', label: 'Worth trying', bg: 'rgba(59, 130, 246, 0.1)', border: 'rgba(59, 130, 246, 0.3)', text: '#3b82f6' },
+      low: { icon: '🤔', label: 'Optional', bg: 'rgba(148, 163, 184, 0.1)', border: 'rgba(148, 163, 184, 0.3)', text: '#64748b' },
     };
-    const c = colors[severity];
+    const b = badges[severity];
     return (
       <span
         style={{
-          padding: '2px 8px',
-          borderRadius: '4px',
+          padding: '4px 10px',
+          borderRadius: '12px',
           fontSize: '11px',
           fontWeight: 600,
-          backgroundColor: c.bg,
-          border: `1px solid ${c.border}`,
-          color: c.text,
-          textTransform: 'uppercase',
+          backgroundColor: b.bg,
+          border: `1px solid ${b.border}`,
+          color: b.text,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
         }}
       >
-        {severity}
+        <span>{b.icon}</span>
+        <span>{b.label}</span>
       </span>
     );
   }
@@ -223,7 +292,7 @@ export default function CoachPanel({
           </button>
 
           <button
-            onClick={state.kind === 'loading' ? undefined : askCoach}
+            onClick={state.kind === 'loading' ? undefined : startCoaching}
             className="inline-flex items-center gap-1 rounded-xl border px-3 py-1.5 text-sm"
             style={{ borderColor: coachBorder }}
             title="Get tips"
@@ -458,6 +527,20 @@ export default function CoachPanel({
             })}
           </div>
 
+          {/* Progress Message */}
+          {progressMessage && (
+            <div
+              className="p-3 border rounded-xl text-sm font-medium"
+              style={{
+                borderColor: 'rgba(34, 197, 94, 0.3)',
+                backgroundColor: 'rgba(34, 197, 94, 0.05)',
+                color: '#22c55e',
+              }}
+            >
+              {progressMessage}
+            </div>
+          )}
+
           {/* Motivation */}
           {state.data.motivation && (
             <div
@@ -477,6 +560,35 @@ export default function CoachPanel({
         <p className="mt-3 text-xs opacity-70">
           Tip quality improves with Pro.
         </p>
+      )}
+
+      {/* Intent Modal */}
+      {theme && (
+        <CoachIntentModal
+          isOpen={showIntentModal}
+          onClose={() => setShowIntentModal(false)}
+          onSubmit={askCoach}
+          theme={theme}
+          darkMode={darkMode}
+        />
+      )}
+
+      {/* Display current intent */}
+      {currentIntent && state.kind === 'ok' && (
+        <div
+          className="mt-3 p-3 border rounded-xl text-xs"
+          style={{
+            borderColor: coachBorder,
+            backgroundColor: withAlpha(coachText, 0.03),
+          }}
+        >
+          <div className="font-semibold opacity-70 mb-1">Writing context:</div>
+          <div className="opacity-90">
+            For: <strong>{currentIntent.audience}</strong> •
+            To: <strong>{currentIntent.purpose}</strong> •
+            Tone: <strong>{currentIntent.tone}</strong>
+          </div>
+        </div>
       )}
     </aside>
   );

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { useUser, SignedOut, SignInButton } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import {
-  Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText, Square, Pause, Lock, Save, Highlighter, Undo2, Redo2,
+  Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText, Square, Pause, Lock, Save, Highlighter, Undo2, Redo2, SpellCheck, Edit3,
 } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { ModernButton } from '@/components/ModernButton';
@@ -28,6 +28,9 @@ import { FocusMode } from '@/components/FocusMode';
 import { TextComparison } from '@/components/TextComparison';
 import { useToast } from '@/components/ToastContainer';
 import { useKeyboardShortcuts, KeyboardShortcut } from '@/hooks/useKeyboardShortcuts';
+import { GrammarCheck } from '@/components/GrammarCheck';
+import { SentenceRewriteModal } from '@/components/SentenceRewriteModal';
+import { CoachIntent } from '@/components/CoachIntentModal';
 import {
   saveLocalDocument,
   getCurrentDocumentId,
@@ -60,6 +63,16 @@ function PageBody() {
   // Sentence highlighting
   const [highlightMode, setHighlightMode] = useState(false);
   const [currentSentenceIndex, setCurrentSentenceIndex] = useState(-1);
+
+  // Grammar checking
+  const [grammarCheckEnabled, setGrammarCheckEnabled] = useState(false);
+
+  // Sentence rewriting
+  const [showRewriteModal, setShowRewriteModal] = useState(false);
+  const [selectedSentence, setSelectedSentence] = useState('');
+  const [selectedRange, setSelectedRange] = useState<{ start: number; end: number } | null>(null);
+  const [currentIntentForRewrite, setCurrentIntentForRewrite] = useState<CoachIntent | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Undo/Redo history
   const [textHistory, setTextHistory] = useState<string[]>(['']);
@@ -921,6 +934,72 @@ function PageBody() {
     }
   };
 
+  // Apply grammar fix
+  const handleApplyGrammarFix = (offset: number, length: number, replacement: string) => {
+    const before = text.substring(0, offset);
+    const after = text.substring(offset + length);
+    const newText = before + replacement + after;
+    setText(newText);
+    toast.success('Applied suggestion!');
+  };
+
+  // Handle rewrite sentence button
+  const handleRewriteSentence = () => {
+    // Try to get selection from textarea (normal mode)
+    if (textareaRef.current) {
+      const textarea = textareaRef.current;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+
+      if (start !== end) {
+        const selected = text.substring(start, end).trim();
+        if (selected) {
+          setSelectedSentence(selected);
+          setSelectedRange({ start, end });
+          setShowRewriteModal(true);
+          return;
+        }
+      }
+    }
+
+    // Try to get selection from window (works in all modes including Grammar Check)
+    const selection = window.getSelection();
+    const selectedText = selection?.toString().trim();
+
+    if (!selectedText) {
+      toast.info('Select a sentence first to rewrite it!');
+      return;
+    }
+
+    // Find the position of selected text in the full text
+    const start = text.indexOf(selectedText);
+    if (start === -1) {
+      toast.error('Could not find selected text. Please try selecting again.');
+      return;
+    }
+
+    const end = start + selectedText.length;
+
+    setSelectedSentence(selectedText);
+    setSelectedRange({ start, end });
+    setShowRewriteModal(true);
+  };
+
+  // Apply rewritten sentence
+  const handleApplyRewrite = (newSentence: string) => {
+    if (!selectedRange) return;
+
+    const before = text.substring(0, selectedRange.start);
+    const after = text.substring(selectedRange.end);
+    const newText = before + newSentence + after;
+    setText(newText);
+    toast.success('Applied rewrite!');
+
+    // Clear selection
+    setSelectedRange(null);
+    setSelectedSentence('');
+  };
+
   // Update history when text changes (debounced)
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -1179,8 +1258,23 @@ function PageBody() {
               darkMode={darkMode}
               highContrast={highContrast}
             />
+          ) : grammarCheckEnabled ? (
+            <GrammarCheck
+              text={text}
+              onTextChange={setText}
+              onApplyFix={handleApplyGrammarFix}
+              enabled={grammarCheckEnabled}
+              theme={theme}
+              fontSize={fontSize}
+              fontFamily={getFontFamily()}
+              bgColor={bgColor}
+              editorTextColor={editorTextColor}
+              darkMode={darkMode}
+              highContrast={highContrast}
+            />
           ) : (
             <textarea
+              ref={textareaRef}
               id="text"
               value={text}
               onChange={(e) => setText(e.target.value)}
@@ -1234,7 +1328,26 @@ function PageBody() {
                 size="sm"
               >
                 <Highlighter size={16} />
-                {highlightMode ? 'ON' : 'OFF'}
+                Highlight {highlightMode ? 'ON' : 'OFF'}
+              </ModernButton>
+
+              <ModernButton
+                variant={grammarCheckEnabled ? 'primary' : 'secondary'}
+                onClick={() => setGrammarCheckEnabled(!grammarCheckEnabled)}
+                size="sm"
+              >
+                <SpellCheck size={16} />
+                Grammar {grammarCheckEnabled ? 'ON' : 'OFF'}
+              </ModernButton>
+
+              <ModernButton
+                variant="secondary"
+                onClick={handleRewriteSentence}
+                size="sm"
+                title="Select text and click to rewrite it"
+              >
+                <Edit3 size={16} />
+                Rewrite
               </ModernButton>
             </div>
 
@@ -1385,6 +1498,8 @@ function PageBody() {
               coachBg={coachBg}
               coachText={coachText}
               coachBorder={coachBorder}
+              theme={theme}
+              darkMode={darkMode}
               onApplySuggestion={(before, after) => {
                 // Replace the first occurrence of 'before' with 'after'
                 const updated = text.replace(before, after);
@@ -1491,6 +1606,17 @@ function PageBody() {
 
       {/* Onboarding Tutorial */}
       <OnboardingTutorial theme={theme} />
+
+      {/* Sentence Rewrite Modal */}
+      <SentenceRewriteModal
+        isOpen={showRewriteModal}
+        onClose={() => setShowRewriteModal(false)}
+        selectedSentence={selectedSentence}
+        onApply={handleApplyRewrite}
+        theme={theme}
+        darkMode={darkMode}
+        intent={currentIntentForRewrite}
+      />
 
       <footer className="py-8 mt-16 text-sm text-center border-t border-slate-200 text-slate-500 dark:border-slate-800">
         <div className="mb-2">© 2025 Dyslexia Writer Ltd. All rights reserved.</div>
