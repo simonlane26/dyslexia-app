@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { useUser, SignedOut, SignInButton } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import {
-  Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText, Square, Pause, Lock, Save, Highlighter, Undo2, Redo2, SpellCheck, Edit3,
+  Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText, Lock, Save, Highlighter, Undo2, Redo2, SpellCheck, Edit3,
 } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { ModernButton } from '@/components/ModernButton';
@@ -1067,7 +1067,7 @@ function PageBody() {
             features.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         }}
-        isSignedIn={isSignedIn}
+        isSignedIn={!!isSignedIn}
         theme={theme}
         darkMode={darkMode}
       />
