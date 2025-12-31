@@ -11,6 +11,8 @@ import {
   MessageSquare,
   Zap,
   Shield,
+  Eye,
+  Crown,
 } from 'lucide-react';
 
 interface FeaturesSectionProps {
@@ -20,6 +22,15 @@ interface FeaturesSectionProps {
 
 export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
   const features = [
+    {
+      icon: <Eye size={32} />,
+      title: 'Reading Guide',
+      description:
+        'Line Focus, Sentence Spotlight, or Reading Ruler modes reduce visual noise and help you stay focused. Only your current text is bright—everything else fades.',
+      color: '#10b981',
+      isPro: true,
+      isNew: true,
+    },
     {
       icon: <SpellCheck size={32} />,
       title: 'Real-Time Grammar Check',
@@ -33,6 +44,7 @@ export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
       description:
         'Select any sentence and get 3 alternatives: Simpler, More confident, or Clearer. One-click to apply. No grammar jargon, just plain language.',
       color: '#3b82f6',
+      isNew: true,
     },
     {
       icon: <MessageSquare size={32} />,
@@ -185,17 +197,55 @@ export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
                 {feature.icon}
               </div>
 
-              {/* Title */}
-              <h3
-                style={{
-                  fontSize: '20px',
-                  fontWeight: '700',
-                  color: theme.text,
-                  marginBottom: '12px',
-                }}
-              >
-                {feature.title}
-              </h3>
+              {/* Title with badges */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                <h3
+                  style={{
+                    fontSize: '20px',
+                    fontWeight: '700',
+                    color: theme.text,
+                    margin: 0,
+                  }}
+                >
+                  {feature.title}
+                </h3>
+                {(feature as any).isPro && (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '4px 10px',
+                      backgroundColor: '#fbbf24',
+                      color: '#000000',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: '700',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                    }}
+                  >
+                    <Crown size={14} />
+                    Pro
+                  </span>
+                )}
+                {(feature as any).isNew && (
+                  <span
+                    style={{
+                      padding: '4px 10px',
+                      backgroundColor: darkMode ? '#10b981' : '#10b981',
+                      color: '#ffffff',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: '700',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                    }}
+                  >
+                    New
+                  </span>
+                )}
+              </div>
 
               {/* Description */}
               <p
