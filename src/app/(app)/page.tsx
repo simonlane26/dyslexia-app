@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { useUser, SignedOut, SignInButton } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import {
-  Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText, Lock, Save, Highlighter, Undo2, Redo2, SpellCheck, Edit3,
+  Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText, Lock, Save, Highlighter, Undo2, Redo2, SpellCheck, Edit3, Eye,
 } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { ModernButton } from '@/components/ModernButton';
@@ -34,6 +34,7 @@ import { CoachIntent } from '@/components/CoachIntentModal';
 import { HeroSection } from '@/components/HeroSection';
 import { FeaturesSection } from '@/components/FeaturesSection';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
+import { ReadingGuide } from '@/components/ReadingGuide';
 import {
   saveLocalDocument,
   getCurrentDocumentId,
@@ -69,6 +70,10 @@ function PageBody() {
 
   // Grammar checking
   const [grammarCheckEnabled, setGrammarCheckEnabled] = useState(false);
+
+  // Reading Guide (Pro feature)
+  const [readingGuideEnabled, setReadingGuideEnabled] = useState(false);
+  const [readingGuideType, setReadingGuideType] = useState<'line' | 'sentence' | 'ruler'>('line');
 
   // Sentence rewriting
   const [showRewriteModal, setShowRewriteModal] = useState(false);
@@ -1289,6 +1294,19 @@ function PageBody() {
               darkMode={darkMode}
               highContrast={highContrast}
             />
+          ) : readingGuideEnabled ? (
+            <ReadingGuide
+              text={text}
+              onTextChange={setText}
+              theme={theme}
+              fontSize={fontSize}
+              fontFamily={getFontFamily()}
+              bgColor={bgColor}
+              editorTextColor={editorTextColor}
+              darkMode={darkMode}
+              highContrast={highContrast}
+              guideType={readingGuideType}
+            />
           ) : grammarCheckEnabled ? (
             <GrammarCheck
               text={text}
@@ -1380,6 +1398,54 @@ function PageBody() {
                 <Edit3 size={16} />
                 Rewrite
               </ModernButton>
+
+              {/* Reading Guide - Pro Feature */}
+              {isPro ? (
+                <div style={{ position: 'relative', display: 'inline-block' }}>
+                  <ModernButton
+                    variant={readingGuideEnabled ? 'primary' : 'secondary'}
+                    onClick={() => setReadingGuideEnabled(!readingGuideEnabled)}
+                    size="sm"
+                  >
+                    <Eye size={16} />
+                    Reading Guide {readingGuideEnabled ? 'ON' : 'OFF'}
+                  </ModernButton>
+                  {readingGuideEnabled && (
+                    <select
+                      value={readingGuideType}
+                      onChange={(e) => setReadingGuideType(e.target.value as 'line' | 'sentence' | 'ruler')}
+                      title="Choose reading guide type"
+                      aria-label="Reading guide type"
+                      style={{
+                        marginLeft: '8px',
+                        padding: '6px 12px',
+                        borderRadius: '8px',
+                        border: `1px solid ${theme.border}`,
+                        backgroundColor: darkMode ? '#374151' : '#ffffff',
+                        color: theme.text,
+                        fontSize: '13px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <option value="line">Line Focus</option>
+                      <option value="sentence">Sentence Spotlight</option>
+                      <option value="ruler">Reading Ruler</option>
+                    </select>
+                  )}
+                </div>
+              ) : (
+                <ModernButton
+                  variant="secondary"
+                  onClick={() => {
+                    toast.info('Reading Guide is a Pro feature! Upgrade to unlock.');
+                    router.push('/pricing');
+                  }}
+                  size="sm"
+                >
+                  <Lock size={16} />
+                  Reading Guide (Pro)
+                </ModernButton>
+              )}
             </div>
 
             {/* Secondary Actions Row */}
