@@ -52,6 +52,7 @@ export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
       description:
         'Intent-first coaching that asks who you\'re writing for and why. Get tips tailored to your audience, purpose, and tone—no technical terms.',
       color: '#8b5cf6',
+      isPro: true,
     },
     {
       icon: <Sparkles size={32} />,
