@@ -275,21 +275,20 @@ export function ReadingGuide({
             border: `2px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : '#e5e7eb'}`,
             borderRadius: '12px',
             overflow: 'hidden',
+            backgroundColor: darkMode ? '#374151' : bgColor,
           }}
         >
-          {/* Horizontal ruler line */}
+          {/* Horizontal ruler highlight - BEHIND text */}
           <div
             style={{
               position: 'absolute',
-              top: `${(currentLineIndex + 0.5) * (fontSize * 1.8 + 16)}px`,
+              top: `${(currentLineIndex + 0.5) * (fontSize * 1.8 + 16) + 8}px`,
               left: 0,
               right: 0,
               height: `${fontSize * 1.8 + 16}px`,
               backgroundColor: darkMode
-                ? 'rgba(34, 197, 94, 0.15)'
-                : 'rgba(34, 197, 94, 0.1)',
-              borderTop: `2px solid ${theme.primary}`,
-              borderBottom: `2px solid ${theme.primary}`,
+                ? 'rgba(34, 197, 94, 0.12)'
+                : 'rgba(34, 197, 94, 0.08)',
               transition: 'top 0.15s ease',
               pointerEvents: 'none',
               zIndex: 0,
