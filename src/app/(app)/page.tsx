@@ -42,6 +42,12 @@ import {
   getLocalDocument,
   Document,
 } from '@/lib/documentStorage';
+import {
+  websiteSchema,
+  organizationSchema,
+  softwareApplicationSchema,
+  faqSchema,
+} from '@/app/schema';
 
 const OCRImport = dynamic<OCRProps>(() => import('@/components/OCRImport'), { ssr: false });
 
@@ -1039,21 +1045,16 @@ function PageBody() {
         color: theme.text,
       }}
     >
-      {/* JSON-LD */}
+      {/* JSON-LD Structured Data for SEO */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'SoftwareApplication',
-            name: 'Dyslexia Writer',
-            applicationCategory: 'EducationalApplication',
-            operatingSystem: 'Web',
-            url: 'https://www.dyslexiawrite.com/',
-            description:
-              'Dyslexia-friendly writing app with dictation, text-to-speech, and one-tap simplification.',
-            offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
-          }),
+          __html: JSON.stringify([
+            websiteSchema,
+            organizationSchema,
+            softwareApplicationSchema,
+            faqSchema,
+          ]),
         }}
       />
 
