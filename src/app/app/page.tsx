@@ -31,9 +31,6 @@ import { useKeyboardShortcuts, KeyboardShortcut } from '@/hooks/useKeyboardShort
 import { GrammarCheck } from '@/components/GrammarCheck';
 import { SentenceRewriteModal } from '@/components/SentenceRewriteModal';
 import { CoachIntent } from '@/components/CoachIntentModal';
-import { HeroSection } from '@/components/HeroSection';
-import { FeaturesSection } from '@/components/FeaturesSection';
-import { TestimonialsSection } from '@/components/TestimonialsSection';
 import { ReadingGuide } from '@/components/ReadingGuide';
 import {
   saveLocalDocument,
@@ -42,12 +39,6 @@ import {
   getLocalDocument,
   Document,
 } from '@/lib/documentStorage';
-import {
-  websiteSchema,
-  organizationSchema,
-  softwareApplicationSchema,
-  faqSchema,
-} from '@/app/schema';
 
 const OCRImport = dynamic<OCRProps>(() => import('@/components/OCRImport'), { ssr: false });
 
@@ -1045,47 +1036,6 @@ function PageBody() {
         color: theme.text,
       }}
     >
-      {/* JSON-LD Structured Data for SEO */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify([
-            websiteSchema,
-            organizationSchema,
-            softwareApplicationSchema,
-            faqSchema,
-          ]),
-        }}
-      />
-
-      {/* Hero Section */}
-      <HeroSection
-        onGetStarted={() => {
-          const editor = document.getElementById('text');
-          if (editor) {
-            editor.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            setTimeout(() => editor.focus(), 500);
-          }
-        }}
-        onSeeFeatures={() => {
-          const features = document.getElementById('features-section');
-          if (features) {
-            features.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        }}
-        isSignedIn={!!isSignedIn}
-        theme={theme}
-        darkMode={darkMode}
-      />
-
-      {/* Features Section */}
-      <div id="features-section">
-        <FeaturesSection theme={theme} darkMode={darkMode} />
-      </div>
-
-      {/* Testimonials Section */}
-      <TestimonialsSection theme={theme} darkMode={darkMode} />
-
       <div className="max-w-4xl px-4 py-8 mx-auto">
         <div className="mb-8 text-center">
           <h2 className="flex items-center justify-center gap-3 mb-6 text-3xl font-bold leading-tight tracking-tight md:text-4xl">

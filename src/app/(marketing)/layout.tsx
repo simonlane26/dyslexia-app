@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { ClerkProvider } from "@clerk/nextjs";
+import { LandingHeader } from "@/components/LandingHeader";
 
 export const dynamic = "force-static";
 
@@ -27,6 +29,12 @@ export const metadata: Metadata = {
 
 // ✅ required default export
 export default function MarketingLayout({ children }: { children: ReactNode }) {
-  // nested layouts should NOT include <html> or <body>
-  return <div className="min-h-screen">{children}</div>;
+  return (
+    <ClerkProvider>
+      <div className="min-h-screen">
+        <LandingHeader />
+        {children}
+      </div>
+    </ClerkProvider>
+  );
 }

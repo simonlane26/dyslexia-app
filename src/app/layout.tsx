@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/og-image.png',
+        url: '/OG%20Image.png',
         width: 1200,
         height: 630,
         alt: 'Dyslexia Writer - Write Better, Faster',
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     title: 'Dyslexia Writer - AI-Powered Writing Tools for Dyslexic Writers',
     description:
       'Free dyslexia-friendly writing app with AI grammar check, sentence rewriting, and reading guides.',
-    images: ['/og-image.png'],
+    images: ['/OG%20Image.png'],
     creator: '@dyslexiawriter',
   },
   robots: {
