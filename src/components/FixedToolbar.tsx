@@ -139,6 +139,10 @@ export function FixedToolbar({
             display: 'flex',
             gap: '8px',
             alignItems: 'center',
+            padding: '8px 12px',
+            backgroundColor: darkMode ? 'rgba(59, 130, 246, 0.08)' : 'rgba(59, 130, 246, 0.05)',
+            borderRadius: '10px',
+            border: `1px solid ${darkMode ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.15)'}`,
           }}
         >
           <ModernButton
@@ -175,6 +179,10 @@ export function FixedToolbar({
             display: 'flex',
             gap: '6px',
             alignItems: 'center',
+            padding: '6px 10px',
+            backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.08)' : 'rgba(139, 92, 246, 0.05)',
+            borderRadius: '10px',
+            border: `1px solid ${darkMode ? 'rgba(139, 92, 246, 0.2)' : 'rgba(139, 92, 246, 0.15)'}`,
           }}
         >
           <ModernButton
@@ -241,10 +249,14 @@ export function FixedToolbar({
             display: 'flex',
             gap: '6px',
             alignItems: 'center',
+            padding: '6px 10px',
+            backgroundColor: darkMode ? 'rgba(16, 185, 129, 0.08)' : 'rgba(16, 185, 129, 0.05)',
+            borderRadius: '10px',
+            border: `1px solid ${darkMode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.15)'}`,
           }}
         >
           <ModernButton
-            variant="secondary"
+            variant="success"
             onClick={onSave}
             disabled={isSaving}
             title="Save document (Ctrl+S)"
@@ -335,30 +347,43 @@ export function FixedToolbar({
           flexWrap: 'wrap',
         }}
       >
-        {/* Compact Stats Pill */}
+        {/* Compact Stats Pill - Enhanced */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
-            padding: '6px 12px',
-            backgroundColor: darkMode ? 'rgba(59, 130, 246, 0.1)' : 'rgba(59, 130, 246, 0.08)',
-            borderRadius: '20px',
-            border: `1px solid ${darkMode ? 'rgba(59, 130, 246, 0.3)' : 'rgba(59, 130, 246, 0.2)'}`,
+            gap: '14px',
+            padding: '8px 16px',
+            backgroundColor: darkMode ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.12)',
+            borderRadius: '24px',
+            border: `2px solid ${darkMode ? 'rgba(59, 130, 246, 0.4)' : 'rgba(59, 130, 246, 0.3)'}`,
+            boxShadow: darkMode
+              ? '0 2px 8px rgba(59, 130, 246, 0.2)'
+              : '0 2px 8px rgba(59, 130, 246, 0.15)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Type size={14} style={{ color: theme.primary }} />
-            <span style={{ fontSize: '13px', fontWeight: '500', color: theme.text }}>
-              {wordCount.toLocaleString()}
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Type size={16} style={{ color: theme.primary, fontWeight: 'bold' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <span style={{ fontSize: '14px', fontWeight: '700', color: theme.text, lineHeight: '1' }}>
+                {wordCount.toLocaleString()}
+              </span>
+              <span style={{ fontSize: '10px', fontWeight: '500', color: theme.text, opacity: 0.6, lineHeight: '1' }}>
+                words
+              </span>
+            </div>
           </div>
-          <div style={{ width: '1px', height: '14px', backgroundColor: theme.border, opacity: 0.5 }} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Clock size={14} style={{ color: theme.primary }} />
-            <span style={{ fontSize: '13px', fontWeight: '500', color: theme.text }}>
-              {readingTime}
-            </span>
+          <div style={{ width: '2px', height: '28px', backgroundColor: theme.primary, opacity: 0.3, borderRadius: '2px' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Clock size={16} style={{ color: theme.primary, fontWeight: 'bold' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <span style={{ fontSize: '14px', fontWeight: '700', color: theme.text, lineHeight: '1' }}>
+                {readingTime}
+              </span>
+              <span style={{ fontSize: '10px', fontWeight: '500', color: theme.text, opacity: 0.6, lineHeight: '1' }}>
+                read time
+              </span>
+            </div>
           </div>
         </div>
 
