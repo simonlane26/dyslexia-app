@@ -67,7 +67,7 @@ function PageBody() {
   // Grammar checking
   const [grammarCheckEnabled, setGrammarCheckEnabled] = useState(false);
 
-  // Reading Guide (Pro feature)
+  // Reading Guide
   const [readingGuideEnabled, setReadingGuideEnabled] = useState(false);
   const [readingGuideType, setReadingGuideType] = useState<'line' | 'sentence' | 'ruler'>('line');
 

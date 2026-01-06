@@ -163,11 +163,6 @@ export function FixedToolbar({
             <BookOpen size={18} />
             Read Aloud
           </ModernButton>
-
-          <ModernButton variant="secondary" onClick={onRewrite} disabled={!text.trim()} title="Rewrite selected sentence">
-            <FileText size={18} />
-            Rewrite
-          </ModernButton>
         </div>
 
         {/* Divider */}
@@ -205,20 +200,37 @@ export function FixedToolbar({
             Highlight
           </ModernButton>
 
+          <ModernButton
+            variant={readingGuideEnabled ? 'primary' : 'secondary'}
+            onClick={onReadingGuideToggle}
+            title="Toggle reading guide"
+            size="sm"
+          >
+            <Eye size={14} />
+            Guide
+          </ModernButton>
+
           {isPro ? (
             <ModernButton
-              variant={readingGuideEnabled ? 'primary' : 'secondary'}
-              onClick={onReadingGuideToggle}
-              title="Toggle reading guide"
+              variant="secondary"
+              onClick={onRewrite}
+              disabled={!text.trim()}
+              title="Rewrite selected sentence with multiple tones"
               size="sm"
             >
-              <Eye size={14} />
-              Guide
+              <FileText size={14} />
+              Rewrite
             </ModernButton>
           ) : (
-            <ModernButton variant="secondary" onClick={onUpgradeClick} title="Upgrade to Pro" size="sm">
-              <Lock size={14} />
-              Guide
+            <ModernButton
+              variant="secondary"
+              onClick={onUpgradeClick}
+              title="⭐ Pro Feature - Rewrite with multiple tones and styles"
+              size="sm"
+              disabled={!text.trim()}
+            >
+              <span style={{ fontSize: '12px', marginRight: '2px' }}>⭐</span>
+              Rewrite
             </ModernButton>
           )}
 
@@ -233,8 +245,13 @@ export function FixedToolbar({
               Coach
             </ModernButton>
           ) : (
-            <ModernButton variant="secondary" onClick={onUpgradeClick} title="Upgrade to Pro" size="sm">
-              <Lock size={14} />
+            <ModernButton
+              variant="secondary"
+              onClick={onUpgradeClick}
+              title="⭐ Pro Feature - Unlock calmer writing and smarter support"
+              size="sm"
+            >
+              <span style={{ fontSize: '12px', marginRight: '2px' }}>⭐</span>
               Coach
             </ModernButton>
           )}
@@ -316,16 +333,28 @@ export function FixedToolbar({
             )}
           </div>
 
-          <ModernButton
-            variant="secondary"
-            onClick={onCompare}
-            disabled={!simplifiedText}
-            title="Compare original and simplified"
-            size="sm"
-          >
-            <FileText size={14} />
-            Compare
-          </ModernButton>
+          {isPro ? (
+            <ModernButton
+              variant="secondary"
+              onClick={onCompare}
+              disabled={!simplifiedText}
+              title="Compare original and simplified drafts"
+              size="sm"
+            >
+              <FileText size={14} />
+              Compare
+            </ModernButton>
+          ) : (
+            <ModernButton
+              variant="secondary"
+              onClick={onUpgradeClick}
+              title="⭐ Pro Feature - Compare different versions of your writing"
+              size="sm"
+            >
+              <span style={{ fontSize: '12px', marginRight: '2px' }}>⭐</span>
+              Compare
+            </ModernButton>
+          )}
 
           <ModernButton
             variant={accessibilityPanelOpen ? 'primary' : 'secondary'}
