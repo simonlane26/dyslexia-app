@@ -8,7 +8,6 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/Card';
 import { ModernButton } from '@/components/ModernButton';
-import { SettingsPanel } from '@/components/SettingsPanel';
 import { UpgradeButton } from '@/components/UpgradeButton';
 import { ExportPDFButton } from '@/components/ExportPDFButton';
 import { ExportMP3Button } from '@/components/ExportMP3Button';
@@ -20,11 +19,8 @@ import CoachPanel from '@/components/CoachPanel';
 import { DocumentManager } from '@/components/DocumentManager';
 import { KeyboardShortcutsHelp } from '@/components/KeyboardShortcutsHelp';
 import { WordCounter } from '@/components/WordCounter';
-import { WritingTemplates } from '@/components/WritingTemplates';
-import { AccessibilityPresets } from '@/components/AccessibilityPresets';
 import { SentenceHighlighter } from '@/components/SentenceHighlighter';
 import { OnboardingTutorial } from '@/components/OnboardingTutorial';
-import { FocusMode } from '@/components/FocusMode';
 import { TextComparison } from '@/components/TextComparison';
 import { useToast } from '@/components/ToastContainer';
 import { useKeyboardShortcuts, KeyboardShortcut } from '@/hooks/useKeyboardShortcuts';
@@ -32,6 +28,9 @@ import { GrammarCheck } from '@/components/GrammarCheck';
 import { SentenceRewriteModal } from '@/components/SentenceRewriteModal';
 import { CoachIntent } from '@/components/CoachIntentModal';
 import { ReadingGuide } from '@/components/ReadingGuide';
+import { FixedToolbar } from '@/components/FixedToolbar';
+import { CoachDrawer } from '@/components/CoachDrawer';
+import { AccessibilityDrawer } from '@/components/AccessibilityDrawer';
 import {
   saveLocalDocument,
   getCurrentDocumentId,
@@ -71,6 +70,12 @@ function PageBody() {
   // Reading Guide (Pro feature)
   const [readingGuideEnabled, setReadingGuideEnabled] = useState(false);
   const [readingGuideType, setReadingGuideType] = useState<'line' | 'sentence' | 'ruler'>('line');
+
+  // Writing Coach Drawer
+  const [coachPanelOpen, setCoachPanelOpen] = useState(false);
+
+  // Accessibility Drawer
+  const [accessibilityPanelOpen, setAccessibilityPanelOpen] = useState(false);
 
   // Sentence rewriting
   const [showRewriteModal, setShowRewriteModal] = useState(false);
@@ -1075,120 +1080,40 @@ function PageBody() {
         </div>
       </div>
 
-      <SettingsPanel
-        bgColor={bgColor}
-        setBgColor={setBgColor}
-        font={font}
-        setFont={setFont}
-        fontSize={fontSize}
-        setFontSize={setFontSize}
-        highContrast={highContrast}
-        setHighContrast={setHighContrast}
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
-        voiceId={voiceId}
-        setVoiceId={setVoiceId}
-        resetSettings={resetSettings}
-        theme={theme}
-        getFontFamily={getFontFamily}
+      {/* Fixed Toolbar */}
+      <FixedToolbar
+        isListening={isListening}
+        onDictateToggle={() => (isListening ? stopDictation() : startDictation('en-GB'))}
+        onReadAloud={handleReadAloud}
+        onSimplify={simplifyText}
+        loading={loading}
+        onRewrite={handleRewriteSentence}
+        readingGuideEnabled={readingGuideEnabled}
+        onReadingGuideToggle={() => setReadingGuideEnabled(!readingGuideEnabled)}
+        highlightMode={highlightMode}
+        onHighlightToggle={() => setHighlightMode(!highlightMode)}
+        grammarCheckEnabled={grammarCheckEnabled}
+        onGrammarCheckToggle={() => setGrammarCheckEnabled(!grammarCheckEnabled)}
         isPro={isPro}
+        onUpgradeClick={() => router.push('/pricing')}
+        coachPanelOpen={coachPanelOpen}
+        onCoachPanelToggle={() => setCoachPanelOpen(!coachPanelOpen)}
+        accessibilityPanelOpen={accessibilityPanelOpen}
+        onAccessibilityPanelToggle={() => setAccessibilityPanelOpen(!accessibilityPanelOpen)}
+        isSaving={isSaving}
+        onSave={saveDocument}
+        lastSaved={lastSaved}
+        text={text}
+        documentTitle={documentTitle}
+        onCompare={() => {
+          // Will be handled by TextComparison component that we'll keep
+        }}
+        simplifiedText={simplifiedText}
+        theme={theme}
+        darkMode={darkMode}
       />
 
-      {/* Top Toolbar */}
-      <div
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-          backgroundColor: theme.bg,
-          borderBottom: `2px solid ${theme.border}`,
-          padding: '12px 0',
-          marginBottom: '20px',
-        }}
-      >
-        <div className="max-w-6xl px-4 mx-auto">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', justifyContent: 'space-between' }}>
-            {/* Left: Quick actions */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-              <ModernButton
-                onClick={saveDocument}
-                variant="success"
-                size="sm"
-                disabled={isSaving}
-              >
-                <Save size={16} />
-                {isSaving ? 'Saving...' : 'Save'}
-              </ModernButton>
-
-              <ModernButton
-                onClick={handleUndo}
-                variant="secondary"
-                size="sm"
-                disabled={historyIndex === 0}
-              >
-                <Undo2 size={16} />
-              </ModernButton>
-
-              <ModernButton
-                onClick={handleRedo}
-                variant="secondary"
-                size="sm"
-                disabled={historyIndex >= textHistory.length - 1}
-              >
-                <Redo2 size={16} />
-              </ModernButton>
-
-              <WritingTemplates onSelectTemplate={loadTemplate} theme={theme} />
-              <AccessibilityPresets onApplyPreset={applyPreset} theme={theme} />
-              <FocusMode
-                text={text}
-                onTextChange={setText}
-                theme={theme}
-                fontSize={fontSize}
-                fontFamily={getFontFamily()}
-                bgColor={bgColor}
-                darkMode={darkMode}
-                editorTextColor={editorTextColor}
-              />
-            </div>
-
-            {/* Right: Word counter and status */}
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-              {lastSaved && (
-                <span
-                  style={{
-                    fontSize: '12px',
-                    color: theme.text,
-                    opacity: 0.6,
-                  }}
-                >
-                  Saved {new Date(lastSaved).toLocaleTimeString()}
-                </span>
-              )}
-              {readingProgress > 0 && (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '4px 10px',
-                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(34, 197, 94, 0.2)',
-                  }}
-                >
-                  <BookOpen size={14} style={{ color: '#22c55e' }} />
-                  <span style={{ fontSize: '12px', color: theme.text, fontWeight: '500' }}>
-                    {Math.round(readingProgress)}% read
-                  </span>
-                </div>
-              )}
-              <WordCounter text={text} theme={theme} />
-            </div>
-          </div>
-        </div>
-      </div>
-
+      <div className="max-w-6xl px-4 mx-auto" style={{ marginTop: '20px' }}>
       <Card className="mb-6">
         <div className="p-6">
           {/* Document Title */}
@@ -1293,300 +1218,34 @@ function PageBody() {
             />
           )}
 
-          {/* Bottom Action Bar */}
-          <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: `2px solid ${theme.border}` }}>
-            {/* Primary Actions Row */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
-              <ModernButton
-                onClick={() => (isListening ? stopDictation() : startDictation('en-GB'))}
-                variant={isListening ? 'primary' : 'secondary'}
-              >
-                {isListening ? <MicOff size={18} /> : <Mic size={18} />}
-                {isListening ? 'Stop Dictation' : 'Dictate'}
-              </ModernButton>
+          {/* Error display */}
+          {error && (
+            <div style={{
+              marginTop: '12px',
+              padding: '12px',
+              borderRadius: '8px',
+              backgroundColor: '#fee2e2',
+              border: '1px solid #fca5a5',
+            }}>
+              <p style={{ color: '#991b1b', margin: 0, fontSize: '14px' }}>{error}</p>
+            </div>
+          )}
 
-              <ModernButton
-                onClick={simplifyText}
-                disabled={loading || (!isPro && usageCount >= usageLimit)}
-                variant="primary"
-              >
-                <Sparkles size={18} />
-                {loading ? 'Simplifying...' : 'Simplify'}
-              </ModernButton>
-
-              <ModernButton variant="secondary" onClick={handleReadAloud}>
-                <Play size={16} /> Read Aloud
-              </ModernButton>
-
-              <ModernButton variant="secondary" onClick={handleReadAloudSimplified} disabled={!simplifiedText}>
-                <BookOpen size={16} /> Read Simplified
-              </ModernButton>
-
-              <ModernButton
-                variant={highlightMode ? 'primary' : 'secondary'}
-                onClick={() => setHighlightMode(!highlightMode)}
-                size="sm"
-              >
-                <Highlighter size={16} />
-                Highlight {highlightMode ? 'ON' : 'OFF'}
-              </ModernButton>
-
-              <ModernButton
-                variant={grammarCheckEnabled ? 'primary' : 'secondary'}
-                onClick={() => setGrammarCheckEnabled(!grammarCheckEnabled)}
-                size="sm"
-              >
-                <SpellCheck size={16} />
-                Grammar {grammarCheckEnabled ? 'ON' : 'OFF'}
-              </ModernButton>
-
-              <ModernButton
-                variant="secondary"
-                onClick={handleRewriteSentence}
-                size="sm"
-                title="Select text and click to rewrite it"
-              >
-                <Edit3 size={16} />
-                Rewrite
-              </ModernButton>
-
-              {/* Reading Guide - Pro Feature */}
-              {isPro ? (
-                <div style={{ position: 'relative', display: 'inline-block' }}>
-                  <ModernButton
-                    variant={readingGuideEnabled ? 'primary' : 'secondary'}
-                    onClick={() => setReadingGuideEnabled(!readingGuideEnabled)}
-                    size="sm"
-                  >
-                    <Eye size={16} />
-                    Reading Guide {readingGuideEnabled ? 'ON' : 'OFF'}
-                  </ModernButton>
-                  {readingGuideEnabled && (
-                    <select
-                      value={readingGuideType}
-                      onChange={(e) => setReadingGuideType(e.target.value as 'line' | 'sentence' | 'ruler')}
-                      title="Choose reading guide type"
-                      aria-label="Reading guide type"
-                      style={{
-                        marginLeft: '8px',
-                        padding: '6px 12px',
-                        borderRadius: '8px',
-                        border: `1px solid ${theme.border}`,
-                        backgroundColor: darkMode ? '#374151' : '#ffffff',
-                        color: theme.text,
-                        fontSize: '13px',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <option value="line">Line Focus</option>
-                      <option value="sentence">Sentence Spotlight</option>
-                      <option value="ruler">Reading Ruler</option>
-                    </select>
-                  )}
-                </div>
-              ) : (
+          {/* Sign up prompt for non-signed-in users */}
+          <SignedOut>
+            <div style={{ marginTop: '16px' }}>
+              <SignInButton mode="modal">
                 <ModernButton
-                  variant="secondary"
-                  onClick={() => {
-                    toast.info('Reading Guide is a Pro feature! Upgrade to unlock.');
-                    router.push('/pricing');
-                  }}
+                  variant="primary"
                   size="sm"
                 >
-                  <Lock size={16} />
-                  Reading Guide (Pro)
+                  🔑 Sign In to Save Your Work
                 </ModernButton>
-              )}
-            </div>
-
-            {/* Secondary Actions Row */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
-              <TextComparison
-                originalText={text}
-                simplifiedText={simplifiedText}
-                theme={theme}
-                fontSize={fontSize}
-                fontFamily={getFontFamily()}
-                bgColor={bgColor}
-                darkMode={darkMode}
-                editorTextColor={editorTextColor}
-              />
-
-              <ModernButton
-                onClick={() => {
-                  if (confirm('Clear all text?')) {
-                    setText('');
-                    setSimplifiedText('');
-                  }
-                }}
-                variant="danger"
-                size="sm"
-              >
-                <Trash2 size={16} />
-                Clear
-              </ModernButton>
-
-              {/* Export Buttons */}
-              {isPro ? (
-                <>
-                  <ExportPDFButton
-                    text={text}
-                    simplifiedText={simplifiedText}
-                    documentTitle={documentTitle}
-                    documentId={currentDocId || undefined}
-                  />
-                  <ExportMP3Button
-                    text={simplifiedText?.trim() ? simplifiedText : text}
-                    documentTitle={documentTitle}
-                    documentId={currentDocId || undefined}
-                  />
-                  <ExportDOCXButton
-                    text={text}
-                    simplifiedText={simplifiedText}
-                    bgColor={darkMode ? '#374151' : bgColor}
-                    fontFamily={getFontFamily()}
-                    fontSize={fontSize}
-                    enabled={isSignedIn && isPro}
-                    documentTitle={documentTitle}
-                    documentId={currentDocId || undefined}
-                  />
-                </>
-              ) : (
-                <>
-                  <ModernButton
-                    onClick={() => {
-                      toast.info('Upgrade to Pro to export as PDF!');
-                      router.push('/pricing');
-                    }}
-                    variant="secondary"
-                    size="sm"
-                  >
-                    <Download size={16} /> PDF (Pro)
-                  </ModernButton>
-
-                  <ModernButton
-                    onClick={() => {
-                      toast.info('Upgrade to Pro to export as MP3!');
-                      router.push('/pricing');
-                    }}
-                    variant="secondary"
-                    size="sm"
-                  >
-                    🎵 MP3 (Pro)
-                  </ModernButton>
-
-                  <ModernButton
-                    onClick={() => {
-                      toast.info('Upgrade to Pro to export as Word!');
-                      router.push('/pricing');
-                    }}
-                    variant="secondary"
-                    size="sm"
-                  >
-                    <FileText size={16} /> Word (Pro)
-                  </ModernButton>
-                </>
-              )}
-
-              {/* Usage counter for non-pro */}
-              {!isPro && (
-                <div
-                  style={{
-                    marginLeft: 'auto',
-                    padding: '6px 12px',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(59, 130, 246, 0.2)',
-                  }}
-                >
-                  <span style={{ fontSize: '13px', color: theme.text, fontWeight: '500' }}>
-                    {usageCount}/{usageLimit} today
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Error display */}
-            {error && (
-              <div style={{
-                marginTop: '12px',
-                padding: '12px',
-                borderRadius: '8px',
-                backgroundColor: '#fee2e2',
-                border: '1px solid #fca5a5',
-              }}>
-                <p style={{ color: '#991b1b', margin: 0, fontSize: '14px' }}>{error}</p>
-              </div>
-            )}
-
-            {/* Sign up prompt for non-signed-in users */}
-            <SignedOut>
-              <div style={{ marginTop: '16px' }}>
-                <SignInButton mode="modal">
-                  <ModernButton
-                    variant="primary"
-                    size="sm"
-                  >
-                    🔑 Sign In to Save Your Work
-                  </ModernButton>
-                </SignInButton>
-              </div>
-            </SignedOut>
-          </div>
-        </div>
-      </Card>
-
-      {/* Writing Coach — PRO gate */}
-      <div className="max-w-4xl px-4 mx-auto">
-        {isSignedIn ? (
-          isPro ? (
-            <CoachPanel
-              sourceText={text}
-              isPro={isPro}
-              coachBg={coachBg}
-              coachText={coachText}
-              coachBorder={coachBorder}
-              theme={theme}
-              darkMode={darkMode}
-              onApplySuggestion={(before, after) => {
-                // Replace the first occurrence of 'before' with 'after'
-                const updated = text.replace(before, after);
-                setText(updated);
-                toast.success('Applied suggestion!');
-              }}
-            />
-          ) : (
-            <Card>
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <Lock size={18} />
-                  <span className="font-semibold">Writing Coach (Pro)</span>
-                </div>
-                <p className="mb-4 text-sm text-slate-600">
-                  Writing Coach is available to Pro members. Unlock AI tips, structure, and guidance.
-                </p>
-                <ModernButton variant="primary" onClick={() => router.push('/pricing')}>
-                  Upgrade to Pro
-                </ModernButton>
-              </div>
-            </Card>
-          )
-        ) : (
-          <Card>
-            <div className="p-6">
-              <div className="flex items-center gap-2 mb-2">
-                <Lock size={18} />
-                <span className="font-semibold">Writing Coach</span>
-              </div>
-              <p className="mb-4 text-sm text-slate-600">
-                Please sign in to use Writing Coach, then upgrade to Pro to unlock it.
-              </p>
-              <SignInButton mode="modal">
-                <ModernButton variant="secondary">Sign in</ModernButton>
               </SignInButton>
             </div>
-          </Card>
-        )}
+          </SignedOut>
+        </div>
+      </Card>
       </div>
 
       {/* OCR Import */}
@@ -1664,6 +1323,48 @@ function PageBody() {
         theme={theme}
         darkMode={darkMode}
         intent={currentIntentForRewrite}
+      />
+
+      {/* Writing Coach Drawer */}
+      <CoachDrawer
+        isOpen={coachPanelOpen}
+        onClose={() => setCoachPanelOpen(false)}
+        sourceText={text}
+        isPro={isPro}
+        theme={theme}
+        darkMode={darkMode}
+        onApplySuggestion={(before, after) => {
+          const updated = text.replace(before, after);
+          setText(updated);
+          toast.success('Applied suggestion!');
+        }}
+      />
+
+      {/* Accessibility Drawer */}
+      <AccessibilityDrawer
+        isOpen={accessibilityPanelOpen}
+        onClose={() => setAccessibilityPanelOpen(false)}
+        isPro={isPro}
+        bgColor={bgColor}
+        setBgColor={setBgColor}
+        font={font}
+        setFont={setFont}
+        fontSize={fontSize}
+        setFontSize={setFontSize}
+        highContrast={highContrast}
+        setHighContrast={setHighContrast}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+        voiceId={voiceId}
+        setVoiceId={setVoiceId}
+        resetSettings={resetSettings}
+        theme={theme}
+        getFontFamily={getFontFamily}
+        text={text}
+        onTextChange={setText}
+        onApplyPreset={applyPreset}
+        onSelectTemplate={loadTemplate}
+        editorTextColor={editorTextColor}
       />
 
       <footer className="py-8 mt-16 text-sm text-center border-t border-slate-200 text-slate-500 dark:border-slate-800">
