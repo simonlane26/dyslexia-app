@@ -13,6 +13,9 @@ import {
   faqSchema,
 } from '@/app/schema';
 
+// Prevent static generation - requires runtime environment
+export const dynamic = 'force-dynamic';
+
 export default function LandingPage() {
   const { isSignedIn, isLoaded } = useUser();
   const router = useRouter();
