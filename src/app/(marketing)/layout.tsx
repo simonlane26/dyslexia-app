@@ -3,8 +3,6 @@ import type { ReactNode } from "react";
 import { ClerkProvider } from "@clerk/nextjs";
 import { LandingHeader } from "@/components/LandingHeader";
 
-export const dynamic = "force-static";
-
 export const metadata: Metadata = {
   title: "Dyslexia Writer — Dyslexia-friendly Writing App",
   description:
