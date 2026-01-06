@@ -28,7 +28,6 @@ export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
       description:
         'Line Focus, Sentence Spotlight, or Reading Ruler modes reduce visual noise and help you stay focused. Only your current text is bright—everything else fades.',
       color: '#10b981',
-      isPro: true,
       isNew: true,
     },
     {
@@ -44,6 +43,7 @@ export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
       description:
         'Select any sentence and get 3 alternatives: Simpler, More confident, or Clearer. One-click to apply. No grammar jargon, just plain language.',
       color: '#3b82f6',
+      isPro: true,
       isNew: true,
     },
     {
