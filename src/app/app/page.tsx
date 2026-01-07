@@ -32,6 +32,14 @@ import { FixedToolbar } from '@/components/FixedToolbar';
 import { CoachDrawer } from '@/components/CoachDrawer';
 import { AccessibilityDrawer } from '@/components/AccessibilityDrawer';
 import {
+  WelcomeScreen,
+  StruggleSelection,
+  AccessibilityQuickSetup,
+  CoachIntroduction,
+  SuccessCelebration,
+} from '@/components/Onboarding';
+import { useOnboarding } from '@/hooks/useOnboarding';
+import {
   saveLocalDocument,
   getCurrentDocumentId,
   setCurrentDocumentId,
@@ -101,6 +109,7 @@ function PageBody() {
   const toast = useToast();
   const { user, isLoaded, isSignedIn } = useUser();
   const router = useRouter();
+  const onboarding = useOnboarding();
 
   // UI settings
   const [bgColor, setBgColor] = useState('#f9f7ed');
@@ -247,6 +256,12 @@ function PageBody() {
       setCurrentDocumentId(doc.id);
       setLastSaved(doc.updatedAt);
       toast.success('Document saved');
+
+      // Show first-save celebration if onboarding is complete
+      if (onboarding.hasCompletedOnboarding && !localStorage.getItem('dyslexia-firstSaveCelebrated')) {
+        localStorage.setItem('dyslexia-firstSaveCelebrated', 'true');
+        onboarding.showFirstSaveCelebration();
+      }
     } catch (error: any) {
       toast.error(error.message || 'Failed to save document');
     } finally {
@@ -1029,6 +1044,14 @@ function PageBody() {
     return () => clearTimeout(timer);
   }, [text]);
 
+  // Detect first typing for celebration
+  useEffect(() => {
+    if (text.length > 15 && onboarding.hasCompletedOnboarding && !localStorage.getItem('dyslexia-firstTypeCelebrated')) {
+      localStorage.setItem('dyslexia-firstTypeCelebrated', 'true');
+      onboarding.showFirstTypeCelebration();
+    }
+  }, [text, onboarding]);
+
   return (
     <div
       className="min-h-screen transition-all duration-300"
@@ -1043,6 +1066,19 @@ function PageBody() {
     >
       <div className="max-w-4xl px-4 py-8 mx-auto">
         <div className="mb-8 text-center">
+          <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
+            <img
+              src="/DW Logo.jpg"
+              alt="Dyslexia Writer Logo"
+              style={{
+                height: '60px',
+                width: 'auto',
+                borderRadius: '8px',
+                boxShadow: darkMode ? '0 2px 12px rgba(255, 255, 255, 0.1)' : '0 2px 12px rgba(0, 0, 0, 0.1)',
+              }}
+            />
+          </div>
+
           <h2 className="flex items-center justify-center gap-3 mb-6 text-3xl font-bold leading-tight tracking-tight md:text-4xl">
             <span
               aria-hidden
@@ -1394,6 +1430,72 @@ function PageBody() {
             <span className="font-medium text-blue-700">Simplifying your text...</span>
           </div>
         </div>
+      )}
+
+      {/* Onboarding Screens */}
+      {onboarding.currentStep === 'welcome' && (
+        <WelcomeScreen
+          onStartWriting={() => onboarding.goToNextStep()}
+          onCustomizeSettings={() => {
+            onboarding.goToNextStep();
+            onboarding.goToNextStep(); // Skip struggle selection, go straight to accessibility
+          }}
+          theme={theme}
+          darkMode={darkMode}
+        />
+      )}
+
+      {onboarding.currentStep === 'struggles' && (
+        <StruggleSelection
+          onComplete={(selectedStruggles) => {
+            onboarding.setStruggles(selectedStruggles);
+            onboarding.goToNextStep();
+          }}
+          onSkip={() => onboarding.goToNextStep()}
+          theme={theme}
+          darkMode={darkMode}
+        />
+      )}
+
+      {onboarding.currentStep === 'accessibility' && (
+        <AccessibilityQuickSetup
+          onComplete={(settings) => {
+            // Apply the accessibility settings
+            setBgColor(settings.bgColor);
+            setFont(settings.font);
+            setFontSize(settings.fontSize);
+            onboarding.goToNextStep();
+          }}
+          theme={theme}
+          darkMode={darkMode}
+        />
+      )}
+
+      {onboarding.currentStep === 'coach' && (
+        <CoachIntroduction
+          onComplete={() => onboarding.skipToEnd()}
+          theme={theme}
+          darkMode={darkMode}
+        />
+      )}
+
+      {/* Success Celebrations */}
+      {onboarding.isShowingFirstTypeCelebration && (
+        <SuccessCelebration
+          type="first-type"
+          onClose={() => onboarding.hideFirstTypeCelebration()}
+          theme={theme}
+          darkMode={darkMode}
+        />
+      )}
+
+      {onboarding.isShowingFirstSaveCelebration && (
+        <SuccessCelebration
+          type="first-save"
+          onClose={() => onboarding.hideFirstSaveCelebration()}
+          theme={theme}
+          darkMode={darkMode}
+        />
       )}
     </div>
   );

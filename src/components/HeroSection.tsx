@@ -60,6 +60,20 @@ export function HeroSection({
 
       {/* Content */}
       <div style={{ position: 'relative', zIndex: 1, maxWidth: '900px', margin: '0 auto' }}>
+        {/* Logo */}
+        <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
+          <img
+            src="/DW Logo.jpg"
+            alt="Dyslexia Writer Logo"
+            style={{
+              height: '80px',
+              width: 'auto',
+              borderRadius: '12px',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
+            }}
+          />
+        </div>
+
         {/* Eyebrow text */}
         <div
           style={{
