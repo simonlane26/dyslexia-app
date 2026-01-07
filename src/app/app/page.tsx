@@ -1068,7 +1068,7 @@ function PageBody() {
         <div className="mb-8 text-center">
           <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
             <img
-              src="/DW Logo.jpg"
+              src="/dw-logo.jpg"
               alt="Dyslexia Writer Logo"
               style={{
                 height: '60px',
