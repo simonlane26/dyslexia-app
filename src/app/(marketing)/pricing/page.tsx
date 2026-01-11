@@ -7,6 +7,9 @@ import {
   useUser,
 } from '@clerk/nextjs';
 
+// Force dynamic rendering for Clerk authentication
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import React, { type CSSProperties } from 'react';
 import { Check, Star, Users, School, Sparkles, Volume2, Download, Palette } from 'lucide-react';
