@@ -8,11 +8,22 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: "/",
         // Keep private/app-only stuff out of the index
-        disallow: ["/api/", "/app", "/app/*", "/sign-in", "/sign-up"],
+        disallow: [
+          "/api/",
+          "/app",
+          "/app/*",
+          "/sign-in",
+          "/sign-in/*",
+          "/sign-up",
+          "/sign-up/*",
+          "/sso-callback",
+          "/sso-callback/*",
+          "/success",
+        ],
       },
     ],
     // Point crawlers to your sitemap
     sitemap: "https://www.dyslexiawrite.com/sitemap.xml",
-    // (Optional) host: "www.dyslexiawrite.com",
+    host: "https://www.dyslexiawrite.com",
   };
 }
