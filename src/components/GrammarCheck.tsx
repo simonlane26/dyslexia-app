@@ -18,6 +18,7 @@ interface GrammarCheckProps {
   editorTextColor: string;
   darkMode: boolean;
   highContrast: boolean;
+  isSchoolMode?: boolean;
 }
 
 interface GrammarTooltip {
@@ -37,6 +38,7 @@ export function GrammarCheck({
   editorTextColor,
   darkMode,
   highContrast,
+  isSchoolMode = false,
 }: GrammarCheckProps) {
   const [issues, setIssues] = useState<GrammarIssue[]>([]);
   const [checking, setChecking] = useState(false);
@@ -185,15 +187,17 @@ export function GrammarCheck({
             alignItems: 'center',
             gap: '6px',
             padding: '6px 12px',
-            backgroundColor: darkMode ? 'rgba(239, 68, 68, 0.2)' : 'rgba(239, 68, 68, 0.1)',
+            backgroundColor: isSchoolMode
+              ? (darkMode ? 'rgba(167, 139, 250, 0.2)' : 'rgba(167, 139, 250, 0.1)')
+              : (darkMode ? 'rgba(239, 68, 68, 0.2)' : 'rgba(239, 68, 68, 0.1)'),
             borderRadius: '6px',
             fontSize: '12px',
-            color: theme.danger,
+            color: isSchoolMode ? '#7c3aed' : theme.danger,
             zIndex: 10,
           }}
         >
           <AlertCircle size={14} />
-          {issues.length} issue{issues.length !== 1 ? 's' : ''} found
+          {issues.length} writing {issues.length !== 1 ? 'tips' : 'tip'}
         </div>
       )}
 
@@ -210,6 +214,7 @@ export function GrammarCheck({
         darkMode={darkMode}
         highContrast={highContrast}
         theme={theme}
+        isSchoolMode={isSchoolMode}
       />
 
       {/* Tooltip */}
@@ -250,6 +255,7 @@ function GrammarHighlightedText({
   darkMode,
   highContrast,
   theme,
+  isSchoolMode = false,
 }: {
   text: string;
   issues: GrammarIssue[];
@@ -262,6 +268,7 @@ function GrammarHighlightedText({
   darkMode: boolean;
   highContrast: boolean;
   theme: any;
+  isSchoolMode?: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -297,6 +304,11 @@ function GrammarHighlightedText({
   }
 
   const getUnderlineColor = (severity: string, isDyslexia: boolean) => {
+    if (isSchoolMode) {
+      // Soft, non-shaming purple tones in school mode
+      if (isDyslexia) return '#a78bfa';
+      return '#c4b5fd';
+    }
     if (isDyslexia) return '#f59e0b'; // Orange for dyslexia-relevant
     if (severity === 'error') return '#ef4444'; // Red for errors
     if (severity === 'warning') return '#3b82f6'; // Blue for warnings
@@ -368,9 +380,11 @@ function GrammarHighlightedText({
               ),
               textDecorationThickness: '2px',
               cursor: 'pointer',
-              backgroundColor: segment.issue.isDyslexiaRelevant
-                ? 'rgba(245, 158, 11, 0.1)'
-                : undefined,
+              backgroundColor: isSchoolMode
+                ? 'rgba(196, 181, 253, 0.1)'
+                : segment.issue.isDyslexiaRelevant
+                  ? 'rgba(245, 158, 11, 0.1)'
+                  : undefined,
             }}
             title={segment.issue.shortMessage}
           >

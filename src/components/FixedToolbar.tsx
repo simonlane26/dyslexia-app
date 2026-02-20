@@ -23,6 +23,7 @@ import { ExportPDFButton } from './ExportPDFButton';
 import { ExportMP3Button } from './ExportMP3Button';
 import { ExportDOCXButton } from './ExportDOCXButton';
 import { useState } from 'react';
+import type { CopyMap } from '@/lib/schoolCopy';
 
 interface Theme {
   bg: string;
@@ -70,6 +71,10 @@ interface FixedToolbarProps {
   // Theme
   theme: Theme;
   darkMode: boolean;
+
+  // School Mode
+  copy: CopyMap;
+  isSchoolMode: boolean;
 }
 
 export function FixedToolbar({
@@ -100,6 +105,8 @@ export function FixedToolbar({
   simplifiedText,
   theme,
   darkMode,
+  copy,
+  isSchoolMode,
 }: FixedToolbarProps) {
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
 
@@ -156,7 +163,7 @@ export function FixedToolbar({
 
           <ModernButton variant="secondary" onClick={onSimplify} disabled={loading || !text.trim()} title="Simplify text">
             <Sparkles size={18} />
-            Simplify
+            {copy.simplifyLabel}
           </ModernButton>
 
           <ModernButton variant="secondary" onClick={onReadAloud} title="Read text aloud">
@@ -187,7 +194,7 @@ export function FixedToolbar({
             size="sm"
           >
             <SpellCheck size={14} />
-            Grammar
+            {copy.grammarLabel}
           </ModernButton>
 
           <ModernButton
@@ -238,21 +245,21 @@ export function FixedToolbar({
             <ModernButton
               variant={coachPanelOpen ? 'primary' : 'secondary'}
               onClick={onCoachPanelToggle}
-              title="Toggle Writing Coach panel"
+              title={`Toggle ${copy.aiCoachLabel} panel`}
               size="sm"
             >
               <MessageSquare size={14} />
-              Coach
+              {copy.aiCoachButton}
             </ModernButton>
           ) : (
             <ModernButton
               variant="secondary"
               onClick={onUpgradeClick}
-              title="⭐ Pro Feature - Unlock calmer writing and smarter support"
+              title={`⭐ Pro Feature - ${copy.aiCoachLabel}`}
               size="sm"
             >
               <span style={{ fontSize: '12px', marginRight: '2px' }}>⭐</span>
-              Coach
+              {copy.aiCoachButton}
             </ModernButton>
           )}
         </div>

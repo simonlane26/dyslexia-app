@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { ModernButton } from './ModernButton';
 import CoachPanel from './CoachPanel';
 import { useEffect } from 'react';
+import type { CopyMap } from '@/lib/schoolCopy';
 
 interface Theme {
   bg: string;
@@ -26,6 +27,8 @@ interface CoachDrawerProps {
   theme: Theme;
   darkMode: boolean;
   onApplySuggestion: (before: string, after: string) => void;
+  copy: CopyMap;
+  isSchoolMode: boolean;
 }
 
 export function CoachDrawer({
@@ -36,6 +39,8 @@ export function CoachDrawer({
   theme,
   darkMode,
   onApplySuggestion,
+  copy,
+  isSchoolMode,
 }: CoachDrawerProps) {
   // Close on Escape key
   useEffect(() => {
@@ -121,7 +126,7 @@ export function CoachDrawer({
               color: theme.text,
             }}
           >
-            ✨ Writing Coach
+            ✨ {copy.aiCoachLabel}
           </h2>
           <ModernButton
             variant="secondary"
@@ -151,6 +156,8 @@ export function CoachDrawer({
               theme={theme}
               darkMode={darkMode}
               onApplySuggestion={onApplySuggestion}
+              isSchoolMode={isSchoolMode}
+              copy={copy}
             />
           ) : (
             <div
@@ -161,10 +168,10 @@ export function CoachDrawer({
               }}
             >
               <p style={{ fontSize: '16px', marginBottom: '16px' }}>
-                Writing Coach is a Pro feature
+                {copy.aiCoachLabel} is a Pro feature
               </p>
               <p style={{ fontSize: '14px', opacity: 0.7, marginBottom: '24px' }}>
-                Upgrade to unlock AI-powered writing tips, structure analysis, and personalized guidance.
+                Upgrade to unlock personalised writing tips, structure analysis, and guidance.
               </p>
               <ModernButton variant="primary" onClick={() => window.location.href = '/pricing'}>
                 Upgrade to Pro

@@ -11,6 +11,9 @@ type Provider = 'openai' | 'openrouter' | 'none';
 const SYSTEM_PROMPT =
   'You simplify text for dyslexic readers. Keep meaning the same; prefer short sentences and simple words. Remove filler. Keep names and facts. Output only the simplified text.';
 
+const SCHOOL_SYSTEM_PROMPT =
+  'You make writing easier to read for children aged 8–16 with dyslexia. Use very short sentences. Use simple, everyday words. Keep the same meaning. Do not add explanations or comments — output only the easier version of the text.';
+
 // ---------- utils
 const clean = (s?: string | null) => (s ?? '').trim().replace(/^"(.*)"$/, '$1');
 const todayStr = () => new Date().toISOString().split('T')[0];
@@ -65,6 +68,7 @@ export async function POST(req: NextRequest) {
     }
     const body = await req.json().catch(() => null as any);
     const text = String(body?.text ?? '').trim();
+    const isSchoolMode = body?.isSchoolMode === true;
     if (!text) {
       return NextResponse.json({ error: "Missing 'text' string" }, { status: 400, headers: H });
     }
@@ -103,7 +107,7 @@ export async function POST(req: NextRequest) {
       model: sel.model,
       temperature: 0.2,
       messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'system', content: isSchoolMode ? SCHOOL_SYSTEM_PROMPT : SYSTEM_PROMPT },
         { role: 'user', content: text },
       ],
     };

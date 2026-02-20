@@ -13,6 +13,7 @@
     "@clerk/types": "^4.85.0",
     "@headlessui/react": "^2",
     "@heroicons/react": "^2",
+    "@supabase/supabase-js": "^2.97.0",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/file-saver": "^2.0.7",
     "@types/stripe": "^8.0.417",

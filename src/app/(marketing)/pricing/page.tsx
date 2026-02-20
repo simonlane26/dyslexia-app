@@ -713,23 +713,6 @@ export default function ModernPricingPage() {
             ].map((plan) => (
               <PricingCard key={plan.id}>
                 <div style={{ padding: '32px' }}>
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '20px',
-                      right: '20px',
-                      background:
-                        'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-                      color: 'white',
-                      padding: '6px 12px',
-                      borderRadius: '20px',
-                      fontSize: '12px',
-                      fontWeight: 600,
-                    }}
-                  >
-                    Coming Soon
-                  </div>
-
                   <div style={{ textAlign: 'center', marginBottom: '32px' }}>
                     <h3
                       style={{
@@ -768,19 +751,37 @@ export default function ModernPricingPage() {
                   <div style={{ marginBottom: '32px' }}>
                     <FeatureItem highlighted>Up to {plan.range}</FeatureItem>
                     <FeatureItem>Teacher Dashboard</FeatureItem>
-                    <FeatureItem>Class Roster Import</FeatureItem>
-                    <FeatureItem>Usage Reports</FeatureItem>
+                    <FeatureItem>School Mode — child-safe copy</FeatureItem>
+                    <FeatureItem>No grades, no red marks</FeatureItem>
+                    <FeatureItem>EU data hosting (GDPR)</FeatureItem>
+                    <FeatureItem>No student writing stored</FeatureItem>
                     <FeatureItem>Priority Support</FeatureItem>
                   </div>
 
-                  <ModernButton
-                    variant="ghost"
-                    size="lg"
-                    style={{ width: '100%' }}
-                    disabled
-                  >
-                    Coming Soon
-                  </ModernButton>
+                  <SignedIn>
+                    <ModernButton
+                      variant="success"
+                      size="lg"
+                      style={{ width: '100%' }}
+                      onClick={() => handleGetPro(plan.id)}
+                    >
+                      Get {plan.name} Plan
+                    </ModernButton>
+                  </SignedIn>
+                  <SignedOut>
+                    <SignInButton mode="modal">
+                      <ModernButton variant="primary" size="lg" style={{ width: '100%' }}>
+                        Sign in to get started
+                      </ModernButton>
+                    </SignInButton>
+                  </SignedOut>
+
+                  <p style={{ textAlign: 'center', fontSize: '12px', color: '#94a3b8', marginTop: '12px' }}>
+                    <Link href="/schools-privacy" style={{ color: '#7c3aed', textDecoration: 'underline' }}>
+                      Schools privacy policy
+                    </Link>
+                    {' · '}GDPR compliant
+                  </p>
                 </div>
               </PricingCard>
             ))}

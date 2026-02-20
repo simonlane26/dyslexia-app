@@ -2,6 +2,7 @@
 import "server-only";
 import { NextRequest } from "next/server";
 import Stripe from "stripe";
+import { createSupabaseServerClient } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,6 +12,18 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 /* ---------- helpers ---------- */
+
+function generateSchoolCode(): string {
+  // Avoids visually confusable characters (0/O, 1/I/l)
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
+const SCHOOL_MAX_STUDENTS: Record<string, number> = {
+  starter: 30,
+  mid: 150,
+  full: 500,
+};
 
 function getUserIdFromLines(inv: Stripe.Invoice): string | undefined {
   for (const line of inv.lines?.data ?? []) {
@@ -106,13 +119,47 @@ export async function POST(req: NextRequest) {
         proSince: new Date().toISOString(),
         stripeCustomerId: (s.customer as string) || undefined,
       };
+
+      let publicExtra: Record<string, unknown> = {};
+
       if (plan?.startsWith("school_")) {
-        flags.schoolTier = plan.replace("school_", ""); // starter|mid|full
+        const tier = plan.replace("school_", "") as "starter" | "mid" | "full";
+        flags.schoolTier = tier;
+
+        // Create a school record in Supabase and store the school code
+        try {
+          const db = createSupabaseServerClient();
+          const schoolCode = generateSchoolCode();
+          const { data: school, error } = await db
+            .from("schools")
+            .insert({
+              name: "My School",
+              school_code: schoolCode,
+              plan_tier: tier,
+              stripe_customer_id: (s.customer as string) || null,
+              max_students: SCHOOL_MAX_STUDENTS[tier] ?? 30,
+            })
+            .select("id")
+            .single();
+
+          if (!error && school) {
+            publicExtra = {
+              schoolId: school.id,
+              schoolRole: "teacher",
+              schoolCode,
+            };
+            console.log("[stripe] ✅ created school", school.id, "code:", schoolCode);
+          } else {
+            console.error("[stripe] ⚠️ failed to create school record:", error?.message);
+          }
+        } catch (dbErr: any) {
+          console.error("[stripe] ⚠️ supabase error:", dbErr?.message);
+        }
       }
 
       await clerkPatchUserMetadata(uid, {
-        privateData: flags,                           // <-- your app reads this
-        publicData: { isPro: true, plan: plan ?? null, mode: mode ?? null }, // handy for dashboard
+        privateData: flags,
+        publicData: { isPro: true, plan: plan ?? null, mode: mode ?? null, ...publicExtra },
       });
 
       console.log("[stripe] ✅ set isPro=true for", uid, "plan:", plan, "mode:", mode);

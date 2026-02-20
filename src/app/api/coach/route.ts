@@ -205,11 +205,23 @@ export async function POST(req: NextRequest) {
     return jsonError(400, { error: 'MISSING_TEXT' }, baseHdrs);
   }
 
-  // Extract intent if provided
+  // Extract intent and school mode if provided
   const intent = body?.intent;
+  const isSchoolMode = body?.isSchoolMode === true;
 
-  // Build system prompt with intent context
-  const systemPrompt = buildSystemPrompt(intent);
+  // Build system prompt — child-safe version for school mode
+  const systemPrompt = isSchoolMode
+    ? 'You are a kind and encouraging writing helper for students aged 8–16 with dyslexia. ' +
+      'Use very simple, friendly language a child will understand. ' +
+      '\n\n⚠️ RULES:\n' +
+      '- Never use words like "error", "wrong", "mistake", or "bad"\n' +
+      '- Instead say "try this", "this could be clearer", "good idea to..."\n' +
+      '- Focus on one or two things at a time — do not overwhelm\n' +
+      '- Keep every suggestion very short and positive\n' +
+      '- Always say something encouraging first\n' +
+      '- Never mention AI or technical terms\n' +
+      '- No grades or scores — only kind, practical tips\n'
+    : buildSystemPrompt(intent);
 
   // Timeout guard (prevents hanging fetch causing 500)
   const ctrl = new AbortController();

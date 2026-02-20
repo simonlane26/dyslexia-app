@@ -31,6 +31,8 @@ import { ReadingGuide } from '@/components/ReadingGuide';
 import { FixedToolbar } from '@/components/FixedToolbar';
 import { CoachDrawer } from '@/components/CoachDrawer';
 import { AccessibilityDrawer } from '@/components/AccessibilityDrawer';
+import { useSchoolMode } from '@/hooks/useSchoolMode';
+import { getCopy } from '@/lib/schoolCopy';
 import {
   WelcomeScreen,
   StruggleSelection,
@@ -105,11 +107,17 @@ function PageBody() {
   const [usageLimit] = useState(5);
   const [isPro, setIsPro] = useState(false);
 
+  // School session tracking (counts only, no content ever sent)
+  const [sessionSimplifications, setSessionSimplifications] = useState(0);
+  const sessionStartRef = useRef<number>(Date.now());
+
   // Hooks
   const toast = useToast();
   const { user, isLoaded, isSignedIn } = useUser();
   const router = useRouter();
   const onboarding = useOnboarding();
+  const schoolMode = useSchoolMode();
+  const copy = getCopy(schoolMode.isSchoolMode);
 
   // UI settings
   const [bgColor, setBgColor] = useState('#f9f7ed');
@@ -232,6 +240,34 @@ function PageBody() {
 
     return () => clearTimeout(timer);
   }, [text, simplifiedText, documentTitle]);
+
+  // School session tracking — POST aggregate metrics every 60s (no content sent)
+  useEffect(() => {
+    if (!schoolMode.isSchoolMode || !schoolMode.schoolId) return;
+    const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+    if (wordCount < 10) return; // Skip trivial sessions
+
+    const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 0);
+    const avgSentLen = sentences.length > 0
+      ? sentences.reduce((sum, s) => sum + s.trim().split(/\s+/).length, 0) / sentences.length
+      : 0;
+    const durationMinutes = Math.round((Date.now() - sessionStartRef.current) / 60000);
+
+    const timer = setTimeout(() => {
+      fetch('/api/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          words_typed: wordCount,
+          simplifications_used: sessionSimplifications,
+          avg_sentence_length: Math.round(avgSentLen * 10) / 10,
+          session_duration_minutes: durationMinutes,
+        }),
+      }).catch(() => {}); // Fire-and-forget
+    }, 60_000);
+
+    return () => clearTimeout(timer);
+  }, [text, schoolMode.isSchoolMode, schoolMode.schoolId, sessionSimplifications]);
 
   const saveDocument = () => {
     if (!text.trim() && !simplifiedText.trim()) {
@@ -531,7 +567,7 @@ function PageBody() {
       const res = await fetch('/api/simplify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text.trim() }),
+        body: JSON.stringify({ text: text.trim(), isSchoolMode: schoolMode.isSchoolMode }),
       });
 
       const hdrs = {
@@ -565,6 +601,9 @@ function PageBody() {
       const data = payload || {};
       if (data.simplifiedText) {
         setSimplifiedText(data.simplifiedText);
+        if (schoolMode.isSchoolMode) {
+          setSessionSimplifications((n) => n + 1);
+        }
         if (data.usage) {
           setUsageCount(data.usage.count ?? 0);
           setIsPro(!!data.usage.isPro);
@@ -1110,6 +1149,26 @@ function PageBody() {
         </Suspense>
 
         <div className="flex items-center gap-3">
+          {schoolMode.isTeacher && (
+            <ModernButton
+              variant="secondary"
+              size="sm"
+              onClick={() => router.push('/dashboard')}
+              title="Class Dashboard"
+            >
+              📊 Class Dashboard
+            </ModernButton>
+          )}
+          {schoolMode.isSchoolMode && !schoolMode.schoolId && (
+            <ModernButton
+              variant="primary"
+              size="sm"
+              onClick={() => router.push('/join-school')}
+              title="Link to your school"
+            >
+              🏫 Join your school
+            </ModernButton>
+          )}
           <Suspense fallback={null}>
             <UpgradeButton />
           </Suspense>
@@ -1147,6 +1206,8 @@ function PageBody() {
         simplifiedText={simplifiedText}
         theme={theme}
         darkMode={darkMode}
+        copy={copy}
+        isSchoolMode={schoolMode.isSchoolMode}
       />
 
       <div className="max-w-6xl px-4 mx-auto" style={{ marginTop: '20px' }}>
@@ -1232,6 +1293,7 @@ function PageBody() {
               editorTextColor={editorTextColor}
               darkMode={darkMode}
               highContrast={highContrast}
+              isSchoolMode={schoolMode.isSchoolMode}
             />
           ) : (
             <textarea
@@ -1374,6 +1436,8 @@ function PageBody() {
           setText(updated);
           toast.success('Applied suggestion!');
         }}
+        copy={copy}
+        isSchoolMode={schoolMode.isSchoolMode}
       />
 
       {/* Accessibility Drawer */}

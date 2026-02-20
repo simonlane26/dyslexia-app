@@ -4,6 +4,8 @@
 import React, { useState } from 'react';
 import { Sparkles, Volume2, RotateCcw, Loader2, AlertTriangle, Lightbulb, Edit3, List, CheckCircle, Star, ChevronDown, ChevronUp } from 'lucide-react';
 import { CoachIntentModal, CoachIntent } from './CoachIntentModal';
+import type { CopyMap } from '@/lib/schoolCopy';
+import { DEFAULT_COPY } from '@/lib/schoolCopy';
 
 type Props = {
   /** Raw text from the editor */
@@ -22,6 +24,10 @@ type Props = {
   /** Theme for modals */
   theme?: any;
   darkMode?: boolean;
+
+  /** School Mode */
+  isSchoolMode?: boolean;
+  copy?: CopyMap;
 };
 
 type TipCategory = 'clarity' | 'simplicity' | 'structure' | 'grammar' | 'strength';
@@ -66,6 +72,8 @@ export default function CoachPanel({
   onApplySuggestion,
   theme,
   darkMode = false,
+  isSchoolMode = false,
+  copy = DEFAULT_COPY,
 }: Props) {
   const [state, setState] = useState<CoachState>({ kind: 'idle' });
   const [expandedTips, setExpandedTips] = useState<Set<number>>(new Set());
@@ -139,7 +147,7 @@ export default function CoachPanel({
       const res = await fetch('/api/coach', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, intent }),
+        body: JSON.stringify({ text, intent, isSchoolMode }),
       });
 
       if (!res.ok) {
@@ -238,8 +246,8 @@ export default function CoachPanel({
 
   function getSeverityBadge(severity: TipSeverity) {
     const badges = {
-      high: { icon: '⭐', label: 'Quick win', bg: 'rgba(34, 197, 94, 0.1)', border: 'rgba(34, 197, 94, 0.3)', text: '#22c55e' },
-      medium: { icon: '💡', label: 'Worth trying', bg: 'rgba(59, 130, 246, 0.1)', border: 'rgba(59, 130, 246, 0.3)', text: '#3b82f6' },
+      high: { icon: '⭐', label: copy.coachBadgeHigh, bg: 'rgba(34, 197, 94, 0.1)', border: 'rgba(34, 197, 94, 0.3)', text: '#22c55e' },
+      medium: { icon: '💡', label: copy.coachBadgeMedium, bg: 'rgba(59, 130, 246, 0.1)', border: 'rgba(59, 130, 246, 0.3)', text: '#3b82f6' },
       low: { icon: '🤔', label: 'Optional', bg: 'rgba(148, 163, 184, 0.1)', border: 'rgba(148, 163, 184, 0.3)', text: '#64748b' },
     };
     const b = badges[severity];

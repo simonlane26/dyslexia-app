@@ -10,6 +10,7 @@ const PUBLIC_PATHS = [
   '/terms',
   '/cookies',
   '/success',
+  '/schools-privacy',
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/sso-callback(.*)',
