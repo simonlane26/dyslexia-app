@@ -43,21 +43,29 @@ export async function GET(req: NextRequest) {
   const schoolId: string = meta.schoolId;
 
   // Fetch school info
-  const { data: school } = await db
-    .from("schools")
-    .select("name, school_code, plan_tier, max_students")
-    .eq("id", schoolId)
-    .maybeSingle();
+  let school = null;
+  let members: { id: string; display_name: string | null; role: string; joined_at: string }[] | null = null;
 
-  // Get all students in this school
-  const { data: members, error: membersError } = await db
-    .from("school_members")
-    .select("id, display_name, role, joined_at")
-    .eq("school_id", schoolId)
-    .eq("role", "student");
+  try {
+    const schoolRes = await db
+      .from("schools")
+      .select("name, school_code, plan_tier, max_students")
+      .eq("id", schoolId)
+      .maybeSingle();
+    school = schoolRes.data;
 
-  if (membersError) {
-    return NextResponse.json({ error: membersError.message }, { status: 500 });
+    const membersRes = await db
+      .from("school_members")
+      .select("id, display_name, role, joined_at")
+      .eq("school_id", schoolId)
+      .eq("role", "student");
+
+    if (membersRes.error) {
+      return NextResponse.json({ error: `Query failed: ${membersRes.error.message}` }, { status: 500 });
+    }
+    members = membersRes.data;
+  } catch (e) {
+    return NextResponse.json({ error: `Supabase query failed: ${e instanceof Error ? e.message : String(e)}` }, { status: 500 });
   }
 
   if (!members?.length) {
