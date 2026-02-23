@@ -36,8 +36,8 @@ export async function GET(req: NextRequest) {
   let db;
   try {
     db = createSupabaseServerClient();
-  } catch {
-    return NextResponse.json({ error: "Database not configured" }, { status: 503 });
+  } catch (e) {
+    return NextResponse.json({ error: `Supabase init failed: ${e instanceof Error ? e.message : String(e)}` }, { status: 503 });
   }
 
   const schoolId: string = meta.schoolId;
