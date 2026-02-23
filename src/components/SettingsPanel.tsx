@@ -180,7 +180,7 @@ export function SettingsPanel({
 
 {!isPro && (
   <p className="mt-2 text-xs text-slate-500">
-    More background colors available with Pro ✨
+    Some people find these colours calmer — available in Pro.
   </p>
 )}
 

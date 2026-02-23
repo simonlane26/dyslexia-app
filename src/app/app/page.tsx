@@ -111,6 +111,9 @@ function PageBody() {
   const [sessionSimplifications, setSessionSimplifications] = useState(0);
   const sessionStartRef = useRef<number>(Date.now());
 
+  // Welcome banner — shown once after onboarding completes
+  const [showWelcomeBanner, setShowWelcomeBanner] = useState(false);
+
   // Hooks
   const toast = useToast();
   const { user, isLoaded, isSignedIn } = useUser();
@@ -1091,6 +1094,13 @@ function PageBody() {
     }
   }, [text, onboarding]);
 
+  // Show welcome banner once after onboarding completes
+  useEffect(() => {
+    if (onboarding.hasCompletedOnboarding && !localStorage.getItem('dw-welcome-banner-dismissed')) {
+      setShowWelcomeBanner(true);
+    }
+  }, [onboarding.hasCompletedOnboarding]);
+
   return (
     <div
       className="min-h-screen transition-all duration-300"
@@ -1209,6 +1219,43 @@ function PageBody() {
         copy={copy}
         isSchoolMode={schoolMode.isSchoolMode}
       />
+
+      {/* First-session welcome banner */}
+      {showWelcomeBanner && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '12px',
+          padding: '12px 20px',
+          backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.15)' : 'rgba(139, 92, 246, 0.08)',
+          borderBottom: `1px solid ${darkMode ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.15)'}`,
+        }}>
+          <p style={{ margin: 0, fontSize: '14px', color: darkMode ? '#c4b5fd' : '#6d28d9', fontWeight: 500 }}>
+            ✏️ Start anywhere. There&apos;s no right way to write here.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setShowWelcomeBanner(false);
+              localStorage.setItem('dw-welcome-banner-dismissed', '1');
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '18px',
+              color: darkMode ? '#a78bfa' : '#7c3aed',
+              lineHeight: 1,
+              padding: '0 4px',
+              flexShrink: 0,
+            }}
+            aria-label="Dismiss"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       <div className="max-w-6xl px-4 mx-auto" style={{ marginTop: '20px' }}>
       <Card className="mb-6">

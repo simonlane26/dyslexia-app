@@ -22,7 +22,7 @@ import { ModernButton } from './ModernButton';
 import { ExportPDFButton } from './ExportPDFButton';
 import { ExportMP3Button } from './ExportMP3Button';
 import { ExportDOCXButton } from './ExportDOCXButton';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { CopyMap } from '@/lib/schoolCopy';
 
 interface Theme {
@@ -110,6 +110,28 @@ export function FixedToolbar({
 }: FixedToolbarProps) {
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
 
+  // One-time feature tips (shown once via localStorage)
+  const [showSimplifyTip, setShowSimplifyTip] = useState(false);
+  const [showA11yTip, setShowA11yTip] = useState(false);
+
+  useEffect(() => {
+    if (!localStorage.getItem('dw-tip-simplify')) setShowSimplifyTip(true);
+    if (!localStorage.getItem('dw-tip-a11y')) setShowA11yTip(true);
+  }, []);
+
+  function dismissSimplifyTip() {
+    setShowSimplifyTip(false);
+    localStorage.setItem('dw-tip-simplify', '1');
+  }
+
+  function dismissA11yTip() {
+    setShowA11yTip(false);
+    localStorage.setItem('dw-tip-a11y', '1');
+  }
+
+  // Contextual Pro upgrade popover
+  const [proPopover, setProPopover] = useState<null | 'rewrite' | 'coach'>(null);
+
   // Calculate stats for compact display
   const wordCount = text.trim() ? text.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
   const readingTimeMinutes = Math.ceil(wordCount / 200);
@@ -161,10 +183,18 @@ export function FixedToolbar({
             Dictate
           </ModernButton>
 
-          <ModernButton variant="secondary" onClick={onSimplify} disabled={loading || !text.trim()} title="Simplify text">
-            <Sparkles size={18} />
-            {copy.simplifyLabel}
-          </ModernButton>
+          <div style={{ position: 'relative' }}>
+            <ModernButton variant="secondary" onClick={() => { onSimplify(); dismissSimplifyTip(); }} disabled={loading || !text.trim()} title="Simplify text">
+              <Sparkles size={18} />
+              {copy.simplifyLabel}
+            </ModernButton>
+            {showSimplifyTip && (
+              <FeatureTip
+                message="Paste or type anything, then hit this to make it simpler and easier to read."
+                onDismiss={dismissSimplifyTip}
+              />
+            )}
+          </div>
 
           <ModernButton variant="secondary" onClick={onReadAloud} title="Read text aloud">
             <BookOpen size={18} />
@@ -229,16 +259,26 @@ export function FixedToolbar({
               Rewrite
             </ModernButton>
           ) : (
-            <ModernButton
-              variant="secondary"
-              onClick={onUpgradeClick}
-              title="⭐ Pro Feature - Rewrite with multiple tones and styles"
-              size="sm"
-              disabled={!text.trim()}
-            >
-              <span style={{ fontSize: '12px', marginRight: '2px' }}>⭐</span>
-              Rewrite
-            </ModernButton>
+            <div style={{ position: 'relative' }}>
+              <ModernButton
+                variant="secondary"
+                onClick={() => setProPopover(proPopover === 'rewrite' ? null : 'rewrite')}
+                title="Rewrite — Pro feature"
+                size="sm"
+                disabled={!text.trim()}
+              >
+                <span style={{ fontSize: '12px', marginRight: '2px' }}>⭐</span>
+                Rewrite
+              </ModernButton>
+              {proPopover === 'rewrite' && (
+                <ProUpgradePopover
+                  message="Rewrite lets you find new ways to say what you mean — try different tones until it feels right."
+                  onUpgrade={() => { setProPopover(null); onUpgradeClick(); }}
+                  onDismiss={() => setProPopover(null)}
+                  darkMode={darkMode}
+                />
+              )}
+            </div>
           )}
 
           {isPro ? (
@@ -252,15 +292,25 @@ export function FixedToolbar({
               {copy.aiCoachButton}
             </ModernButton>
           ) : (
-            <ModernButton
-              variant="secondary"
-              onClick={onUpgradeClick}
-              title={`⭐ Pro Feature - ${copy.aiCoachLabel}`}
-              size="sm"
-            >
-              <span style={{ fontSize: '12px', marginRight: '2px' }}>⭐</span>
-              {copy.aiCoachButton}
-            </ModernButton>
+            <div style={{ position: 'relative' }}>
+              <ModernButton
+                variant="secondary"
+                onClick={() => setProPopover(proPopover === 'coach' ? null : 'coach')}
+                title={`${copy.aiCoachLabel} — Pro feature`}
+                size="sm"
+              >
+                <span style={{ fontSize: '12px', marginRight: '2px' }}>⭐</span>
+                {copy.aiCoachButton}
+              </ModernButton>
+              {proPopover === 'coach' && (
+                <ProUpgradePopover
+                  message="Pro helps you write with confidence and structure — gentle tips, no jargon, no red marks."
+                  onUpgrade={() => { setProPopover(null); onUpgradeClick(); }}
+                  onDismiss={() => setProPopover(null)}
+                  darkMode={darkMode}
+                />
+              )}
+            </div>
           )}
         </div>
 
@@ -363,14 +413,22 @@ export function FixedToolbar({
             </ModernButton>
           )}
 
-          <ModernButton
-            variant={accessibilityPanelOpen ? 'primary' : 'secondary'}
-            onClick={onAccessibilityPanelToggle}
-            title="Accessibility settings"
-            size="sm"
-          >
-            <Settings size={14} />
-          </ModernButton>
+          <div style={{ position: 'relative' }}>
+            <ModernButton
+              variant={accessibilityPanelOpen ? 'primary' : 'secondary'}
+              onClick={() => { onAccessibilityPanelToggle(); dismissA11yTip(); }}
+              title="Accessibility settings"
+              size="sm"
+            >
+              <Settings size={14} />
+            </ModernButton>
+            {showA11yTip && (
+              <FeatureTip
+                message="Change font, colours, and text size here to make reading easier."
+                onDismiss={dismissA11yTip}
+              />
+            )}
+          </div>
         </div>
       </div>
 
@@ -438,6 +496,144 @@ export function FixedToolbar({
           </span>
         )}
       </div>
+    </div>
+  );
+}
+
+function FeatureTip({ message, onDismiss }: { message: string; onDismiss: () => void }) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: 'calc(100% + 8px)',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        backgroundColor: '#1e293b',
+        color: '#f8fafc',
+        borderRadius: '10px',
+        padding: '10px 14px',
+        fontSize: '13px',
+        lineHeight: '1.5',
+        maxWidth: '260px',
+        whiteSpace: 'normal',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+        zIndex: 50,
+        textAlign: 'center',
+      }}
+    >
+      <div style={{ marginBottom: '8px' }}>{message}</div>
+      <button
+        type="button"
+        onClick={onDismiss}
+        style={{
+          backgroundColor: 'rgba(255,255,255,0.15)',
+          border: '1px solid rgba(255,255,255,0.25)',
+          borderRadius: '6px',
+          color: '#f8fafc',
+          fontSize: '12px',
+          fontWeight: 600,
+          padding: '4px 12px',
+          cursor: 'pointer',
+        }}
+      >
+        Got it
+      </button>
+      {/* Arrow */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '-6px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 0,
+          height: 0,
+          borderLeft: '6px solid transparent',
+          borderRight: '6px solid transparent',
+          borderBottom: '6px solid #1e293b',
+        }}
+      />
+    </div>
+  );
+}
+
+function ProUpgradePopover({
+  message,
+  onUpgrade,
+  onDismiss,
+  darkMode,
+}: {
+  message: string;
+  onUpgrade: () => void;
+  onDismiss: () => void;
+  darkMode: boolean;
+}) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: 'calc(100% + 8px)',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        backgroundColor: darkMode ? '#1e293b' : '#ffffff',
+        border: `1px solid ${darkMode ? 'rgba(139,92,246,0.4)' : 'rgba(139,92,246,0.25)'}`,
+        borderRadius: '12px',
+        padding: '14px 16px',
+        fontSize: '13px',
+        lineHeight: '1.5',
+        width: '220px',
+        boxShadow: '0 6px 20px rgba(0,0,0,0.18)',
+        zIndex: 50,
+        textAlign: 'center',
+        color: darkMode ? '#f8fafc' : '#1e293b',
+      }}
+    >
+      <div style={{ marginBottom: '12px' }}>{message}</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <button
+          type="button"
+          onClick={onUpgrade}
+          style={{
+            background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
+            border: 'none',
+            borderRadius: '8px',
+            color: '#ffffff',
+            fontSize: '13px',
+            fontWeight: 700,
+            padding: '8px 12px',
+            cursor: 'pointer',
+          }}
+        >
+          Unlock with Pro →
+        </button>
+        <button
+          type="button"
+          onClick={onDismiss}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: darkMode ? 'rgba(248,250,252,0.5)' : '#94a3b8',
+            fontSize: '12px',
+            cursor: 'pointer',
+            padding: '2px',
+          }}
+        >
+          Maybe later
+        </button>
+      </div>
+      {/* Arrow */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '-6px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 0,
+          height: 0,
+          borderLeft: '6px solid transparent',
+          borderRight: '6px solid transparent',
+          borderBottom: `6px solid ${darkMode ? '#1e293b' : '#ffffff'}`,
+        }}
+      />
     </div>
   );
 }
