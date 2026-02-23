@@ -220,7 +220,24 @@ export async function POST(req: NextRequest) {
       '- Keep every suggestion very short and positive\n' +
       '- Always say something encouraging first\n' +
       '- Never mention AI or technical terms\n' +
-      '- No grades or scores — only kind, practical tips\n'
+      '- No grades or scores — only kind, practical tips\n\n' +
+      'Return JSON with this structure:\n' +
+      '{\n' +
+      '  "tips": [\n' +
+      '    {\n' +
+      '      "category": "clarity" | "simplicity" | "structure" | "grammar" | "strength",\n' +
+      '      "severity": "high" | "medium" | "low",\n' +
+      '      "message": "Short, friendly tip",\n' +
+      '      "suggestion": "What to try",\n' +
+      '      "sentenceText": "The sentence (if applicable)",\n' +
+      '      "before": "Original text",\n' +
+      '      "after": "Suggested replacement"\n' +
+      '    }\n' +
+      '  ],\n' +
+      '  "stats": { "avgSentenceLength": number, "longSentences": number, "complexWords": number, "readingLevel": "Easy" | "Medium" | "Hard" },\n' +
+      '  "strengths": ["1-2 things the student is doing well"],\n' +
+      '  "motivation": "One short encouraging sentence"\n' +
+      '}'
     : buildSystemPrompt(intent);
 
   // Timeout guard (prevents hanging fetch causing 500)
