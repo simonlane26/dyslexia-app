@@ -61,7 +61,13 @@ export async function GET(req: NextRequest) {
       .eq("role", "student");
 
     if (membersRes.error) {
-      return NextResponse.json({ error: `Query failed: ${membersRes.error.message}` }, { status: 500 });
+      return NextResponse.json({
+        error: `Query failed: ${membersRes.error.message}`,
+        code: membersRes.error.code,
+        details: membersRes.error.details,
+        hint: membersRes.error.hint,
+        url: (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "MISSING").slice(0, 50),
+      }, { status: 500 });
     }
     members = membersRes.data;
   } catch (e) {
