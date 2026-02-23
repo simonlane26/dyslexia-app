@@ -65,7 +65,11 @@ export async function GET(req: NextRequest) {
     }
     members = membersRes.data;
   } catch (e) {
-    return NextResponse.json({ error: `Supabase query failed: ${e instanceof Error ? e.message : String(e)}` }, { status: 500 });
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "MISSING";
+    return NextResponse.json({
+      error: `Supabase query failed: ${e instanceof Error ? e.message : String(e)}`,
+      url: url.slice(0, 40),
+    }, { status: 500 });
   }
 
   if (!members?.length) {
