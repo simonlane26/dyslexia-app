@@ -33,7 +33,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "No school linked" }, { status: 403 });
   }
 
-  const db = createSupabaseServerClient();
+  let db;
+  try {
+    db = createSupabaseServerClient();
+  } catch {
+    return NextResponse.json({ error: "Database not configured" }, { status: 503 });
+  }
+
   const schoolId: string = meta.schoolId;
 
   // Fetch school info
@@ -41,14 +47,18 @@ export async function GET(req: NextRequest) {
     .from("schools")
     .select("name, school_code, plan_tier, max_students")
     .eq("id", schoolId)
-    .single();
+    .maybeSingle();
 
   // Get all students in this school
-  const { data: members } = await db
+  const { data: members, error: membersError } = await db
     .from("school_members")
     .select("id, display_name, role, joined_at")
     .eq("school_id", schoolId)
     .eq("role", "student");
+
+  if (membersError) {
+    return NextResponse.json({ error: membersError.message }, { status: 500 });
+  }
 
   if (!members?.length) {
     return NextResponse.json({
