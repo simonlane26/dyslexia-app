@@ -1517,7 +1517,7 @@ function PageBody() {
       <footer className="py-8 mt-16 text-sm text-center border-t border-slate-200 text-slate-500 dark:border-slate-800">
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
           <img
-            src="/Education-Supplier-Badge-JPEG.webp"
+            src="/Incensu.jpg"
             alt="Approved Education Supplier"
             style={{ height: '80px', width: 'auto' }}
           />

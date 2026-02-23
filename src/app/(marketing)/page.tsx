@@ -158,7 +158,7 @@ export default function LandingPage() {
         }}
       >
         <img
-          src="/Education-Supplier-Badge-JPEG.webp"
+          src="/Incensu.jpg"
           alt="Approved Education Supplier"
           style={{ height: '120px', width: 'auto' }}
         />
