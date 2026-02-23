@@ -144,6 +144,29 @@ export default function LandingPage() {
         darkMode={darkMode}
       />
 
+      {/* Education Supplier Badge */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '12px',
+          padding: '40px 24px',
+          backgroundColor: darkMode ? '#1e293b' : '#f8fafc',
+          borderTop: `1px solid ${theme.border}`,
+          borderBottom: `1px solid ${theme.border}`,
+        }}
+      >
+        <img
+          src="/Education-Supplier-Badge-JPEG.webp"
+          alt="Approved Education Supplier"
+          style={{ height: '120px', width: 'auto' }}
+        />
+        <p style={{ fontSize: '15px', color: theme.textSecondary, margin: 0 }}>
+          Trusted by schools across the UK
+        </p>
+      </div>
+
       {/* Features Section */}
       <div id="features-section">
         <FeaturesSection theme={theme} darkMode={darkMode} />
