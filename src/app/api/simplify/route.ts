@@ -72,6 +72,9 @@ export async function POST(req: NextRequest) {
     if (!text) {
       return NextResponse.json({ error: "Missing 'text' string" }, { status: 400, headers: H });
     }
+    if (text.length > 10_000) {
+      return NextResponse.json({ error: 'Text too long (max 10,000 characters)' }, { status: 400, headers: H });
+    }
 
     // 2) provider + key
     const sel = pickProvider();

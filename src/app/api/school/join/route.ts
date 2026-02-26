@@ -50,6 +50,9 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
+  if (!/^[A-Z0-9]{8}$/.test(school_code.toUpperCase().trim())) {
+    return NextResponse.json({ error: "Invalid school code format" }, { status: 400 });
+  }
 
   const db = createSupabaseServerClient();
 

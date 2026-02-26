@@ -204,9 +204,21 @@ export async function POST(req: NextRequest) {
   if (!text) {
     return jsonError(400, { error: 'MISSING_TEXT' }, baseHdrs);
   }
+  if (text.length > 10_000) {
+    return jsonError(400, { error: 'TEXT_TOO_LONG', detail: 'Max 10,000 characters' }, baseHdrs);
+  }
 
-  // Extract intent and school mode if provided
-  const intent = body?.intent;
+  // Extract and validate intent — whitelist values to prevent prompt injection
+  const rawIntent = body?.intent;
+  const ALLOWED_AUDIENCES = new Set(['friend', 'teacher', 'boss', 'general']);
+  const ALLOWED_PURPOSES = new Set(['inform', 'persuade', 'explain', 'story']);
+  const ALLOWED_TONES = new Set(['casual', 'neutral', 'formal']);
+  const intent = (
+    rawIntent &&
+    ALLOWED_AUDIENCES.has(rawIntent.audience) &&
+    ALLOWED_PURPOSES.has(rawIntent.purpose) &&
+    ALLOWED_TONES.has(rawIntent.tone)
+  ) ? rawIntent : undefined;
   const isSchoolMode = body?.isSchoolMode === true;
 
   // Build system prompt — child-safe version for school mode

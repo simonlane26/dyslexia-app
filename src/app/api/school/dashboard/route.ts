@@ -61,21 +61,13 @@ export async function GET(req: NextRequest) {
       .eq("role", "student");
 
     if (membersRes.error) {
-      return NextResponse.json({
-        error: `Query failed: ${membersRes.error.message}`,
-        code: membersRes.error.code,
-        details: membersRes.error.details,
-        hint: membersRes.error.hint,
-        url: (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "MISSING").slice(0, 50),
-      }, { status: 500 });
+      console.error("[school/dashboard] members query error:", membersRes.error);
+      return NextResponse.json({ error: "Failed to load dashboard" }, { status: 500 });
     }
     members = membersRes.data;
   } catch (e) {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "MISSING";
-    return NextResponse.json({
-      error: `Supabase query failed: ${e instanceof Error ? e.message : String(e)}`,
-      url: url.slice(0, 40),
-    }, { status: 500 });
+    console.error("[school/dashboard] unexpected error:", e);
+    return NextResponse.json({ error: "Failed to load dashboard" }, { status: 500 });
   }
 
   if (!members?.length) {
