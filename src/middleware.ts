@@ -11,6 +11,7 @@ const PUBLIC_PATHS = [
   '/cookies',
   '/success',
   '/schools-privacy',
+  '/accessibility',
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/sso-callback(.*)',

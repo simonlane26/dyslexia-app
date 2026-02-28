@@ -1531,7 +1531,8 @@ function PageBody() {
         <div>
           <a href="/privacy" className="mx-2 hover:underline">Privacy Policy</a> |
           <a href="/terms" className="mx-2 hover:underline">Terms of Service</a> |
-          <a href="/cookies" className="mx-2 hover:underline">Cookie Policy</a>
+          <a href="/cookies" className="mx-2 hover:underline">Cookie Policy</a> |
+          <a href="/accessibility" className="mx-2 hover:underline">Accessibility</a>
         </div>
       </footer>
 
