@@ -144,27 +144,73 @@ export default function LandingPage() {
         darkMode={darkMode}
       />
 
-      {/* Education Supplier Badge */}
+      {/* Trust Signals Strip */}
       <div
         style={{
           display: 'flex',
-          flexDirection: 'column',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
           alignItems: 'center',
-          gap: '12px',
-          padding: '40px 24px',
+          gap: '48px',
+          padding: '48px 32px',
           backgroundColor: darkMode ? '#1e293b' : '#f8fafc',
           borderTop: `1px solid ${theme.border}`,
           borderBottom: `1px solid ${theme.border}`,
         }}
       >
-        <img
-          src="/Incensu.jpg"
-          alt="Approved Education Supplier"
-          style={{ height: '120px', width: 'auto' }}
-        />
-        <p style={{ fontSize: '15px', color: theme.textSecondary, margin: 0 }}>
-          Trusted by schools across the UK
-        </p>
+        {/* Education Supplier Badge */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+          <img
+            src="/Incensu.jpg"
+            alt="Approved Education Supplier"
+            style={{ height: '110px', width: 'auto' }}
+          />
+          <p style={{ fontSize: '14px', color: theme.textSecondary, margin: 0, textAlign: 'center' }}>
+            Trusted by schools across the UK
+          </p>
+        </div>
+
+        {/* Divider */}
+        <div style={{
+          width: '1px',
+          height: '80px',
+          backgroundColor: theme.border,
+          display: 'block',
+        }} />
+
+        {/* Disability Confident Employer Signal */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', maxWidth: '260px' }}>
+          <div style={{
+            width: '56px',
+            height: '56px',
+            borderRadius: '50%',
+            backgroundColor: darkMode ? '#1d4ed8' : '#2563eb',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </div>
+          <p style={{
+            fontSize: '16px',
+            fontWeight: 700,
+            color: theme.text,
+            margin: 0,
+            textAlign: 'center',
+            lineHeight: '1.4',
+          }}>
+            Used by Disability Confident employers
+          </p>
+          <p style={{ fontSize: '14px', color: theme.textSecondary, margin: 0, textAlign: 'center' }}>
+            Supporting neurodiverse staff in the workplace
+          </p>
+        </div>
       </div>
 
       {/* Features Section */}
