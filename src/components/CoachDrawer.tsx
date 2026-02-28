@@ -168,13 +168,13 @@ export function CoachDrawer({
               }}
             >
               <p style={{ fontSize: '16px', marginBottom: '16px' }}>
-                {copy.aiCoachLabel} is a Pro feature
+                Writing feels easier when someone&apos;s in your corner.
               </p>
               <p style={{ fontSize: '14px', opacity: 0.7, marginBottom: '24px' }}>
-                Upgrade to unlock personalised writing tips, structure analysis, and guidance.
+                The {copy.aiCoachLabel} spots one or two things to try — calm suggestions, no red marks, no jargon. Just your writing, getting clearer.
               </p>
               <ModernButton variant="primary" onClick={() => window.location.href = '/pricing'}>
-                Upgrade to Pro
+                Unlock the {copy.aiCoachLabel} →
               </ModernButton>
             </div>
           )}
