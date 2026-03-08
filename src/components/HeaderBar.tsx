@@ -23,7 +23,7 @@ export function HeaderBar() {
         <div className="flex items-center gap-2">
           <span className="text-2xl" aria-hidden>✍️</span>
           <span className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-            Dyslexia Writer
+            Dyslexia Write
           </span>
         </div>
 

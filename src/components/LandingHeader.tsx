@@ -10,7 +10,7 @@ export function LandingHeader() {
         <Link href="/" className="flex items-center gap-2 transition hover:opacity-80">
           <span className="text-2xl" aria-hidden>✍️</span>
           <span className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-            Dyslexia Writer
+            Dyslexia Write
           </span>
         </Link>
 

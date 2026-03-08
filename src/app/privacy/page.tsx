@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Dyslexia Writer",
+  title: "Privacy Policy | Dyslexia Write",
   description:
     "How DyslexiaWrite.com collects, uses, and protects your information (UK + GDPR).",
 };

@@ -7,7 +7,7 @@ import { ToastProvider } from "@/components/ToastContainer";
 
 export const dynamic = 'force-dynamic'; // prevents static prerender of `/`
 export const metadata: Metadata = {
-  title: "Dyslexia Writer",
+  title: "Dyslexia Write",
   description: "Dyslexia-friendly writing and reading tools.",
 };
 

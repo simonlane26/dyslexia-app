@@ -19,7 +19,11 @@
       "Bash(npm install)",
       "Bash(npm show:*)",
       "Bash(npm install:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(findstr:*)",
+      "Bash(git rm:*)",
+      "Bash(git push:*)",
+      "Bash(xargs sed -i 's/Dyslexia Writer/Dyslexia Write/g')"
     ],
     "deny": [],
     "ask": []

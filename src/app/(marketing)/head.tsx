@@ -3,7 +3,7 @@ export default function Head() {
   const software = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "Dyslexia Writer",
+    name: "Dyslexia Write",
     applicationCategory: "EducationalApplication",
     operatingSystem: "Web",
     url: "https://www.dyslexiawrite.com/",
@@ -18,7 +18,7 @@ export default function Head() {
   const organization = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Dyslexia Writer",
+    name: "Dyslexia Write",
     url: "https://www.dyslexiawrite.com/",
     logo: "https://www.dyslexiawrite.com/logo.png"
   };
@@ -27,7 +27,7 @@ export default function Head() {
   const website = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Dyslexia Writer",
+    name: "Dyslexia Write",
     url: "https://www.dyslexiawrite.com/",
     potentialAction: {
       "@type": "SearchAction",

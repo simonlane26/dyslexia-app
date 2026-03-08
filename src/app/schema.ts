@@ -2,7 +2,7 @@
 export const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: 'Dyslexia Writer',
+  name: 'Dyslexia Write',
   url: 'https://www.dyslexiawrite.com',
   description:
     'AI-powered writing tools designed specifically for dyslexic writers. Features include grammar checking, sentence rewriting, reading guides, and writing coaching.',
@@ -16,11 +16,11 @@ export const websiteSchema = {
 export const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'Dyslexia Writer Ltd',
+  name: 'Dyslexia Write Ltd',
   url: 'https://www.dyslexiawrite.com',
   logo: 'https://www.dyslexiawrite.com/logo.png',
   description:
-    'Dyslexia Writer Ltd provides AI-powered writing assistance tools specifically designed for people with dyslexia.',
+    'Dyslexia Write Ltd provides AI-powered writing assistance tools specifically designed for people with dyslexia.',
   foundingDate: '2024',
   sameAs: [
     // Add your social media profiles here
@@ -39,7 +39,7 @@ export const organizationSchema = {
 export const softwareApplicationSchema = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'Dyslexia Writer',
+  name: 'Dyslexia Write',
   applicationCategory: 'EducationalApplication',
   applicationSubCategory: 'Writing Assistant',
   operatingSystem: 'Web Browser',
@@ -74,7 +74,7 @@ export const softwareApplicationSchema = {
   url: 'https://www.dyslexiawrite.com',
   author: {
     '@type': 'Organization',
-    name: 'Dyslexia Writer Ltd',
+    name: 'Dyslexia Write Ltd',
   },
 };
 
@@ -84,18 +84,18 @@ export const faqSchema = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'What is Dyslexia Writer?',
+      name: 'What is Dyslexia Write?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Dyslexia Writer is a free, AI-powered writing app specifically designed for people with dyslexia. It includes grammar checking, sentence rewriting, reading guides, and writing coaching features to help you write with confidence.',
+        text: 'Dyslexia Write is a free, AI-powered writing app specifically designed for people with dyslexia. It includes grammar checking, sentence rewriting, reading guides, and writing coaching features to help you write with confidence.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Is Dyslexia Writer free to use?',
+      name: 'Is Dyslexia Write free to use?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes! Dyslexia Writer offers a free plan with 5 uses per day. Pro features like Reading Guide and unlimited AI suggestions are available with a paid subscription.',
+        text: 'Yes! Dyslexia Write offers a free plan with 5 uses per day. Pro features like Reading Guide and unlimited AI suggestions are available with a paid subscription.',
       },
     },
     {
@@ -108,10 +108,10 @@ export const faqSchema = {
     },
     {
       '@type': 'Question',
-      name: 'Does Dyslexia Writer work on mobile?',
+      name: 'Does Dyslexia Write work on mobile?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes! Dyslexia Writer is a web-based application that works on any device with a modern web browser, including smartphones, tablets, and computers.',
+        text: 'Yes! Dyslexia Write is a web-based application that works on any device with a modern web browser, including smartphones, tablets, and computers.',
       },
     },
     {

@@ -4,7 +4,7 @@ import { TeacherDashboard } from "@/components/dashboard/TeacherDashboard";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Class Dashboard | Dyslexia Writer",
+  title: "Class Dashboard | Dyslexia Write",
   description: "Teacher view of student writing progress.",
 };
 

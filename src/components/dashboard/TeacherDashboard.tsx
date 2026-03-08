@@ -161,7 +161,7 @@ export function TeacherDashboard() {
 
       {/* Footer note */}
       <p style={{ marginTop: "48px", fontSize: "12px", color: "#94a3b8", textAlign: "center" }}>
-        Dyslexia Writer never stores student writing.{" "}
+        Dyslexia Write never stores student writing.{" "}
         <Link href="/schools-privacy" style={{ color: "#7c3aed" }}>Schools privacy policy</Link>
       </p>
     </div>

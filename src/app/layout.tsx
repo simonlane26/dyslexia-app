@@ -6,8 +6,8 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: {
-    default: 'Dyslexia Writer - AI-Powered Writing Tools for Dyslexic Writers',
-    template: '%s | Dyslexia Writer',
+    default: 'Dyslexia Write - AI-Powered Writing Tools for Dyslexic Writers',
+    template: '%s | Dyslexia Write',
   },
   description:
     'Free dyslexia-friendly writing app with AI grammar check, sentence rewriting, reading guides, and writing coach. Designed specifically for dyslexic writers to write with confidence.',
@@ -26,9 +26,9 @@ export const metadata: Metadata = {
     'assistive technology',
     'learning disability tools',
   ],
-  authors: [{ name: 'Dyslexia Writer Ltd' }],
-  creator: 'Dyslexia Writer Ltd',
-  publisher: 'Dyslexia Writer Ltd',
+  authors: [{ name: 'Dyslexia Write Ltd' }],
+  creator: 'Dyslexia Write Ltd',
+  publisher: 'Dyslexia Write Ltd',
   formatDetection: {
     email: false,
     address: false,
@@ -39,11 +39,11 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'Dyslexia Writer - AI-Powered Writing Tools for Dyslexic Writers',
+    title: 'Dyslexia Write - AI-Powered Writing Tools for Dyslexic Writers',
     description:
       'Free dyslexia-friendly writing app with AI grammar check, sentence rewriting, reading guides, and writing coach. Write with confidence.',
     url: 'https://www.dyslexiawrite.com',
-    siteName: 'Dyslexia Writer',
+    siteName: 'Dyslexia Write',
     locale: 'en_GB',
     type: 'website',
     images: [
@@ -51,13 +51,13 @@ export const metadata: Metadata = {
         url: '/OG%20Image.png',
         width: 1200,
         height: 630,
-        alt: 'Dyslexia Writer - Write Better, Faster',
+        alt: 'Dyslexia Write - Write Better, Faster',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Dyslexia Writer - AI-Powered Writing Tools for Dyslexic Writers',
+    title: 'Dyslexia Write - AI-Powered Writing Tools for Dyslexic Writers',
     description:
       'Free dyslexia-friendly writing app with AI grammar check, sentence rewriting, and reading guides.',
     images: ['/OG%20Image.png'],

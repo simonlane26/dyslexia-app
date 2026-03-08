@@ -2,9 +2,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | Dyslexia Writer",
+  title: "Terms of Service | Dyslexia Write",
   description:
-    "Terms and conditions for using the Dyslexia Writer website and app.",
+    "Terms and conditions for using the Dyslexia Write website and app.",
 };
 
 export default function TermsPage() {

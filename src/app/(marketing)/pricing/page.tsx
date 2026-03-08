@@ -322,7 +322,7 @@ export default function ModernPricingPage() {
                 margin: 0,
               }}
             >
-              Dyslexia Writer
+              Dyslexia Write
             </h1>
           </div>
           <p

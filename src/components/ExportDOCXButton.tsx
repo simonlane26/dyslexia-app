@@ -98,7 +98,7 @@ export function ExportDOCXButton({
 
     const children: Paragraph[] = [
       new Paragraph({
-        text: 'Dyslexia Writer Export',
+        text: 'Dyslexia Write Export',
         heading: HeadingLevel.TITLE,
         alignment: AlignmentType.CENTER,
       }),
@@ -126,9 +126,9 @@ export function ExportDOCXButton({
     }
 
     const doc = new Document({
-      creator: 'Dyslexia Writer',
-      title: 'Dyslexia Writer Export',
-      description: 'Exported from Dyslexia Writer',
+      creator: 'Dyslexia Write',
+      title: 'Dyslexia Write Export',
+      description: 'Exported from Dyslexia Write',
       sections: [
         {
           properties: {
