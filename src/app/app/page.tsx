@@ -1113,78 +1113,6 @@ function PageBody() {
         color: theme.text,
       }}
     >
-      <div className="max-w-4xl px-4 py-8 mx-auto">
-        <div className="mb-8 text-center">
-          <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
-            <img
-              src="/dw-logo.jpg"
-              alt="Dyslexia Writer Logo"
-              style={{
-                height: '60px',
-                width: 'auto',
-                borderRadius: '8px',
-                boxShadow: darkMode ? '0 2px 12px rgba(255, 255, 255, 0.1)' : '0 2px 12px rgba(0, 0, 0, 0.1)',
-              }}
-            />
-          </div>
-
-          <h2 className="flex items-center justify-center gap-3 mb-6 text-3xl font-bold leading-tight tracking-tight md:text-4xl">
-            <span
-              aria-hidden
-              style={{
-                color: darkMode ? '#f9fafb' : '#1e293b',
-                WebkitTextFillColor: darkMode ? '#f9fafb' : '#1e293b',
-                backgroundImage: 'none',
-                lineHeight: 1,
-                display: 'inline-block',
-              }}
-            >
-              ✍️
-            </span>
-            <span className="text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
-              Start Writing Now
-            </span>
-          </h2>
-
-          <p
-            className="max-w-2xl mx-auto text-lg"
-            style={{ color: darkMode ? '#cbd5e1' : '#64748b' }}
-          >
-            Use the editor below or sign in to save your work and access pro features
-          </p>
-        </div>
-
-        <Suspense fallback={null}>
-          <AuthDebug />
-        </Suspense>
-
-        <div className="flex items-center gap-3">
-          {schoolMode.isTeacher && (
-            <ModernButton
-              variant="secondary"
-              size="sm"
-              onClick={() => router.push('/dashboard')}
-              title="Class Dashboard"
-            >
-              📊 Class Dashboard
-            </ModernButton>
-          )}
-          {schoolMode.isSchoolMode && !schoolMode.schoolId && (
-            <ModernButton
-              variant="primary"
-              size="sm"
-              onClick={() => router.push('/join-school')}
-              title="Link to your school"
-            >
-              🏫 Join your school
-            </ModernButton>
-          )}
-          <Suspense fallback={null}>
-            <UpgradeButton />
-          </Suspense>
-        </div>
-      </div>
-
       {/* Fixed Toolbar */}
       <FixedToolbar
         isListening={isListening}
@@ -1257,7 +1185,7 @@ function PageBody() {
         </div>
       )}
 
-      <div className="max-w-6xl px-4 mx-auto" style={{ marginTop: '20px' }}>
+      <div className="max-w-6xl px-4 mx-auto" style={{ marginTop: '12px' }}>
       <Card className="mb-6">
         <div className="p-6">
           {/* Document Title */}

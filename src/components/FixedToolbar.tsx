@@ -141,7 +141,7 @@ export function FixedToolbar({
     <div
       style={{
         position: 'sticky',
-        top: 0,
+        top: '56px',
         zIndex: 20,
         backgroundColor: theme.surface,
         borderBottom: `1px solid ${theme.border}`,
