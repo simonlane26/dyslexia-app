@@ -134,8 +134,26 @@ export function FixedToolbar({
 
   // Calculate stats for compact display
   const wordCount = text.trim() ? text.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
-  const readingTimeMinutes = Math.ceil(wordCount / 200);
-  const readingTime = readingTimeMinutes === 0 ? '< 1m' : readingTimeMinutes === 1 ? '1m' : `${readingTimeMinutes}m`;
+
+  function getWordMessage(count: number): string {
+    if (count === 0) return 'Start writing...';
+    if (count <= 30) return `Great start — ${count} words written`;
+    if (count <= 100) return `Getting going — ${count} words written`;
+    if (count <= 300) return `Nice work — ${count} words written`;
+    if (count <= 600) return `Strong effort — ${count} words written`;
+    return `Keep it up — ${count.toLocaleString()} words written`;
+  }
+
+  const groupLabelStyle: React.CSSProperties = {
+    fontSize: '10px',
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    letterSpacing: '0.08em',
+    color: theme.text,
+    opacity: 0.45,
+    paddingLeft: '2px',
+    marginBottom: '4px',
+  };
 
   return (
     <div
@@ -145,353 +163,317 @@ export function FixedToolbar({
         zIndex: 20,
         backgroundColor: theme.surface,
         borderBottom: `1px solid ${theme.border}`,
-        padding: '12px 16px',
+        padding: '10px 16px',
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        gap: '20px',
+        alignItems: 'flex-end',
+        gap: '16px',
         flexWrap: 'wrap',
+        letterSpacing: '0.02em',
       }}
     >
-      {/* Left side - All Tools */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '16px',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-        }}
-      >
-        {/* GROUP 1 - Writing Actions (Big, Primary) */}
-        <div
-          style={{
-            display: 'flex',
-            gap: '8px',
-            alignItems: 'center',
-            padding: '8px 12px',
-            backgroundColor: darkMode ? 'rgba(59, 130, 246, 0.08)' : 'rgba(59, 130, 246, 0.05)',
-            borderRadius: '10px',
-            border: `1px solid ${darkMode ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.15)'}`,
-          }}
-        >
-          <ModernButton
-            variant={isListening ? 'primary' : 'secondary'}
-            onClick={onDictateToggle}
-            title="Toggle dictation (Ctrl+D)"
+      {/* Left side — grouped tools */}
+      <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+
+        {/* WRITING TOOLS */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <span style={groupLabelStyle}>Writing Tools</span>
+          <div
+            style={{
+              display: 'flex',
+              gap: '6px',
+              alignItems: 'center',
+              padding: '6px 10px',
+              backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.08)' : 'rgba(139, 92, 246, 0.05)',
+              borderRadius: '10px',
+              border: `1px solid ${darkMode ? 'rgba(139, 92, 246, 0.2)' : 'rgba(139, 92, 246, 0.15)'}`,
+            }}
           >
-            {isListening ? <MicOff size={18} /> : <Mic size={18} />}
-            Dictate
-          </ModernButton>
-
-          <div style={{ position: 'relative' }}>
-            <ModernButton variant="secondary" onClick={() => { onSimplify(); dismissSimplifyTip(); }} disabled={loading || !text.trim()} title="Simplify text">
-              <Sparkles size={18} />
-              {copy.simplifyLabel}
-            </ModernButton>
-            {showSimplifyTip && (
-              <FeatureTip
-                message="Paste or type anything, then hit this to make it simpler and easier to read."
-                onDismiss={dismissSimplifyTip}
-              />
-            )}
-          </div>
-
-          <ModernButton variant="secondary" onClick={onReadAloud} title="Read text aloud">
-            <BookOpen size={18} />
-            Read Aloud
-          </ModernButton>
-        </div>
-
-        {/* Divider */}
-        <div style={{ width: '2px', height: '32px', backgroundColor: theme.border, opacity: 0.5 }} />
-
-        {/* GROUP 2 - Support Tools (Small toggles) */}
-        <div
-          style={{
-            display: 'flex',
-            gap: '6px',
-            alignItems: 'center',
-            padding: '6px 10px',
-            backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.08)' : 'rgba(139, 92, 246, 0.05)',
-            borderRadius: '10px',
-            border: `1px solid ${darkMode ? 'rgba(139, 92, 246, 0.2)' : 'rgba(139, 92, 246, 0.15)'}`,
-          }}
-        >
-          <ModernButton
-            variant={grammarCheckEnabled ? 'primary' : 'secondary'}
-            onClick={onGrammarCheckToggle}
-            title="Toggle grammar check"
-            size="sm"
-          >
-            <SpellCheck size={14} />
-            {copy.grammarLabel}
-          </ModernButton>
-
-          <ModernButton
-            variant={highlightMode ? 'primary' : 'secondary'}
-            onClick={onHighlightToggle}
-            title="Toggle sentence highlighting"
-            size="sm"
-          >
-            <Highlighter size={14} />
-            Highlight
-          </ModernButton>
-
-          <ModernButton
-            variant={readingGuideEnabled ? 'primary' : 'secondary'}
-            onClick={onReadingGuideToggle}
-            title="Toggle reading guide"
-            size="sm"
-          >
-            <Eye size={14} />
-            Guide
-          </ModernButton>
-
-          {isPro ? (
-            <ModernButton
-              variant="secondary"
-              onClick={onRewrite}
-              disabled={!text.trim()}
-              title="Rewrite selected sentence with multiple tones"
-              size="sm"
-            >
-              <FileText size={14} />
-              Rewrite
-            </ModernButton>
-          ) : (
-            <div style={{ position: 'relative' }}>
+            {isPro ? (
               <ModernButton
                 variant="secondary"
-                onClick={() => setProPopover(proPopover === 'rewrite' ? null : 'rewrite')}
-                title="Rewrite — Pro feature"
-                size="sm"
+                onClick={onRewrite}
                 disabled={!text.trim()}
+                title="Rewrite selected sentence with multiple tones"
+                size="sm"
               >
-                <span style={{ fontSize: '12px', marginRight: '2px' }}>⭐</span>
-                Rewrite
+                ✏️ Rewrite
               </ModernButton>
-              {proPopover === 'rewrite' && (
-                <ProUpgradePopover
-                  message="Rewrite lets you find new ways to say what you mean — try different tones until it feels right."
-                  onUpgrade={() => { setProPopover(null); onUpgradeClick(); }}
-                  onDismiss={() => setProPopover(null)}
-                  darkMode={darkMode}
-                />
-              )}
-            </div>
-          )}
+            ) : (
+              <div style={{ position: 'relative' }}>
+                <ModernButton
+                  variant="secondary"
+                  onClick={() => setProPopover(proPopover === 'rewrite' ? null : 'rewrite')}
+                  title="Rewrite — Pro feature"
+                  size="sm"
+                  disabled={!text.trim()}
+                >
+                  ✏️ Rewrite
+                </ModernButton>
+                {proPopover === 'rewrite' && (
+                  <ProUpgradePopover
+                    message="Rewrite lets you find new ways to say what you mean — try different tones until it feels right."
+                    onUpgrade={() => { setProPopover(null); onUpgradeClick(); }}
+                    onDismiss={() => setProPopover(null)}
+                    darkMode={darkMode}
+                  />
+                )}
+              </div>
+            )}
 
-          {isPro ? (
-            <ModernButton
-              variant={coachPanelOpen ? 'primary' : 'secondary'}
-              onClick={onCoachPanelToggle}
-              title={`Toggle ${copy.aiCoachLabel} panel`}
-              size="sm"
-            >
-              <MessageSquare size={14} />
-              {copy.aiCoachButton}
-            </ModernButton>
-          ) : (
             <div style={{ position: 'relative' }}>
               <ModernButton
                 variant="secondary"
-                onClick={() => setProPopover(proPopover === 'coach' ? null : 'coach')}
-                title={`${copy.aiCoachLabel} — Pro feature`}
+                onClick={() => { onSimplify(); dismissSimplifyTip(); }}
+                disabled={loading || !text.trim()}
+                title="Simplify text"
                 size="sm"
               >
-                <span style={{ fontSize: '12px', marginRight: '2px' }}>⭐</span>
-                {copy.aiCoachButton}
+                ✨ {copy.simplifyLabel}
               </ModernButton>
-              {proPopover === 'coach' && (
-                <ProUpgradePopover
-                  message="Pro helps you write with confidence and structure — gentle tips, no jargon, no red marks."
-                  onUpgrade={() => { setProPopover(null); onUpgradeClick(); }}
-                  onDismiss={() => setProPopover(null)}
-                  darkMode={darkMode}
+              {showSimplifyTip && (
+                <FeatureTip
+                  message="Paste or type anything, then hit this to make it simpler and easier to read."
+                  onDismiss={dismissSimplifyTip}
                 />
               )}
             </div>
-          )}
+
+            {isPro ? (
+              <ModernButton
+                variant={coachPanelOpen ? 'primary' : 'secondary'}
+                onClick={onCoachPanelToggle}
+                title={`Toggle ${copy.aiCoachLabel} panel`}
+                size="sm"
+              >
+                💡 {copy.aiCoachButton}
+              </ModernButton>
+            ) : (
+              <div style={{ position: 'relative' }}>
+                <ModernButton
+                  variant="secondary"
+                  onClick={() => setProPopover(proPopover === 'coach' ? null : 'coach')}
+                  title={`${copy.aiCoachLabel} — Pro feature`}
+                  size="sm"
+                >
+                  💡 {copy.aiCoachButton}
+                </ModernButton>
+                {proPopover === 'coach' && (
+                  <ProUpgradePopover
+                    message="Pro helps you write with confidence and structure — gentle tips, no jargon, no red marks."
+                    onUpgrade={() => { setProPopover(null); onUpgradeClick(); }}
+                    onDismiss={() => setProPopover(null)}
+                    darkMode={darkMode}
+                  />
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Divider */}
-        <div style={{ width: '2px', height: '32px', backgroundColor: theme.border, opacity: 0.5 }} />
+        <div style={{ width: '1px', height: '48px', backgroundColor: theme.border, opacity: 0.5, marginBottom: '2px' }} />
 
-        {/* GROUP 3 - Document Management */}
-        <div
-          style={{
-            display: 'flex',
-            gap: '6px',
-            alignItems: 'center',
-            padding: '6px 10px',
-            backgroundColor: darkMode ? 'rgba(16, 185, 129, 0.08)' : 'rgba(16, 185, 129, 0.05)',
-            borderRadius: '10px',
-            border: `1px solid ${darkMode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.15)'}`,
-          }}
-        >
-          <ModernButton
-            variant="success"
-            onClick={onSave}
-            disabled={isSaving}
-            title="Save document (Ctrl+S)"
-            size="sm"
+        {/* READING SUPPORT */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <span style={groupLabelStyle}>Reading Support</span>
+          <div
+            style={{
+              display: 'flex',
+              gap: '6px',
+              alignItems: 'center',
+              padding: '6px 10px',
+              backgroundColor: darkMode ? 'rgba(16, 185, 129, 0.08)' : 'rgba(16, 185, 129, 0.05)',
+              borderRadius: '10px',
+              border: `1px solid ${darkMode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.15)'}`,
+            }}
           >
-            <Save size={14} />
-            {isSaving ? 'Saving...' : 'Save'}
-          </ModernButton>
-
-          <div style={{ position: 'relative' }}>
             <ModernButton
               variant="secondary"
-              onClick={() => setExportMenuOpen(!exportMenuOpen)}
-              title="Export document"
+              onClick={onReadAloud}
+              title="Read text aloud"
               size="sm"
             >
-              <Download size={14} />
-              Export
-              <ChevronDown size={12} />
+              🔊 Read Aloud
             </ModernButton>
 
-            {exportMenuOpen && (
-              <>
-                <div
-                  style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    zIndex: 30,
-                  }}
-                  onClick={() => setExportMenuOpen(false)}
-                />
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + 4px)',
-                    right: 0,
-                    backgroundColor: theme.surface,
-                    border: `1px solid ${theme.border}`,
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                    padding: '8px',
-                    minWidth: '160px',
-                    zIndex: 31,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '4px',
-                  }}
-                >
-                  <ExportPDFButton text={text} documentTitle={documentTitle} />
-                  <ExportMP3Button text={text} documentTitle={documentTitle} />
-                  <ExportDOCXButton text={text} documentTitle={documentTitle} />
-                </div>
-              </>
-            )}
+            <ModernButton
+              variant={highlightMode ? 'primary' : 'secondary'}
+              onClick={onHighlightToggle}
+              title="Toggle sentence highlighting"
+              size="sm"
+            >
+              🔍 Highlight
+            </ModernButton>
+
+            <ModernButton
+              variant={readingGuideEnabled ? 'primary' : 'secondary'}
+              onClick={onReadingGuideToggle}
+              title="Toggle reading guide"
+              size="sm"
+            >
+              📖 Guide
+            </ModernButton>
           </div>
+        </div>
 
-          {isPro ? (
-            <ModernButton
-              variant="secondary"
-              onClick={onCompare}
-              disabled={!simplifiedText}
-              title="Compare original and simplified drafts"
-              size="sm"
-            >
-              <FileText size={14} />
-              Compare
-            </ModernButton>
-          ) : (
-            <ModernButton
-              variant="secondary"
-              onClick={onUpgradeClick}
-              title="⭐ Pro Feature - Compare different versions of your writing"
-              size="sm"
-            >
-              <span style={{ fontSize: '12px', marginRight: '2px' }}>⭐</span>
-              Compare
-            </ModernButton>
-          )}
+        {/* Divider */}
+        <div style={{ width: '1px', height: '48px', backgroundColor: theme.border, opacity: 0.5, marginBottom: '2px' }} />
 
-          <div style={{ position: 'relative' }}>
+        {/* INPUT */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <span style={groupLabelStyle}>Input</span>
+          <div
+            style={{
+              display: 'flex',
+              gap: '6px',
+              alignItems: 'center',
+              padding: '6px 10px',
+              backgroundColor: darkMode ? 'rgba(59, 130, 246, 0.08)' : 'rgba(59, 130, 246, 0.05)',
+              borderRadius: '10px',
+              border: `1px solid ${darkMode ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.15)'}`,
+            }}
+          >
             <ModernButton
-              variant={accessibilityPanelOpen ? 'primary' : 'secondary'}
-              onClick={() => { onAccessibilityPanelToggle(); dismissA11yTip(); }}
-              title="Accessibility settings"
+              variant={isListening ? 'primary' : 'secondary'}
+              onClick={onDictateToggle}
+              title="Toggle dictation (Ctrl+D)"
               size="sm"
             >
-              <Settings size={14} />
+              {isListening ? <MicOff size={14} /> : <Mic size={14} />}
+              🎤 Dictate
             </ModernButton>
-            {showA11yTip && (
-              <FeatureTip
-                message="Change font, colours, and text size here to make reading easier."
-                onDismiss={dismissA11yTip}
-              />
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div style={{ width: '1px', height: '48px', backgroundColor: theme.border, opacity: 0.5, marginBottom: '2px' }} />
+
+        {/* DOCUMENT ACTIONS */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <span style={groupLabelStyle}>Document</span>
+          <div
+            style={{
+              display: 'flex',
+              gap: '6px',
+              alignItems: 'center',
+              padding: '6px 10px',
+              backgroundColor: darkMode ? 'rgba(16, 185, 129, 0.08)' : 'rgba(16, 185, 129, 0.05)',
+              borderRadius: '10px',
+              border: `1px solid ${darkMode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.15)'}`,
+            }}
+          >
+            <ModernButton
+              variant="success"
+              onClick={onSave}
+              disabled={isSaving}
+              title="Save document (Ctrl+S)"
+              size="sm"
+            >
+              <Save size={14} />
+              {isSaving ? 'Saving...' : 'Save'}
+            </ModernButton>
+
+            <div style={{ position: 'relative' }}>
+              <ModernButton
+                variant="secondary"
+                onClick={() => setExportMenuOpen(!exportMenuOpen)}
+                title="Export document"
+                size="sm"
+              >
+                <Download size={14} />
+                Export
+                <ChevronDown size={12} />
+              </ModernButton>
+
+              {exportMenuOpen && (
+                <>
+                  <div
+                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 30 }}
+                    onClick={() => setExportMenuOpen(false)}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 'calc(100% + 4px)',
+                      right: 0,
+                      backgroundColor: theme.surface,
+                      border: `1px solid ${theme.border}`,
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      padding: '8px',
+                      minWidth: '160px',
+                      zIndex: 31,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px',
+                    }}
+                  >
+                    <ExportPDFButton text={text} documentTitle={documentTitle} />
+                    <ExportMP3Button text={text} documentTitle={documentTitle} />
+                    <ExportDOCXButton text={text} documentTitle={documentTitle} />
+                  </div>
+                </>
+              )}
+            </div>
+
+            {isPro ? (
+              <ModernButton
+                variant="secondary"
+                onClick={onCompare}
+                disabled={!simplifiedText}
+                title="Compare original and simplified drafts"
+                size="sm"
+              >
+                <FileText size={14} />
+                Compare
+              </ModernButton>
+            ) : (
+              <ModernButton
+                variant="secondary"
+                onClick={onUpgradeClick}
+                title="⭐ Pro Feature - Compare different versions of your writing"
+                size="sm"
+              >
+                <span style={{ fontSize: '12px', marginRight: '2px' }}>⭐</span>
+                Compare
+              </ModernButton>
             )}
+
+            <div style={{ position: 'relative' }}>
+              <ModernButton
+                variant={accessibilityPanelOpen ? 'primary' : 'secondary'}
+                onClick={() => { onAccessibilityPanelToggle(); dismissA11yTip(); }}
+                title="Accessibility settings"
+                size="sm"
+              >
+                <Settings size={14} />
+              </ModernButton>
+              {showA11yTip && (
+                <FeatureTip
+                  message="Change font, colours, and text size here to make reading easier."
+                  onDismiss={dismissA11yTip}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Right side - Stats & Info */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '8px',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-        }}
-      >
-        {/* Compact Stats Pill - Enhanced */}
-        <div
+      {/* Right side — word count + saved */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', paddingBottom: '2px' }}>
+        <span
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-            padding: '8px 16px',
-            backgroundColor: darkMode ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.12)',
-            borderRadius: '24px',
-            border: `2px solid ${darkMode ? 'rgba(59, 130, 246, 0.4)' : 'rgba(59, 130, 246, 0.3)'}`,
-            boxShadow: darkMode
-              ? '0 2px 8px rgba(59, 130, 246, 0.2)'
-              : '0 2px 8px rgba(59, 130, 246, 0.15)',
+            fontSize: '13px',
+            fontWeight: 600,
+            color: theme.primary,
+            letterSpacing: '0.01em',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Type size={16} style={{ color: theme.primary, fontWeight: 'bold' }} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              <span style={{ fontSize: '14px', fontWeight: '700', color: theme.text, lineHeight: '1' }}>
-                {wordCount.toLocaleString()}
-              </span>
-              <span style={{ fontSize: '10px', fontWeight: '500', color: theme.text, opacity: 0.6, lineHeight: '1' }}>
-                words
-              </span>
-            </div>
-          </div>
-          <div style={{ width: '2px', height: '28px', backgroundColor: theme.primary, opacity: 0.3, borderRadius: '2px' }} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Clock size={16} style={{ color: theme.primary, fontWeight: 'bold' }} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              <span style={{ fontSize: '14px', fontWeight: '700', color: theme.text, lineHeight: '1' }}>
-                {readingTime}
-              </span>
-              <span style={{ fontSize: '10px', fontWeight: '500', color: theme.text, opacity: 0.6, lineHeight: '1' }}>
-                read time
-              </span>
-            </div>
-          </div>
-        </div>
-
+          {getWordMessage(wordCount)}
+        </span>
         {lastSaved && (
-          <span
-            style={{
-              fontSize: '12px',
-              color: theme.text,
-              opacity: 0.6,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-            }}
-          >
+          <span style={{ fontSize: '11px', color: theme.text, opacity: 0.5 }}>
             Saved {new Date(lastSaved).toLocaleTimeString()}
           </span>
         )}

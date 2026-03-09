@@ -114,6 +114,9 @@ function PageBody() {
   // Welcome banner — shown once after onboarding completes
   const [showWelcomeBanner, setShowWelcomeBanner] = useState(false);
 
+  // Floating rewrite popup
+  const [floatingRewrite, setFloatingRewrite] = useState<{ x: number; y: number } | null>(null);
+
   // Hooks
   const toast = useToast();
   const { user, isLoaded, isSignedIn } = useUser();
@@ -926,6 +929,54 @@ function PageBody() {
     isStoppingRef.current = false;
   };
 
+  // Writing confidence indicator — rotating encouragement based on word count
+  function getConfidenceMessage(count: number): string {
+    if (count === 0) return '';
+    // Seed from word-count tier so message is stable within a band but varies between sessions
+    const tier = Math.floor(count / 25);
+    if (count <= 25) {
+      const msgs = [
+        "Great start — you're writing ✨",
+        "Every word counts 💪",
+        "You've begun — that's the hardest part 👍",
+        "Writing clarity: building nicely 🌱",
+      ];
+      return msgs[tier % msgs.length];
+    }
+    if (count <= 100) {
+      const msgs = [
+        "Writing clarity: improving 📈",
+        "Clear and easy to follow 👍",
+        "Your ideas are coming through ✨",
+        "Getting clearer with every sentence 💪",
+      ];
+      return msgs[tier % msgs.length];
+    }
+    const msgs = [
+      "Clear and easy to read 🌟",
+      "Strong writing — well done 💪",
+      "Writing clarity: really clear 👍",
+      "Your writing is flowing well ✨",
+    ];
+    return msgs[tier % msgs.length];
+  }
+
+  // Show floating rewrite popup on textarea selection
+  const handleTextareaMouseUp = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    if (textarea.selectionStart === textarea.selectionEnd) {
+      setFloatingRewrite(null);
+      return;
+    }
+    setFloatingRewrite({ x: e.clientX, y: e.clientY });
+  };
+
+  const triggerFloatingRewrite = () => {
+    setFloatingRewrite(null);
+    handleRewriteSentence();
+  };
+
   const coachBg = darkMode ? '#374151' : bgColor;
   const coachText = editorTextColor;
   const coachBorder = darkMode ? '#6b7280' : (highContrast ? '#000000' : '#e5e7eb');
@@ -1222,13 +1273,26 @@ function PageBody() {
             />
           </div>
 
-          <label
-            htmlFor="text"
-            className="block mb-3 text-lg font-semibold"
-            style={{ color: theme.text }}
-          >
-            ✨ Your Writing
-          </label>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <label
+              htmlFor="text"
+              className="text-lg font-semibold"
+              style={{ color: theme.text, margin: 0 }}
+            >
+              ✨ Your Writing
+            </label>
+            {getConfidenceMessage(text.trim() ? text.trim().split(/\s+/).filter(w => w.length > 0).length : 0) && (
+              <span style={{
+                fontSize: '13px',
+                fontWeight: 500,
+                color: theme.primary,
+                opacity: 0.85,
+                letterSpacing: '0.01em',
+              }}>
+                {getConfidenceMessage(text.trim() ? text.trim().split(/\s+/).filter(w => w.length > 0).length : 0)}
+              </span>
+            )}
+          </div>
 
           {highlightMode && isReading ? (
             <SentenceHighlighter
@@ -1276,8 +1340,10 @@ function PageBody() {
               id="text"
               value={text}
               onChange={(e) => setText(e.target.value)}
+              onMouseUp={handleTextareaMouseUp}
+              onKeyUp={() => setFloatingRewrite(null)}
               placeholder="Start writing here..."
-              className="w-full p-4 transition-all duration-200 resize-none rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full transition-all duration-200 resize-none rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               style={{
                 backgroundColor: darkMode ? '#374151' : bgColor,
                 fontFamily: getFontFamily(),
@@ -1287,6 +1353,7 @@ function PageBody() {
                 border: `2px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : '#e5e7eb'}`,
                 minHeight: '60vh',
                 maxHeight: '70vh',
+                padding: '30px',
               }}
             />
           )}
@@ -1477,6 +1544,61 @@ function PageBody() {
             <span className="font-medium text-blue-700">Simplifying your text...</span>
           </div>
         </div>
+      )}
+
+      {/* Floating Rewrite Popup — appears on text selection */}
+      {floatingRewrite && (
+        <>
+          {/* Click-outside backdrop */}
+          <div
+            style={{ position: 'fixed', inset: 0, zIndex: 99 }}
+            onMouseDown={() => setFloatingRewrite(null)}
+          />
+          <div
+            style={{
+              position: 'fixed',
+              top: floatingRewrite.y - 52,
+              left: floatingRewrite.x,
+              transform: 'translateX(-50%)',
+              zIndex: 100,
+              display: 'flex',
+              gap: '6px',
+              alignItems: 'center',
+              backgroundColor: darkMode ? '#1e293b' : '#ffffff',
+              border: `1px solid ${darkMode ? 'rgba(139,92,246,0.35)' : 'rgba(139,92,246,0.2)'}`,
+              borderRadius: '12px',
+              padding: '6px 10px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.18)',
+            }}
+          >
+            <span style={{ fontSize: '11px', fontWeight: 600, color: darkMode ? '#94a3b8' : '#94a3b8', marginRight: '2px', letterSpacing: '0.04em' }}>
+              Rewrite as:
+            </span>
+            {(['Simpler', 'Clearer', 'More confident'] as const).map((label) => (
+              <button
+                key={label}
+                type="button"
+                onMouseDown={(e) => { e.preventDefault(); triggerFloatingRewrite(); }}
+                style={{
+                  background: darkMode ? 'rgba(139,92,246,0.15)' : 'rgba(139,92,246,0.08)',
+                  border: `1px solid ${darkMode ? 'rgba(139,92,246,0.3)' : 'rgba(139,92,246,0.2)'}`,
+                  borderRadius: '8px',
+                  color: darkMode ? '#c4b5fd' : '#7c3aed',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  padding: '4px 10px',
+                  cursor: 'pointer',
+                  letterSpacing: '0.01em',
+                }}
+              >
+                {label}
+              </button>
+            ))}
+            {!isPro && (
+              <span style={{ fontSize: '11px', color: darkMode ? '#94a3b8' : '#94a3b8', marginLeft: '4px' }}>⭐ Pro</span>
+            )}
+          </div>
+        </>
       )}
 
       {/* Onboarding Screens */}

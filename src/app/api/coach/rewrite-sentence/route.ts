@@ -62,7 +62,7 @@ function buildRewritePrompt(intent?: { audience: string; purpose: string; tone: 
     '      "label": "Simpler" | "More confident" | "More formal" | "Clearer" | "Shorter",\n' +
     '      "icon": "✨" | "💪" | "👔" | "💡" | "⚡",\n' +
     '      "text": "The rewritten sentence",\n' +
-    '      "explanation": "Brief reason why this version is better (1 sentence)"\n' +
+    '      "explanation": "Friendly word-level explanation of what changed and why — no grammar jargon. Use plain language. If a word was swapped, say what each word means. Add 1-2 short example sentences. E.g. \\"\'Too\' means extra or also. \'To\' is used before a verb. Example: I want to run. I want to talk.\\""\n' +
     '    }\n' +
     '  ]\n' +
     '}\n\n' +

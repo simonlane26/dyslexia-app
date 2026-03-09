@@ -39,6 +39,7 @@ export function SentenceRewriteModal({
 }: SentenceRewriteModalProps) {
   const [state, setState] = useState<RewriteState>({ kind: 'idle' });
   const [appliedIndex, setAppliedIndex] = useState<number | null>(null);
+  const [expandedExplain, setExpandedExplain] = useState<number | null>(null);
 
   // Fetch alternatives when modal opens
   useEffect(() => {
@@ -392,15 +393,43 @@ export function SentenceRewriteModal({
                     >
                       {alt.text}
                     </div>
-                    <div
-                      style={{
-                        fontSize: '13px',
-                        color: darkMode ? '#9ca3af' : '#6b7280',
-                        lineHeight: '1.5',
-                      }}
-                    >
-                      {alt.explanation}
-                    </div>
+                    {alt.explanation && (
+                      <div>
+                        <button
+                          type="button"
+                          onClick={() => setExpandedExplain(expandedExplain === index ? null : index)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: '4px 0',
+                            fontSize: '13px',
+                            color: darkMode ? '#a78bfa' : '#7c3aed',
+                            fontWeight: '500',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                          }}
+                        >
+                          💡 {expandedExplain === index ? 'Hide explanation' : 'Why this changed'}
+                        </button>
+                        {expandedExplain === index && (
+                          <div
+                            style={{
+                              marginTop: '8px',
+                              padding: '12px',
+                              backgroundColor: darkMode ? 'rgba(167, 139, 250, 0.1)' : 'rgba(124, 58, 237, 0.06)',
+                              borderRadius: '8px',
+                              fontSize: '13px',
+                              color: theme.text,
+                              lineHeight: '1.6',
+                            }}
+                          >
+                            {alt.explanation}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}
