@@ -92,6 +92,28 @@ export async function GET(req: NextRequest) {
     .in("member_id", memberIds)
     .gte("session_date", thirtyDaysAgo.toISOString().slice(0, 10));
 
+  // Fetch active assignment (if any)
+  const { data: activeAssignment } = await db
+    .from("assignments")
+    .select("id, title, description, min_words, due_date, created_at")
+    .eq("school_id", schoolId)
+    .eq("is_active", true)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  // Fetch sessions since assignment was created (for completion status)
+  let assignmentSessions: { member_id: string; words_typed: number }[] = [];
+  if (activeAssignment) {
+    const { data: aSessions } = await db
+      .from("writing_sessions")
+      .select("member_id, words_typed")
+      .eq("school_id", schoolId)
+      .in("member_id", memberIds)
+      .gte("session_date", activeAssignment.created_at.slice(0, 10));
+    assignmentSessions = aSessions ?? [];
+  }
+
   // Aggregate per student
   type StudentAgg = {
     memberId: string;
@@ -132,6 +154,12 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // Aggregate assignment words per student
+  const assignmentWordMap = new Map<string, number>();
+  for (const s of assignmentSessions) {
+    assignmentWordMap.set(s.member_id, (assignmentWordMap.get(s.member_id) ?? 0) + (s.words_typed ?? 0));
+  }
+
   const students = Array.from(studentMap.values()).map((s) => {
     const avgSentLen =
       s.sentenceLengthSamples > 0
@@ -146,6 +174,14 @@ export async function GET(req: NextRequest) {
     if (simplificationRate >= 1) badges.push("Writing Confidence Improving");
     if (s.totalWords >= 500) badges.push("Easier to Read");
 
+    const assignmentWords = assignmentWordMap.get(s.memberId) ?? 0;
+    const minWords = activeAssignment?.min_words ?? 0;
+    let assignmentStatus: "completed" | "in_progress" | "not_started" = "not_started";
+    if (activeAssignment) {
+      if (minWords > 0 && assignmentWords >= minWords) assignmentStatus = "completed";
+      else if (assignmentWords > 0) assignmentStatus = "in_progress";
+    }
+
     return {
       memberId: s.memberId,
       displayName: s.displayName,
@@ -153,6 +189,8 @@ export async function GET(req: NextRequest) {
       totalWords: s.totalWords,
       avgSentenceLength: avgSentLen,
       badges,
+      assignmentStatus,
+      assignmentWords,
     };
   });
 
@@ -161,5 +199,6 @@ export async function GET(req: NextRequest) {
     schoolId,
     schoolName: school?.name ?? "My School",
     schoolCode: meta.schoolCode ?? null,
+    activeAssignment: activeAssignment ?? null,
   });
 }

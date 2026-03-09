@@ -3,6 +3,15 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+interface Assignment {
+  id: string;
+  title: string;
+  description: string | null;
+  min_words: number;
+  due_date: string | null;
+  created_at: string;
+}
+
 interface StudentData {
   memberId: string;
   displayName: string;
@@ -10,12 +19,15 @@ interface StudentData {
   totalWords: number;
   avgSentenceLength: number | null;
   badges: string[];
+  assignmentStatus: "completed" | "in_progress" | "not_started";
+  assignmentWords: number;
 }
 
 interface DashboardData {
   students: StudentData[];
   schoolName: string;
   schoolCode: string | null;
+  activeAssignment: Assignment | null;
 }
 
 const BADGE_STYLES: Record<string, { bg: string; text: string }> = {
@@ -25,13 +37,34 @@ const BADGE_STYLES: Record<string, { bg: string; text: string }> = {
   "Easier to Read":               { bg: "#fff7ed", text: "#c2410c" },
 };
 
+const STATUS_STYLE = {
+  completed:   { bg: "#f0fdf4", text: "#16a34a", label: "Completed" },
+  in_progress: { bg: "#fefce8", text: "#ca8a04", label: "In progress" },
+  not_started: { bg: "#f8fafc", text: "#94a3b8", label: "Not started" },
+};
+
 export function TeacherDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [codeCopied, setCodeCopied] = useState(false);
 
+  // Assignment form state
+  const [showAssignForm, setShowAssignForm] = useState(false);
+  const [formTitle, setFormTitle] = useState("");
+  const [formDescription, setFormDescription] = useState("");
+  const [formMinWords, setFormMinWords] = useState("");
+  const [formDueDate, setFormDueDate] = useState("");
+  const [formSaving, setFormSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
   useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  function loadDashboard() {
+    setLoading(true);
+    setError(null);
     fetch("/api/school/dashboard")
       .then((r) => r.json())
       .then((d) => {
@@ -43,7 +76,7 @@ export function TeacherDashboard() {
         setError(e.message ?? "Could not load dashboard.");
         setLoading(false);
       });
-  }, []);
+  }
 
   function copyCode() {
     if (!data?.schoolCode) return;
@@ -51,6 +84,40 @@ export function TeacherDashboard() {
       setCodeCopied(true);
       setTimeout(() => setCodeCopied(false), 2000);
     });
+  }
+
+  async function handleCreateAssignment(e: React.FormEvent) {
+    e.preventDefault();
+    if (!formTitle.trim()) { setFormError("Please enter a title."); return; }
+    setFormSaving(true);
+    setFormError(null);
+    try {
+      const res = await fetch("/api/school/assignments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: formTitle,
+          description: formDescription || null,
+          min_words: formMinWords ? parseInt(formMinWords, 10) : 0,
+          due_date: formDueDate || null,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Failed to create assignment");
+      setShowAssignForm(false);
+      setFormTitle(""); setFormDescription(""); setFormMinWords(""); setFormDueDate("");
+      loadDashboard();
+    } catch (err: any) {
+      setFormError(err.message ?? "Something went wrong.");
+    } finally {
+      setFormSaving(false);
+    }
+  }
+
+  async function handleEndAssignment() {
+    if (!confirm("End this assignment? Students will no longer see it.")) return;
+    await fetch("/api/school/assignments", { method: "DELETE" });
+    loadDashboard();
   }
 
   if (loading) {
@@ -73,7 +140,7 @@ export function TeacherDashboard() {
   return (
     <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "40px 20px", fontFamily: "Lexend, sans-serif" }}>
       {/* Header */}
-      <div style={{ marginBottom: "40px" }}>
+      <div style={{ marginBottom: "32px" }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
           <div>
             <h1 style={{ fontSize: "2rem", fontWeight: 700, color: "#1e293b", margin: 0 }}>
@@ -121,6 +188,7 @@ export function TeacherDashboard() {
               </div>
             </div>
             <button
+              type="button"
               onClick={copyCode}
               style={{
                 padding: "8px 16px",
@@ -144,17 +212,255 @@ export function TeacherDashboard() {
         )}
       </div>
 
+      {/* Active assignment */}
+      <div style={{ marginBottom: "32px" }}>
+        {data?.activeAssignment ? (
+          <div style={{
+            padding: "20px 24px",
+            backgroundColor: "#f0fdf4",
+            border: "1px solid #bbf7d0",
+            borderRadius: "12px",
+          }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
+              <div>
+                <div style={{ fontSize: "12px", fontWeight: 600, color: "#16a34a", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  Active assignment
+                </div>
+                <div style={{ fontSize: "17px", fontWeight: 700, color: "#14532d", marginBottom: "4px" }}>
+                  {data.activeAssignment.title}
+                </div>
+                {data.activeAssignment.description && (
+                  <div style={{ fontSize: "14px", color: "#166534" }}>{data.activeAssignment.description}</div>
+                )}
+                <div style={{ display: "flex", gap: "16px", marginTop: "8px", flexWrap: "wrap" }}>
+                  {data.activeAssignment.min_words > 0 && (
+                    <span style={{ fontSize: "13px", color: "#16a34a", fontWeight: 500 }}>
+                      Minimum: {data.activeAssignment.min_words} words
+                    </span>
+                  )}
+                  {data.activeAssignment.due_date && (
+                    <span style={{ fontSize: "13px", color: "#16a34a", fontWeight: 500 }}>
+                      Due: {new Date(data.activeAssignment.due_date).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAssignForm(true)}
+                  style={{
+                    padding: "8px 14px",
+                    borderRadius: "8px",
+                    border: "1px solid #bbf7d0",
+                    backgroundColor: "white",
+                    color: "#16a34a",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                  }}
+                >
+                  New assignment
+                </button>
+                <button
+                  type="button"
+                  onClick={handleEndAssignment}
+                  style={{
+                    padding: "8px 14px",
+                    borderRadius: "8px",
+                    border: "1px solid #fca5a5",
+                    backgroundColor: "white",
+                    color: "#dc2626",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                  }}
+                >
+                  End assignment
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <span style={{ fontSize: "14px", color: "#64748b" }}>No active assignment.</span>
+            <button
+              type="button"
+              onClick={() => setShowAssignForm(true)}
+              style={{
+                padding: "8px 16px",
+                borderRadius: "8px",
+                border: "none",
+                background: "linear-gradient(135deg, #7c3aed, #2563eb)",
+                color: "white",
+                cursor: "pointer",
+                fontSize: "14px",
+                fontWeight: 600,
+              }}
+            >
+              + Set assignment
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Assignment creation form */}
+      {showAssignForm && (
+        <div style={{
+          marginBottom: "32px",
+          padding: "24px",
+          backgroundColor: "white",
+          border: "1px solid #e2e8f0",
+          borderRadius: "12px",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+        }}>
+          <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#1e293b", marginTop: 0, marginBottom: "20px" }}>
+            New assignment
+          </h3>
+          <form onSubmit={handleCreateAssignment}>
+            <div style={{ display: "grid", gap: "16px" }}>
+              <div>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>
+                  Task title *
+                </label>
+                <input
+                  type="text"
+                  value={formTitle}
+                  onChange={(e) => setFormTitle(e.target.value)}
+                  placeholder="e.g. Write about your family"
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    borderRadius: "8px",
+                    border: "1px solid #e2e8f0",
+                    fontSize: "14px",
+                    color: "#1e293b",
+                    fontFamily: "Lexend, sans-serif",
+                    boxSizing: "border-box",
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>
+                  Description (optional)
+                </label>
+                <textarea
+                  value={formDescription}
+                  onChange={(e) => setFormDescription(e.target.value)}
+                  placeholder="e.g. Describe what your family like doing. Try to write at least 3 sentences."
+                  rows={3}
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    borderRadius: "8px",
+                    border: "1px solid #e2e8f0",
+                    fontSize: "14px",
+                    color: "#1e293b",
+                    fontFamily: "Lexend, sans-serif",
+                    resize: "vertical",
+                    boxSizing: "border-box",
+                  }}
+                />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>
+                    Minimum words (optional)
+                  </label>
+                  <input
+                    type="number"
+                    value={formMinWords}
+                    onChange={(e) => setFormMinWords(e.target.value)}
+                    placeholder="e.g. 100"
+                    min={0}
+                    style={{
+                      width: "100%",
+                      padding: "10px 12px",
+                      borderRadius: "8px",
+                      border: "1px solid #e2e8f0",
+                      fontSize: "14px",
+                      color: "#1e293b",
+                      fontFamily: "Lexend, sans-serif",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="formDueDate" style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>
+                    Due date (optional)
+                  </label>
+                  <input
+                    id="formDueDate"
+                    type="date"
+                    value={formDueDate}
+                    onChange={(e) => setFormDueDate(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "10px 12px",
+                      borderRadius: "8px",
+                      border: "1px solid #e2e8f0",
+                      fontSize: "14px",
+                      color: "#1e293b",
+                      fontFamily: "Lexend, sans-serif",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+            {formError && (
+              <p style={{ color: "#dc2626", fontSize: "13px", marginTop: "12px", marginBottom: 0 }}>{formError}</p>
+            )}
+            <div style={{ display: "flex", gap: "8px", marginTop: "20px" }}>
+              <button
+                type="submit"
+                disabled={formSaving}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: "8px",
+                  border: "none",
+                  background: "linear-gradient(135deg, #7c3aed, #2563eb)",
+                  color: "white",
+                  cursor: formSaving ? "not-allowed" : "pointer",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  opacity: formSaving ? 0.7 : 1,
+                }}
+              >
+                {formSaving ? "Saving..." : "Set assignment"}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowAssignForm(false); setFormError(null); }}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: "8px",
+                  border: "1px solid #e2e8f0",
+                  backgroundColor: "white",
+                  color: "#475569",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {/* Student grid */}
       {!data?.students.length ? (
         <EmptyState />
       ) : (
         <div style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
           gap: "24px",
         }}>
           {data.students.map((s) => (
-            <StudentCard key={s.memberId} student={s} />
+            <StudentCard key={s.memberId} student={s} hasActiveAssignment={!!data.activeAssignment} assignmentMinWords={data.activeAssignment?.min_words ?? 0} />
           ))}
         </div>
       )}
@@ -168,7 +474,13 @@ export function TeacherDashboard() {
   );
 }
 
-function StudentCard({ student }: { student: StudentData }) {
+function StudentCard({ student, hasActiveAssignment, assignmentMinWords }: {
+  student: StudentData;
+  hasActiveAssignment: boolean;
+  assignmentMinWords: number;
+}) {
+  const statusStyle = STATUS_STYLE[student.assignmentStatus];
+
   return (
     <div style={{
       background: "white",
@@ -183,6 +495,32 @@ function StudentCard({ student }: { student: StudentData }) {
       <div style={{ fontSize: "13px", color: "#64748b", marginBottom: "16px" }}>
         {student.sessionCount} session{student.sessionCount !== 1 ? "s" : ""} this month
       </div>
+
+      {/* Assignment status row */}
+      {hasActiveAssignment && (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          marginBottom: "16px",
+          padding: "8px 12px",
+          backgroundColor: statusStyle.bg,
+          borderRadius: "8px",
+        }}>
+          <span style={{ fontSize: "13px", fontWeight: 600, color: statusStyle.text }}>
+            {student.assignmentStatus === "completed" && "✓ "}
+            {student.assignmentStatus === "in_progress" && "✎ "}
+            {student.assignmentStatus === "not_started" && "◯ "}
+            {statusStyle.label}
+          </span>
+          {student.assignmentWords > 0 && (
+            <span style={{ fontSize: "12px", color: statusStyle.text, opacity: 0.8 }}>
+              — {student.assignmentWords.toLocaleString()} word{student.assignmentWords !== 1 ? "s" : ""}
+              {assignmentMinWords > 0 && ` / ${assignmentMinWords}`}
+            </span>
+          )}
+        </div>
+      )}
 
       <div style={{ display: "flex", gap: "20px", marginBottom: "16px" }}>
         <Stat label="Words written" value={student.totalWords.toLocaleString()} />

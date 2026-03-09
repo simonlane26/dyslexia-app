@@ -117,6 +117,15 @@ function PageBody() {
   // Floating rewrite popup
   const [floatingRewrite, setFloatingRewrite] = useState<{ x: number; y: number } | null>(null);
 
+  // Active school assignment (shown to school users)
+  const [activeAssignment, setActiveAssignment] = useState<{
+    id: string;
+    title: string;
+    description: string | null;
+    min_words: number;
+    due_date: string | null;
+  } | null>(null);
+
   // Hooks
   const toast = useToast();
   const { user, isLoaded, isSignedIn } = useUser();
@@ -274,6 +283,15 @@ function PageBody() {
 
     return () => clearTimeout(timer);
   }, [text, schoolMode.isSchoolMode, schoolMode.schoolId, sessionSimplifications]);
+
+  // Fetch active assignment for school users
+  useEffect(() => {
+    if (!schoolMode.isSchoolMode || !schoolMode.schoolId) return;
+    fetch('/api/school/assignments')
+      .then((r) => r.json())
+      .then((d) => setActiveAssignment(d.assignment ?? null))
+      .catch(() => {});
+  }, [schoolMode.isSchoolMode, schoolMode.schoolId]);
 
   const saveDocument = () => {
     if (!text.trim() && !simplifiedText.trim()) {
@@ -1233,6 +1251,52 @@ function PageBody() {
           >
             ×
           </button>
+        </div>
+      )}
+
+      {/* Today's Task banner — school users only */}
+      {activeAssignment && (
+        <div style={{
+          padding: '14px 20px',
+          backgroundColor: darkMode ? 'rgba(59, 130, 246, 0.12)' : 'rgba(59, 130, 246, 0.07)',
+          borderBottom: `1px solid ${darkMode ? 'rgba(59,130,246,0.25)' : 'rgba(59,130,246,0.15)'}`,
+        }}>
+          <div style={{ maxWidth: '1152px', margin: '0 auto', display: 'flex', alignItems: 'flex-start', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: darkMode ? '#93c5fd' : '#2563eb', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  Today&apos;s Task
+                </span>
+                {activeAssignment.due_date && (
+                  <span style={{ fontSize: '11px', color: darkMode ? '#93c5fd' : '#3b82f6', opacity: 0.8 }}>
+                    · Due {new Date(activeAssignment.due_date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
+                  </span>
+                )}
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 600, color: darkMode ? '#bfdbfe' : '#1d4ed8' }}>
+                {activeAssignment.title}
+              </span>
+              {activeAssignment.description && (
+                <span style={{ fontSize: '13px', color: darkMode ? '#93c5fd' : '#3b82f6', marginLeft: '8px' }}>
+                  — {activeAssignment.description}
+                </span>
+              )}
+            </div>
+            {activeAssignment.min_words > 0 && (
+              <span style={{
+                fontSize: '12px',
+                fontWeight: 600,
+                color: darkMode ? '#93c5fd' : '#2563eb',
+                backgroundColor: darkMode ? 'rgba(59,130,246,0.2)' : 'rgba(59,130,246,0.1)',
+                padding: '3px 10px',
+                borderRadius: '12px',
+                flexShrink: 0,
+                alignSelf: 'center',
+              }}>
+                Minimum {activeAssignment.min_words} words
+              </span>
+            )}
+          </div>
         </div>
       )}
 
