@@ -29,7 +29,7 @@ export async function GET() {
   }
 
   const db = createSupabaseServerClient();
-  const { data } = await db
+  const { data: assignment } = await db
     .from("assignments")
     .select("id, title, description, min_words, due_date, created_at")
     .eq("school_id", meta.schoolId)
@@ -38,7 +38,29 @@ export async function GET() {
     .limit(1)
     .maybeSingle();
 
-  return NextResponse.json({ assignment: data ?? null });
+  // For students: also fetch their feedback for this assignment
+  let feedback: string | null = null;
+  if (assignment && meta.schoolRole !== "teacher") {
+    const { data: member } = await db
+      .from("school_members")
+      .select("id")
+      .eq("clerk_user_id", userId)
+      .eq("school_id", meta.schoolId)
+      .single();
+
+    if (member) {
+      const { data: fb } = await db
+        .from("assignment_feedback")
+        .select("comment")
+        .eq("school_id", meta.schoolId)
+        .eq("student_member_id", member.id)
+        .eq("assignment_id", assignment.id)
+        .maybeSingle();
+      feedback = fb?.comment ?? null;
+    }
+  }
+
+  return NextResponse.json({ assignment: assignment ?? null, feedback });
 }
 
 // POST: create a new assignment (teachers only)

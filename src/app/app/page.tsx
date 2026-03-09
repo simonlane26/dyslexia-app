@@ -125,6 +125,7 @@ function PageBody() {
     min_words: number;
     due_date: string | null;
   } | null>(null);
+  const [teacherFeedback, setTeacherFeedback] = useState<string | null>(null);
 
   // Hooks
   const toast = useToast();
@@ -289,7 +290,10 @@ function PageBody() {
     if (!schoolMode.isSchoolMode || !schoolMode.schoolId) return;
     fetch('/api/school/assignments')
       .then((r) => r.json())
-      .then((d) => setActiveAssignment(d.assignment ?? null))
+      .then((d) => {
+        setActiveAssignment(d.assignment ?? null);
+        setTeacherFeedback(d.feedback ?? null);
+      })
       .catch(() => {});
   }, [schoolMode.isSchoolMode, schoolMode.schoolId]);
 
@@ -1297,6 +1301,24 @@ function PageBody() {
               </span>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Teacher feedback note — shown to students when set */}
+      {teacherFeedback && !schoolMode.isTeacher && (
+        <div style={{
+          maxWidth: '860px',
+          margin: '0 auto',
+          padding: '10px 20px',
+          backgroundColor: darkMode ? 'rgba(124,58,237,0.12)' : 'rgba(124,58,237,0.06)',
+          borderLeft: '3px solid #7c3aed',
+        }}>
+          <span style={{ fontSize: '12px', fontWeight: 700, color: darkMode ? '#c4b5fd' : '#7c3aed', marginRight: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Teacher note
+          </span>
+          <span style={{ fontSize: '13px', color: darkMode ? '#e2d9f3' : '#4c1d95' }}>
+            {teacherFeedback}
+          </span>
         </div>
       )}
 

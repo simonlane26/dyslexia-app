@@ -21,6 +21,7 @@ interface StudentData {
   badges: string[];
   assignmentStatus: "completed" | "in_progress" | "not_started";
   assignmentWords: number;
+  teacherFeedback: string | null;
 }
 
 interface DashboardData {
@@ -460,7 +461,7 @@ export function TeacherDashboard() {
           gap: "24px",
         }}>
           {data.students.map((s) => (
-            <StudentCard key={s.memberId} student={s} hasActiveAssignment={!!data.activeAssignment} assignmentMinWords={data.activeAssignment?.min_words ?? 0} />
+            <StudentCard key={s.memberId} student={s} hasActiveAssignment={!!data.activeAssignment} assignmentMinWords={data.activeAssignment?.min_words ?? 0} assignmentId={data.activeAssignment?.id ?? null} />
           ))}
         </div>
       )}
@@ -474,12 +475,36 @@ export function TeacherDashboard() {
   );
 }
 
-function StudentCard({ student, hasActiveAssignment, assignmentMinWords }: {
+function StudentCard({ student, hasActiveAssignment, assignmentMinWords, assignmentId }: {
   student: StudentData;
   hasActiveAssignment: boolean;
   assignmentMinWords: number;
+  assignmentId: string | null;
 }) {
   const statusStyle = STATUS_STYLE[student.assignmentStatus];
+  const [feedback, setFeedback] = useState(student.teacherFeedback ?? "");
+  const [feedbackSaving, setFeedbackSaving] = useState(false);
+  const [feedbackSaved, setFeedbackSaved] = useState(false);
+
+  async function saveFeedback() {
+    if (!assignmentId) return;
+    setFeedbackSaving(true);
+    try {
+      await fetch("/api/school/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          student_member_id: student.memberId,
+          assignment_id: assignmentId,
+          comment: feedback,
+        }),
+      });
+      setFeedbackSaved(true);
+      setTimeout(() => setFeedbackSaved(false), 2000);
+    } finally {
+      setFeedbackSaving(false);
+    }
+  }
 
   return (
     <div style={{
@@ -530,7 +555,7 @@ function StudentCard({ student, hasActiveAssignment, assignmentMinWords }: {
       </div>
 
       {student.badges.length > 0 && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "16px" }}>
           {student.badges.map((badge) => {
             const style = BADGE_STYLES[badge] ?? { bg: "#f1f5f9", text: "#475569" };
             return (
@@ -546,6 +571,52 @@ function StudentCard({ student, hasActiveAssignment, assignmentMinWords }: {
               </span>
             );
           })}
+        </div>
+      )}
+
+      {/* Teacher feedback — only shown when there's an active assignment */}
+      {hasActiveAssignment && assignmentId && (
+        <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "14px" }}>
+          <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#94a3b8", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            Feedback note
+          </label>
+          <textarea
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
+            placeholder="e.g. Great improvement in sentences!"
+            rows={2}
+            style={{
+              width: "100%",
+              padding: "8px 10px",
+              borderRadius: "8px",
+              border: "1px solid #e2e8f0",
+              fontSize: "13px",
+              color: "#1e293b",
+              fontFamily: "Lexend, sans-serif",
+              resize: "none",
+              boxSizing: "border-box",
+            }}
+          />
+          <button
+            type="button"
+            onClick={saveFeedback}
+            disabled={feedbackSaving}
+            style={{
+              marginTop: "6px",
+              padding: "6px 14px",
+              borderRadius: "6px",
+              border: "none",
+              backgroundColor: feedbackSaved ? "#16a34a" : "#7c3aed",
+              color: "white",
+              cursor: feedbackSaving ? "not-allowed" : "pointer",
+              fontSize: "12px",
+              fontWeight: 600,
+              opacity: feedbackSaving ? 0.7 : 1,
+              transition: "background-color 0.2s",
+            }}
+          >
+            {feedbackSaved ? "Saved!" : feedbackSaving ? "Saving..." : "Save note"}
+          </button>
         </div>
       )}
     </div>

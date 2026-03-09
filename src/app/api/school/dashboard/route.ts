@@ -154,6 +154,20 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // Fetch feedback for all students on the active assignment
+  const feedbackMap = new Map<string, string>();
+  if (activeAssignment) {
+    const { data: feedbackRows } = await db
+      .from("assignment_feedback")
+      .select("student_member_id, comment")
+      .eq("school_id", schoolId)
+      .eq("assignment_id", activeAssignment.id)
+      .in("student_member_id", memberIds);
+    for (const row of feedbackRows ?? []) {
+      feedbackMap.set(row.student_member_id, row.comment);
+    }
+  }
+
   // Aggregate assignment words per student
   const assignmentWordMap = new Map<string, number>();
   for (const s of assignmentSessions) {
@@ -191,6 +205,7 @@ export async function GET(req: NextRequest) {
       badges,
       assignmentStatus,
       assignmentWords,
+      teacherFeedback: feedbackMap.get(s.memberId) ?? null,
     };
   });
 
