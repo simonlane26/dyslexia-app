@@ -87,7 +87,7 @@ export function HeroSection({
             backdropFilter: 'blur(10px)',
           }}
         >
-          ✨ AI-Powered Writing Tools for Dyslexic Writers
+          ✨ Confidence Support for Dyslexic Writers
         </div>
 
         {/* Main headline */}
@@ -96,11 +96,11 @@ export function HeroSection({
             fontSize: 'clamp(32px, 6vw, 56px)',
             fontWeight: '800',
             lineHeight: '1.2',
-            marginBottom: '24px',
+            marginBottom: '16px',
             textShadow: '0 2px 20px rgba(0, 0, 0, 0.2)',
           }}
         >
-          Write Better, Faster —
+          Confidence Support
           <br />
           <span
             style={{
@@ -110,24 +110,37 @@ export function HeroSection({
               backgroundClip: 'text',
             }}
           >
-            Dyslexia-Friendly
-          </span>{' '}
-          Tools
+            for Dyslexic Writers
+          </span>
         </h1>
+
+        {/* Direct subtitle */}
+        <p
+          style={{
+            fontSize: 'clamp(15px, 2.5vw, 18px)',
+            lineHeight: '1.5',
+            marginBottom: '12px',
+            maxWidth: '600px',
+            margin: '0 auto 12px',
+            opacity: 0.9,
+            fontWeight: 500,
+          }}
+        >
+          Designed for people who find writing difficult — especially those with dyslexia.
+        </p>
 
         {/* Subheadline */}
         <p
           style={{
-            fontSize: 'clamp(16px, 3vw, 20px)',
+            fontSize: 'clamp(14px, 2vw, 17px)',
             lineHeight: '1.6',
             marginBottom: '40px',
-            maxWidth: '700px',
+            maxWidth: '680px',
             margin: '0 auto 40px',
-            opacity: 0.95,
+            opacity: 0.8,
           }}
         >
-          Real-time grammar checking, AI writing coach, and smart rewriting tools designed
-          specifically for dyslexic writers. Write with confidence.
+          Grammar checking, AI writing coach, and smart rewriting tools — built around how you think, not how you &apos;should&apos; write.
         </p>
 
         {/* CTA Buttons */}

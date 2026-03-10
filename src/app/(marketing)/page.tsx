@@ -16,6 +16,235 @@ import {
 // Prevent static generation - requires runtime environment
 export const dynamic = 'force-dynamic';
 
+const EXAMPLES = [
+  {
+    label: "Simplify",
+    tag: "Simplify",
+    tagColor: "#7c3aed",
+    before: "I wanted too talk too my friend about are homework becuse i didnt understand it and it was really hard for me to no what to do.",
+    after: "I wanted to talk to my friend about our homework because I didn't understand it and it was really hard for me to know what to do.",
+    highlights: ["Correct words", "Fixed spelling", "Clearer flow"],
+  },
+  {
+    label: "Rewrite sentence",
+    tag: "Rewrite",
+    tagColor: "#2563eb",
+    before: "The thing what happened was me and him went to the shop and we buyed some stuff.",
+    after: "He and I went to the shop and bought some things.",
+    highlights: ["Shorter", "Grammatically correct", "Confident tone"],
+  },
+  {
+    label: "Read aloud",
+    tag: "Read Aloud",
+    tagColor: "#059669",
+    before: "Paste any text — an email, an essay, a letter — and hear it read back to you in a clear, natural voice. Great for checking your own writing or reading documents others have sent.",
+    after: null,
+    highlights: ["Hear your writing", "Catch mistakes by ear", "Natural AI voice"],
+    isFeature: true,
+  },
+];
+
+function TransformationSection({
+  theme,
+  darkMode,
+  onGetStarted,
+}: {
+  theme: any;
+  darkMode: boolean;
+  onGetStarted: () => void;
+}) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const ex = EXAMPLES[activeIndex];
+
+  return (
+    <div style={{
+      padding: '80px 24px',
+      backgroundColor: darkMode ? '#0f172a' : '#ffffff',
+    }}>
+      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+        {/* Heading */}
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <p style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7c3aed', marginBottom: '12px' }}>
+            See it in action
+          </p>
+          <h2 style={{ fontSize: '34px', fontWeight: 800, color: theme.text, margin: 0, lineHeight: 1.2 }}>
+            Watch your writing transform
+          </h2>
+          <p style={{ fontSize: '17px', color: theme.textSecondary, marginTop: '12px', marginBottom: 0 }}>
+            Real examples of what Dyslexia Write does — in seconds.
+          </p>
+        </div>
+
+        {/* Tab switcher */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '28px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          {EXAMPLES.map((e, i) => (
+            <button
+              key={e.label}
+              type="button"
+              onClick={() => setActiveIndex(i)}
+              style={{
+                padding: '8px 18px',
+                borderRadius: '20px',
+                border: `2px solid ${activeIndex === i ? e.tagColor : (darkMode ? '#334155' : '#e2e8f0')}`,
+                backgroundColor: activeIndex === i ? `${e.tagColor}14` : 'transparent',
+                color: activeIndex === i ? e.tagColor : theme.textSecondary,
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
+              {e.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Card */}
+        <div style={{
+          borderRadius: '20px',
+          border: `1px solid ${darkMode ? '#1e293b' : '#f1f5f9'}`,
+          overflow: 'hidden',
+          boxShadow: darkMode ? '0 8px 40px rgba(0,0,0,0.4)' : '0 8px 40px rgba(0,0,0,0.08)',
+        }}>
+          {ex.after !== null ? (
+            /* Before / After layout */
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+              {/* Before */}
+              <div style={{
+                padding: '32px 28px',
+                backgroundColor: darkMode ? '#1e293b' : '#fafafa',
+                borderRight: `1px solid ${darkMode ? '#334155' : '#f1f5f9'}`,
+              }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#ef4444', marginBottom: '12px' }}>
+                  Before
+                </div>
+                <p style={{
+                  fontSize: '15px',
+                  lineHeight: 1.7,
+                  color: darkMode ? '#94a3b8' : '#64748b',
+                  margin: 0,
+                  fontStyle: 'italic',
+                }}>
+                  &ldquo;{ex.before}&rdquo;
+                </p>
+              </div>
+              {/* After */}
+              <div style={{
+                padding: '32px 28px',
+                backgroundColor: darkMode ? '#0f1f0f' : '#f0fdf4',
+              }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#16a34a', marginBottom: '12px' }}>
+                  After — with Dyslexia Write
+                </div>
+                <p style={{
+                  fontSize: '15px',
+                  lineHeight: 1.7,
+                  color: darkMode ? '#bbf7d0' : '#14532d',
+                  margin: 0,
+                  fontWeight: 500,
+                }}>
+                  &ldquo;{ex.after}&rdquo;
+                </p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '20px' }}>
+                  {ex.highlights.map((h) => (
+                    <span key={h} style={{
+                      padding: '3px 10px',
+                      borderRadius: '10px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      backgroundColor: darkMode ? 'rgba(22,163,74,0.15)' : '#dcfce7',
+                      color: '#16a34a',
+                    }}>
+                      ✓ {h}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Feature description layout (Read Aloud) */
+            <div style={{
+              padding: '40px 36px',
+              backgroundColor: darkMode ? '#1e293b' : '#f8faff',
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '20px',
+              }}>
+                <div style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '14px',
+                  backgroundColor: '#05966914',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  fontSize: '26px',
+                }}>
+                  🔊
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#059669', marginBottom: '8px' }}>
+                    Read Aloud
+                  </div>
+                  <p style={{
+                    fontSize: '16px',
+                    lineHeight: 1.7,
+                    color: theme.text,
+                    margin: 0,
+                  }}>
+                    {ex.before}
+                  </p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '20px' }}>
+                    {ex.highlights.map((h) => (
+                      <span key={h} style={{
+                        padding: '3px 10px',
+                        borderRadius: '10px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        backgroundColor: darkMode ? 'rgba(5,150,105,0.15)' : '#d1fae5',
+                        color: '#059669',
+                      }}>
+                        ✓ {h}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* CTA */}
+        <div style={{ textAlign: 'center', marginTop: '36px' }}>
+          <button
+            type="button"
+            onClick={onGetStarted}
+            style={{
+              padding: '14px 36px',
+              fontSize: '16px',
+              fontWeight: 700,
+              color: '#ffffff',
+              background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)',
+              border: 'none',
+              borderRadius: '12px',
+              cursor: 'pointer',
+              boxShadow: '0 4px 16px rgba(124,58,237,0.35)',
+            }}
+          >
+            Start Writing Free
+          </button>
+          <p style={{ fontSize: '13px', color: theme.textSecondary, marginTop: '10px' }}>
+            No credit card needed
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function LandingPage() {
   const { isSignedIn, isLoaded } = useUser();
   const router = useRouter();
@@ -143,6 +372,9 @@ export default function LandingPage() {
         theme={theme}
         darkMode={darkMode}
       />
+
+      {/* Before → After Transformation Section */}
+      <TransformationSection theme={theme} darkMode={darkMode} onGetStarted={() => router.push('/sign-up')} />
 
       {/* Trust Signals Strip */}
       <div
