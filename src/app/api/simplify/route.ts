@@ -12,7 +12,7 @@ const SYSTEM_PROMPT =
   'You simplify text for dyslexic readers. Keep meaning the same; prefer short sentences and simple words. Remove filler. Keep names and facts. Output only the simplified text.';
 
 const SCHOOL_SYSTEM_PROMPT =
-  'You make writing easier to read for children aged 8–16 with dyslexia. Use very short sentences. Use simple, everyday words. Keep the same meaning. Do not add explanations or comments — output only the easier version of the text.';
+  'You make writing easier to read for children aged 8\u201316 with dyslexia. Use very short sentences. Use simple, everyday words. Keep the same meaning. Do not add explanations or comments \u2014 output only the easier version of the text.';
 
 // ---------- utils
 const clean = (s?: string | null) => (s ?? '').trim().replace(/^"(.*)"$/, '$1');
@@ -52,14 +52,20 @@ function pickProvider(): { provider: Provider; key: string; url?: string; model?
 // ---------- simple in-memory quota (resets on deploy)
 const dailyUsage = new Map<string, { count: number; date: string }>();
 
+// ---------- CORS (for Chrome extension)
+const CORS_HEADERS: Record<string, string> = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
 // ---------- handlers
 export async function OPTIONS() {
-  // same-origin requests don’t need CORS, but this makes preflight harmless
-  return new NextResponse(null, { status: 204, headers: { 'Cache-Control': 'no-store' } });
+  return new NextResponse(null, { status: 204, headers: { 'Cache-Control': 'no-store', ...CORS_HEADERS } });
 }
 
 export async function POST(req: NextRequest) {
-  const H: Record<string, string> = { 'Cache-Control': 'no-store', 'x-runtime': 'node' };
+  const H: Record<string, string> = { 'Cache-Control': 'no-store', 'x-runtime': 'node', ...CORS_HEADERS };
 
   try {
     // 1) body

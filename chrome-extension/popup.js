@@ -5,8 +5,13 @@ const sizeUp    = document.getElementById('sizeUp');
 const sizeDown  = document.getElementById('sizeDown');
 const sizeValue = document.getElementById('sizeValue');
 const swatches  = document.querySelectorAll('.swatch');
-const readBtn   = document.getElementById('readBtn');
-const clearBtn  = document.getElementById('clearBtn');
+const readBtn        = document.getElementById('readBtn');
+const simplifyBtn    = document.getElementById('simplifyBtn');
+const simplifyPanel  = document.getElementById('simplifyPanel');
+const simplifyResult = document.getElementById('simplifyResult');
+const simplifyApply  = document.getElementById('simplifyApply');
+const simplifyClose  = document.getElementById('simplifyClose');
+const clearBtn       = document.getElementById('clearBtn');
 const wordCount = document.getElementById('wordCount');
 const saveStatus = document.getElementById('saveStatus');
 
@@ -168,6 +173,71 @@ readBtn.addEventListener('click', () => {
 
   window.speechSynthesis.cancel();
   window.speechSynthesis.speak(utter);
+});
+
+// ── Simplify ──
+const API_URL = 'https://www.dyslexiawrite.com/api/simplify';
+let lastSimplified = '';
+
+simplifyBtn.addEventListener('click', async () => {
+  const text = editor.value.trim();
+  if (!text) return;
+
+  simplifyBtn.disabled = true;
+  simplifyBtn.textContent = 'Simplifying…';
+  simplifyPanel.style.display = 'none';
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      const msg = data?.error || 'Something went wrong. Please try again.';
+      simplifyResult.textContent = msg;
+      simplifyPanel.style.background = '#fef2f2';
+      simplifyPanel.style.borderTopColor = '#fecaca';
+      simplifyResult.style.color = '#991b1b';
+      simplifyApply.style.display = 'none';
+      simplifyPanel.style.display = 'block';
+      return;
+    }
+
+    lastSimplified = data.simplifiedText || '';
+    simplifyResult.textContent = lastSimplified;
+    simplifyResult.style.color = '#14532d';
+    simplifyPanel.style.background = '#f0fdf4';
+    simplifyPanel.style.borderTopColor = '#bbf7d0';
+    simplifyApply.style.display = '';
+    simplifyPanel.style.display = 'block';
+  } catch {
+    simplifyResult.textContent = 'Could not reach the server. Check your connection.';
+    simplifyPanel.style.background = '#fef2f2';
+    simplifyPanel.style.borderTopColor = '#fecaca';
+    simplifyResult.style.color = '#991b1b';
+    simplifyApply.style.display = 'none';
+    simplifyPanel.style.display = 'block';
+  } finally {
+    simplifyBtn.disabled = false;
+    simplifyBtn.textContent = '✨ Simplify';
+  }
+});
+
+simplifyApply.addEventListener('click', () => {
+  if (!lastSimplified) return;
+  editor.value = lastSimplified;
+  updateWordCount();
+  save();
+  simplifyPanel.style.display = 'none';
+  lastSimplified = '';
+});
+
+simplifyClose.addEventListener('click', () => {
+  simplifyPanel.style.display = 'none';
+  lastSimplified = '';
 });
 
 // ── Clear ──
