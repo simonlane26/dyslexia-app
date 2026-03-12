@@ -1,0 +1,180 @@
+// ── Elements ──
+const editor    = document.getElementById('editor');
+const fontSelect = document.getElementById('fontSelect');
+const sizeUp    = document.getElementById('sizeUp');
+const sizeDown  = document.getElementById('sizeDown');
+const sizeValue = document.getElementById('sizeValue');
+const swatches  = document.querySelectorAll('.swatch');
+const readBtn   = document.getElementById('readBtn');
+const clearBtn  = document.getElementById('clearBtn');
+const wordCount = document.getElementById('wordCount');
+const saveStatus = document.getElementById('saveStatus');
+
+// ── State ──
+let fontSize   = 17;
+let bgColor    = '#fdf6e3';
+let fontFamily = 'Arial, Helvetica, sans-serif';
+let isReading  = false;
+let saveTimer  = null;
+
+// ── Load saved settings + draft ──
+chrome.storage.local.get(['dw_draft', 'dw_fontSize', 'dw_bgColor', 'dw_fontFamily'], (data) => {
+  if (data.dw_draft)      editor.value = data.dw_draft;
+  if (data.dw_fontSize)   { fontSize = data.dw_fontSize; applyFontSize(); }
+  if (data.dw_bgColor)    { bgColor = data.dw_bgColor; applyBgColor(); }
+  if (data.dw_fontFamily) { fontFamily = data.dw_fontFamily; applyFont(); }
+  updateWordCount();
+});
+
+// ── Font ──
+fontSelect.addEventListener('change', () => {
+  fontFamily = fontSelect.value;
+  applyFont();
+  save();
+});
+
+function applyFont() {
+  editor.style.fontFamily = fontFamily;
+  // Sync select to current value
+  for (let i = 0; i < fontSelect.options.length; i++) {
+    if (fontSelect.options[i].value === fontFamily) {
+      fontSelect.selectedIndex = i;
+      break;
+    }
+  }
+}
+
+// ── Font size ──
+sizeUp.addEventListener('click', () => {
+  if (fontSize >= 28) return;
+  fontSize++;
+  applyFontSize();
+  save();
+});
+
+sizeDown.addEventListener('click', () => {
+  if (fontSize <= 12) return;
+  fontSize--;
+  applyFontSize();
+  save();
+});
+
+function applyFontSize() {
+  editor.style.fontSize = fontSize + 'px';
+  sizeValue.textContent = fontSize;
+}
+
+// ── Background colour ──
+swatches.forEach(swatch => {
+  swatch.addEventListener('click', () => {
+    bgColor = swatch.dataset.color;
+    applyBgColor();
+    save();
+  });
+});
+
+function applyBgColor() {
+  editor.style.backgroundColor = bgColor;
+  // Dark bg needs light text
+  editor.style.color = isDark(bgColor) ? '#f1f5f9' : '#1e293b';
+  editor.style.caretColor = isDark(bgColor) ? '#f1f5f9' : '#1e293b';
+  // Update active swatch
+  swatches.forEach(s => {
+    s.classList.toggle('active', s.dataset.color === bgColor);
+  });
+}
+
+function isDark(hex) {
+  const c = hex.replace('#', '');
+  const r = parseInt(c.substr(0,2),16);
+  const g = parseInt(c.substr(2,2),16);
+  const b = parseInt(c.substr(4,2),16);
+  return (r * 0.299 + g * 0.587 + b * 0.114) < 128;
+}
+
+// ── Word count ──
+editor.addEventListener('input', () => {
+  updateWordCount();
+  scheduleSave();
+});
+
+function updateWordCount() {
+  const words = editor.value.trim()
+    ? editor.value.trim().split(/\s+/).filter(w => w.length > 0).length
+    : 0;
+  wordCount.textContent = words + (words === 1 ? ' word' : ' words');
+}
+
+// ── Auto-save (debounced 1.5s) ──
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(save, 1500);
+}
+
+function save() {
+  chrome.storage.local.set({
+    dw_draft: editor.value,
+    dw_fontSize: fontSize,
+    dw_bgColor: bgColor,
+    dw_fontFamily: fontFamily,
+  }, () => {
+    showSaved();
+  });
+}
+
+function showSaved() {
+  saveStatus.classList.add('visible');
+  clearTimeout(saveStatus._timer);
+  saveStatus._timer = setTimeout(() => saveStatus.classList.remove('visible'), 1800);
+}
+
+// ── Read aloud ──
+readBtn.addEventListener('click', () => {
+  if (isReading) {
+    window.speechSynthesis.cancel();
+    isReading = false;
+    readBtn.textContent = '🔊 Read aloud';
+    readBtn.classList.remove('active');
+    return;
+  }
+
+  const text = editor.value.trim();
+  if (!text) return;
+
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-GB';
+  utter.rate = 0.9;
+
+  utter.onstart = () => {
+    isReading = true;
+    readBtn.textContent = '⏹ Stop';
+    readBtn.classList.add('active');
+    readBtn.classList.remove('primary');
+  };
+
+  utter.onend = () => {
+    isReading = false;
+    readBtn.textContent = '🔊 Read aloud';
+    readBtn.classList.remove('active');
+    readBtn.classList.add('primary');
+  };
+
+  utter.onerror = () => {
+    isReading = false;
+    readBtn.textContent = '🔊 Read aloud';
+    readBtn.classList.remove('active');
+    readBtn.classList.add('primary');
+  };
+
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utter);
+});
+
+// ── Clear ──
+clearBtn.addEventListener('click', () => {
+  if (!editor.value.trim()) return;
+  if (!confirm('Clear your draft?')) return;
+  editor.value = '';
+  updateWordCount();
+  save();
+});
