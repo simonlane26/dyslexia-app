@@ -2,6 +2,23 @@
 import 'server-only';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { jwtVerify } from 'jose';
+
+function getExtensionSecret() {
+  const s = process.env.EXTENSION_TOKEN_SECRET;
+  if (!s) return null;
+  return new TextEncoder().encode(s);
+}
+
+const CORS_HEADERS: Record<string, string> = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: { 'Cache-Control': 'no-store', ...CORS_HEADERS } });
+}
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -162,6 +179,7 @@ export function GET() {
       'Cache-Control': 'no-store',
       'x-api-provider': p?.provider || 'none',
       'x-api-key-present': p ? 'true' : 'false',
+      ...CORS_HEADERS,
     },
   });
 }
@@ -171,7 +189,23 @@ export async function POST(req: NextRequest) {
   const baseHdrs: Record<string, string> = {
     'Cache-Control': 'no-store',
     'x-api-provider': p?.provider || 'none',
+    ...CORS_HEADERS,
   };
+
+  // Auth — require extension token (same pattern as /api/simplify)
+  const authHeader = req.headers.get('authorization') ?? '';
+  const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
+  const secret = getExtensionSecret();
+  if (!bearerToken) {
+    return jsonError(401, { error: 'SIGN_IN_REQUIRED', message: 'Sign in at dyslexiawrite.com/extension-connect to use AI Rewrite.' }, baseHdrs);
+  }
+  if (secret) {
+    try {
+      await jwtVerify(bearerToken, secret);
+    } catch {
+      return jsonError(401, { error: 'INVALID_TOKEN', message: 'Token invalid or expired. Reconnect at dyslexiawrite.com/extension-connect.' }, baseHdrs);
+    }
+  }
 
   if (!p) {
     return jsonError(500, {
@@ -256,7 +290,7 @@ export async function POST(req: NextRequest) {
       status: 200,
       headers: {
         ...baseHdrs,
-        'Content-Type': 'text/plain; charset=utf-8',
+        'Content-Type': 'application/json; charset=utf-8',
       },
     });
   } catch (e: any) {

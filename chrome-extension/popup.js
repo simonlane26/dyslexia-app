@@ -11,6 +11,10 @@ const simplifyPanel  = document.getElementById('simplifyPanel');
 const simplifyResult = document.getElementById('simplifyResult');
 const simplifyApply  = document.getElementById('simplifyApply');
 const simplifyClose  = document.getElementById('simplifyClose');
+const rewriteBtn     = document.getElementById('rewriteBtn');
+const rewritePanel   = document.getElementById('rewritePanel');
+const rewriteCards   = document.getElementById('rewriteCards');
+const rewriteClose   = document.getElementById('rewriteClose');
 const clearBtn       = document.getElementById('clearBtn');
 const wordCount = document.getElementById('wordCount');
 const saveStatus = document.getElementById('saveStatus');
@@ -296,6 +300,87 @@ simplifyApply.addEventListener('click', () => {
 simplifyClose.addEventListener('click', () => {
   simplifyPanel.style.display = 'none';
   lastSimplified = '';
+});
+
+// ── Rewrite ──
+const REWRITE_URL = 'https://www.dyslexiawrite.com/api/coach/rewrite-sentence';
+
+rewriteBtn.addEventListener('click', async () => {
+  const text = editor.value.trim();
+  if (!text) return;
+
+  if (!authToken) {
+    rewritePanel.style.display = 'none';
+    connectPanel.style.display = 'block';
+    return;
+  }
+
+  rewriteBtn.disabled = true;
+  rewriteBtn.textContent = 'Rewriting…';
+  rewritePanel.style.display = 'none';
+  simplifyPanel.style.display = 'none';
+  connectPanel.style.display = 'none';
+
+  try {
+    const res = await fetch(REWRITE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+      body: JSON.stringify({ sentence: text }),
+    });
+
+    if (res.status === 401) {
+      authToken = null;
+      chrome.storage.local.remove('dw_token');
+      updateAuthUI();
+      connectPanel.style.display = 'block';
+      return;
+    }
+
+    const raw = await res.text();
+    let alternatives = [];
+    try {
+      const clean = raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+      const parsed = JSON.parse(clean);
+      alternatives = parsed.alternatives || [];
+    } catch {
+      rewriteCards.innerHTML = '<div style="color:#991b1b;font-size:13px;">Could not parse suggestions. Try again.</div>';
+      rewritePanel.style.display = 'block';
+      return;
+    }
+
+    rewriteCards.innerHTML = '';
+    alternatives.forEach((alt) => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:white;border:1px solid #c7d7fd;border-radius:8px;padding:10px 12px;';
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+          <span style="font-size:14px;">${alt.icon || '✏️'}</span>
+          <span style="font-size:11px;font-weight:700;color:#2563eb;text-transform:uppercase;letter-spacing:0.05em;">${(alt.label || '').replace(/</g,'&lt;')}</span>
+        </div>
+        <div style="font-size:13px;line-height:1.6;color:#1e293b;margin-bottom:8px;">${(alt.text || '').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        <button type="button" style="background:linear-gradient(135deg,#2563eb,#7c3aed);color:white;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">Use this</button>
+      `;
+      card.querySelector('button').addEventListener('click', () => {
+        editor.value = alt.text;
+        updateWordCount();
+        save();
+        rewritePanel.style.display = 'none';
+      });
+      rewriteCards.appendChild(card);
+    });
+
+    rewritePanel.style.display = 'block';
+  } catch {
+    rewriteCards.innerHTML = '<div style="color:#991b1b;font-size:13px;">Could not reach the server. Check your connection.</div>';
+    rewritePanel.style.display = 'block';
+  } finally {
+    rewriteBtn.disabled = false;
+    rewriteBtn.textContent = '✏️ Rewrite';
+  }
+});
+
+rewriteClose.addEventListener('click', () => {
+  rewritePanel.style.display = 'none';
 });
 
 // ── Clear ──

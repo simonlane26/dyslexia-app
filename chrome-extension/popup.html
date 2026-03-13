@@ -273,6 +273,7 @@
     <div class="toolbar-left">
       <button class="tool-btn primary" id="readBtn">🔊 Read aloud</button>
       <button class="tool-btn" id="simplifyBtn">✨ Simplify</button>
+      <button class="tool-btn" id="rewriteBtn">✏️ Rewrite</button>
       <button class="tool-btn" id="clearBtn">✕ Clear</button>
     </div>
     <span class="word-count" id="wordCount">0 words</span>
@@ -288,6 +289,15 @@
       </div>
     </div>
     <div id="simplifyResult" style="font-size:14px; line-height:1.7; color:#14532d;"></div>
+  </div>
+
+  <!-- Rewrite panel -->
+  <div id="rewritePanel" style="display:none; padding:10px 12px; background:#f0f4ff; border-top:1px solid #c7d7fd;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+      <span style="font-size:11px; font-weight:700; color:#2563eb; text-transform:uppercase; letter-spacing:0.05em;">Rewrite options</span>
+      <button type="button" id="rewriteClose" class="tool-btn" style="padding:4px 8px; font-size:11px;">✕</button>
+    </div>
+    <div id="rewriteCards" style="display:flex; flex-direction:column; gap:8px;"></div>
   </div>
 
   <!-- Connect account panel (shown when Simplify is clicked without a token) -->
