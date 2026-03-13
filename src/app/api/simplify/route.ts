@@ -1,6 +1,13 @@
 import 'server-only';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { jwtVerify } from 'jose';
+
+function getExtensionSecret() {
+  const s = process.env.EXTENSION_TOKEN_SECRET;
+  if (!s) return null;
+  return new TextEncoder().encode(s);
+}
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -56,7 +63,7 @@ const dailyUsage = new Map<string, { count: number; date: string }>();
 const CORS_HEADERS: Record<string, string> = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
 // ---------- handlers
@@ -82,7 +89,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Text too long (max 10,000 characters)' }, { status: 400, headers: H });
     }
 
-    // 2) provider + key
+    // 2) Auth — require extension token
+    const authHeader = req.headers.get('authorization') ?? '';
+    const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
+    const secret = getExtensionSecret();
+    if (!bearerToken) {
+      return NextResponse.json({ error: 'SIGN_IN_REQUIRED', message: 'Sign in at dyslexiawrite.com/extension-connect to use AI Simplify.' }, { status: 401, headers: H });
+    }
+    if (secret) {
+      try {
+        await jwtVerify(bearerToken, secret);
+      } catch {
+        return NextResponse.json({ error: 'INVALID_TOKEN', message: 'Token invalid or expired. Reconnect at dyslexiawrite.com/extension-connect.' }, { status: 401, headers: H });
+      }
+    }
+
+    // 3) provider + key
     const sel = pickProvider();
     H['x-api-provider'] = sel.provider;
     H['x-key-present'] = String(Boolean(sel.key));
@@ -96,7 +118,7 @@ export async function POST(req: NextRequest) {
     }
     H['x-model'] = sel.model!;
 
-    // 3) Rate limiting (IP-based for free tier)
+    // 4) Rate limiting (IP-based for free tier)
     const today = todayStr();
     const rateLimitKey = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'anonymous';
     const rec = dailyUsage.get(rateLimitKey);

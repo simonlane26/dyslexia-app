@@ -14,6 +14,12 @@ const simplifyClose  = document.getElementById('simplifyClose');
 const clearBtn       = document.getElementById('clearBtn');
 const wordCount = document.getElementById('wordCount');
 const saveStatus = document.getElementById('saveStatus');
+const authStatus   = document.getElementById('authStatus');
+const connectPanel = document.getElementById('connectPanel');
+const tokenInput   = document.getElementById('tokenInput');
+const connectBtn   = document.getElementById('connectBtn');
+const connectClose = document.getElementById('connectClose');
+const connectError = document.getElementById('connectError');
 
 // ── State ──
 let fontSize   = 17;
@@ -21,14 +27,52 @@ let bgColor    = '#fdf6e3';
 let fontFamily = 'Arial, Helvetica, sans-serif';
 let isReading  = false;
 let saveTimer  = null;
+let authToken  = null;
+
+// ── Auth helpers ──
+function updateAuthUI() {
+  if (authToken) {
+    authStatus.textContent = 'Connected';
+    authStatus.style.color = 'rgba(167,243,208,0.9)';
+  } else {
+    authStatus.textContent = 'Not connected';
+    authStatus.style.color = 'rgba(255,255,255,0.5)';
+  }
+}
+
+connectBtn.addEventListener('click', () => {
+  const val = tokenInput.value.trim();
+  if (!val) { showConnectError('Paste your token first.'); return; }
+  // Basic JWT shape check (three dot-separated parts)
+  if (val.split('.').length !== 3) { showConnectError('That doesn\'t look like a valid token.'); return; }
+  authToken = val;
+  chrome.storage.local.set({ dw_token: val }, () => {
+    connectPanel.style.display = 'none';
+    tokenInput.value = '';
+    connectError.style.display = 'none';
+    updateAuthUI();
+  });
+});
+
+connectClose.addEventListener('click', () => {
+  connectPanel.style.display = 'none';
+  connectError.style.display = 'none';
+});
+
+function showConnectError(msg) {
+  connectError.textContent = msg;
+  connectError.style.display = 'block';
+}
 
 // ── Load saved settings + draft ──
-chrome.storage.local.get(['dw_draft', 'dw_fontSize', 'dw_bgColor', 'dw_fontFamily'], (data) => {
+chrome.storage.local.get(['dw_draft', 'dw_fontSize', 'dw_bgColor', 'dw_fontFamily', 'dw_token'], (data) => {
   if (data.dw_draft)      editor.value = data.dw_draft;
   if (data.dw_fontSize)   { fontSize = data.dw_fontSize; applyFontSize(); }
   if (data.dw_bgColor)    { bgColor = data.dw_bgColor; applyBgColor(); }
   if (data.dw_fontFamily) { fontFamily = data.dw_fontFamily; applyFont(); }
+  if (data.dw_token)      { authToken = data.dw_token; }
   updateWordCount();
+  updateAuthUI();
 });
 
 // ── Font ──
@@ -183,20 +227,34 @@ simplifyBtn.addEventListener('click', async () => {
   const text = editor.value.trim();
   if (!text) return;
 
+  if (!authToken) {
+    simplifyPanel.style.display = 'none';
+    connectPanel.style.display = 'block';
+    return;
+  }
+
   simplifyBtn.disabled = true;
   simplifyBtn.textContent = 'Simplifying…';
   simplifyPanel.style.display = 'none';
+  connectPanel.style.display = 'none';
 
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
       body: JSON.stringify({ text }),
     });
     const data = await res.json();
 
     if (!res.ok) {
-      const msg = data?.error || 'Something went wrong. Please try again.';
+      if (res.status === 401) {
+        authToken = null;
+        chrome.storage.local.remove('dw_token');
+        updateAuthUI();
+        connectPanel.style.display = 'block';
+        return;
+      }
+      const msg = data?.message || data?.error || 'Something went wrong. Please try again.';
       simplifyResult.textContent = msg;
       simplifyPanel.style.background = '#fef2f2';
       simplifyPanel.style.borderTopColor = '#fecaca';

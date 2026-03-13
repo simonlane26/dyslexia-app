@@ -221,14 +221,17 @@
       <div class="header-title">Dyslexia Write</div>
       <div class="header-subtitle">Write here. Improve. Use anywhere.</div>
     </div>
-    <a class="open-app-btn" href="https://dyslexiawrite.com/app" target="_blank">Open full app ↗</a>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+      <a class="open-app-btn" href="https://dyslexiawrite.com/app" target="_blank" rel="noopener noreferrer">Open full app ↗</a>
+      <span id="authStatus" style="font-size:10px; opacity:0.75;"></span>
+    </div>
   </div>
 
   <!-- Settings -->
   <div class="settings">
     <div class="settings-row">
       <span class="settings-label">Font</span>
-      <select class="font-select" id="fontSelect">
+      <select class="font-select" id="fontSelect" aria-label="Font family">
         <option value="Arial, Helvetica, sans-serif">Arial</option>
         <option value="Verdana, Tahoma, sans-serif">Verdana</option>
         <option value="'Comic Sans MS', 'Comic Sans', cursive">Comic Sans</option>
@@ -283,6 +286,19 @@
       </div>
     </div>
     <div id="simplifyResult" style="font-size:14px; line-height:1.7; color:#14532d;"></div>
+  </div>
+
+  <!-- Connect account panel (shown when Simplify is clicked without a token) -->
+  <div id="connectPanel" style="display:none; padding:16px; background:#ede9fe; border-top:1px solid #c4b5fd;">
+    <div style="font-size:12px; font-weight:700; color:#7c3aed; margin-bottom:8px;">Connect your account to use AI Simplify</div>
+    <a href="https://dyslexiawrite.com/extension-connect" target="_blank" rel="noopener noreferrer" id="goConnectLink" style="display:block; text-align:center; background:linear-gradient(135deg,#7c3aed,#2563eb); color:white; text-decoration:none; border-radius:8px; padding:9px; font-size:13px; font-weight:600; margin-bottom:10px;">1. Sign in and get token ↗</a>
+    <div style="font-size:12px; color:#4c1d95; margin-bottom:6px;">2. Paste your token here:</div>
+    <input id="tokenInput" type="text" placeholder="Paste token…" style="width:100%; border:1px solid #c4b5fd; border-radius:6px; padding:8px 10px; font-size:12px; margin-bottom:8px; color:#1e293b; outline:none; background:white;">
+    <div style="display:flex; gap:6px;">
+      <button type="button" id="connectBtn" style="flex:1; background:#7c3aed; color:white; border:none; border-radius:8px; padding:9px; font-size:13px; font-weight:600; cursor:pointer;">Connect</button>
+      <button type="button" id="connectClose" style="background:#e2e8f0; color:#475569; border:none; border-radius:8px; padding:9px 14px; font-size:13px; font-weight:600; cursor:pointer;">✕</button>
+    </div>
+    <p id="connectError" style="font-size:12px; color:#dc2626; margin-top:8px; display:none;"></p>
   </div>
 
   <script src="popup.js"></script>
