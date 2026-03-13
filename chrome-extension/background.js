@@ -1,11 +1,16 @@
-// ── Create context menu on install ──
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.create({
-    id: 'dw-simplify',
-    title: 'Simplify with Dyslexia Write',
-    contexts: ['selection'],
+// ── Create context menu ──
+function createMenu() {
+  chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.create({
+      id: 'dw-simplify',
+      title: 'Simplify with Dyslexia Write',
+      contexts: ['selection'],
+    });
   });
-});
+}
+
+chrome.runtime.onInstalled.addListener(createMenu);
+chrome.runtime.onStartup.addListener(createMenu);
 
 // ── Handle context menu click ──
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
@@ -13,6 +18,11 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
   const text = (info.selectionText || '').trim();
   if (!text) return;
+
+  // Ensure content script is injected (handles already-open tabs)
+  try {
+    await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content.js'] });
+  } catch { /* already injected or page doesn't allow scripts */ }
 
   // Tell content script to show loading state
   chrome.tabs.sendMessage(tab.id, { type: 'DW_SIMPLIFY_START' });

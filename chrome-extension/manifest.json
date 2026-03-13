@@ -12,7 +12,7 @@
       "128": "icons/icon128.png"
     }
   },
-  "permissions": ["storage", "contextMenus"],
+  "permissions": ["storage", "contextMenus", "scripting"],
   "host_permissions": ["https://www.dyslexiawrite.com/*"],
   "background": {
     "service_worker": "background.js"
