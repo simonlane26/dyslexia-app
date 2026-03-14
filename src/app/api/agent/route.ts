@@ -14,7 +14,7 @@ const OPENAI_KEY = cleanEnv(process.env.OPENAI_API_KEY);
 const OPENROUTER_KEY = cleanEnv(process.env.OPENROUTER_API_KEY);
 const SITE_URL = cleanEnv(process.env.NEXT_PUBLIC_SITE_URL) || 'https://www.dyslexiawrite.com';
 
-const SYSTEM_PROMPT = `You are a friendly, patient writing helper inside DyslexiaWrite. You are talking directly with the person who is writing.
+const BASE_PROMPT = `You are a friendly, patient writing helper inside DyslexiaWrite. You are talking directly with the person who is writing.
 
 YOUR ROLE:
 - You guide the writer step by step — you never write FOR them
@@ -25,7 +25,6 @@ YOUR ROLE:
 - You are always encouraging. Never critical. Never negative.
 
 HOW TO HELP:
-- If they haven't started: ask what they want to write about and get them talking first
 - If they're stuck: offer two options ("Would you rather write about X or Y?")
 - If they've written something: notice something good first, then ask a follow-up question
 - If a sentence is very long: gently ask if they'd like help splitting it
@@ -34,17 +33,63 @@ HOW TO HELP:
 
 ALWAYS remember: your job is to be a quiet, confident helper in the background. One question. Short. Warm. That's it.`;
 
+const WRITING_TYPE_GUIDANCE: Record<string, string> = {
+  email: `The writer is writing an EMAIL.
+First question to ask: "Who are you writing to?"
+Then ask: "What do you want them to do or know after reading it?"
+Keep suggestions friendly and direct. Short paragraphs. Clear ask.`,
+
+  essay: `The writer is writing an ESSAY.
+First question to ask: "What is the main topic?"
+Then ask: "What's the main point you want to make?"
+Help them structure: intro idea → main point → example → conclusion.`,
+
+  'work message': `The writer is writing a WORK MESSAGE (e.g. Slack, Teams, email to a colleague or manager).
+First question to ask: "Who is this going to?"
+Then ask: "What's the key thing you need to say or ask?"
+Keep it professional but human. Short and clear.`,
+
+  'social post': `The writer is writing a SOCIAL POST.
+First question to ask: "Which platform is this for — Instagram, X, LinkedIn, something else?"
+Then ask: "What do you want people to feel or do after reading it?"
+Keep it punchy. One idea per post.`,
+
+  story: `The writer is writing a STORY.
+First question to ask: "Who is the main character?"
+Then ask: "What happens to them?"
+Help them paint a picture with simple, vivid details. One scene at a time.`,
+
+  notes: `The writer is taking NOTES.
+First question to ask: "What are you taking notes about?"
+Then ask: "What's the most important thing you want to remember?"
+Help them spot the key ideas and put them in their own words.`,
+
+  homework: `The writer is doing HOMEWORK.
+First question to ask: "What subject is this for?"
+Then ask: "What does the assignment ask you to do?"
+Be encouraging. Break it into small steps. Never do the work for them.`,
+};
+
+function buildSystemPrompt(writingType?: string): string {
+  const typeKey = (writingType || '').toLowerCase().trim();
+  const typeGuidance = WRITING_TYPE_GUIDANCE[typeKey];
+  if (typeGuidance) {
+    return `${BASE_PROMPT}\n\n--- WRITING TYPE CONTEXT ---\n${typeGuidance}`;
+  }
+  return BASE_PROMPT;
+}
+
 function buildMessages(
   documentText: string,
-  chatHistory: { role: 'user' | 'assistant'; content: string }[]
+  chatHistory: { role: 'user' | 'assistant'; content: string }[],
+  writingType?: string,
 ) {
-  // Inject document state as a system context message before the conversation
   const docContext = documentText.trim()
     ? `The writer's document so far:\n"""\n${documentText.slice(0, 3000)}\n"""`
     : 'The writer has not started yet. The document is empty.';
 
   return [
-    { role: 'system' as const, content: SYSTEM_PROMPT },
+    { role: 'system' as const, content: buildSystemPrompt(writingType) },
     { role: 'system' as const, content: docContext },
     ...chatHistory,
   ];
@@ -77,6 +122,7 @@ export async function POST(req: NextRequest) {
   const documentText = String(body?.documentText ?? '').slice(0, 10_000);
   const chatHistory: { role: 'user' | 'assistant'; content: string }[] =
     Array.isArray(body?.chatHistory) ? body.chatHistory.slice(-20) : [];
+  const writingType = typeof body?.writingType === 'string' ? body.writingType : undefined;
 
   // 4) Pick provider
   const useOpenAI = OPENAI_KEY && OPENAI_KEY.length > 20;
@@ -106,7 +152,7 @@ export async function POST(req: NextRequest) {
   const timeout = setTimeout(() => ctrl.abort(), 25_000);
 
   try {
-    const messages = buildMessages(documentText, chatHistory);
+    const messages = buildMessages(documentText, chatHistory, writingType);
     const upstream = await fetch(url, {
       method: 'POST',
       headers,

@@ -45,6 +45,7 @@ export function AgentChat({
   onInsertDraft,
 }: AgentChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [writingType, setWritingType] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [draftLoading, setDraftLoading] = useState(false);
@@ -195,30 +196,25 @@ export function AgentChat({
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
-  // Auto-greet when opened for the first time this session
+  // Auto-focus input when opened (after type selected)
   useEffect(() => {
-    if (isOpen && isPro && !hasGreeted) {
-      setHasGreeted(true);
-      getAgentResponse([]);
-    }
-    if (isOpen) {
+    if (isOpen && writingType) {
       setTimeout(() => inputRef.current?.focus(), 300);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, isPro]);
+  }, [isOpen, writingType]);
 
   // Auto-scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading, draftLoading]);
 
-  async function getAgentResponse(history: Message[]) {
+  async function getAgentResponse(history: Message[], type?: string) {
     setLoading(true);
     try {
       const res = await fetch('/api/agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ documentText, chatHistory: history }),
+        body: JSON.stringify({ documentText, chatHistory: history, writingType: type ?? writingType }),
       });
       const data = await res.json();
 
@@ -240,6 +236,17 @@ export function AgentChat({
     } finally {
       setLoading(false);
     }
+  }
+
+  async function selectWritingType(type: string) {
+    setWritingType(type);
+    setHasGreeted(true);
+    // Send the type as the user's opening message
+    const label = type.charAt(0).toUpperCase() + type.slice(1);
+    const userMsg: Message = { role: 'user', content: `I'm writing a ${label}` };
+    const history = [userMsg];
+    setMessages(history);
+    await getAgentResponse(history, type);
   }
 
   async function handleSend() {
@@ -492,15 +499,61 @@ export function AgentChat({
                 </div>
               )}
 
-              {messages.length === 0 && !loading && !nudge && (
-                <div
-                  style={{
-                    textAlign: 'center',
-                    opacity: 0.4,
-                    fontSize: '13px',
-                    marginTop: '40px',
-                  }}
-                >
+              {/* Format picker — shown before a writing type is chosen */}
+              {!writingType && messages.length === 0 && !loading && (
+                <div style={{ padding: '8px 0' }}>
+                  <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '6px', color: panelText }}>
+                    What are you writing today?
+                  </div>
+                  <div style={{ fontSize: '13px', opacity: 0.6, marginBottom: '16px' }}>
+                    Choose one and I'll ask the right questions.
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {[
+                      { label: 'Email', icon: '✉️' },
+                      { label: 'Essay', icon: '📝' },
+                      { label: 'Work message', icon: '💼' },
+                      { label: 'Social post', icon: '📱' },
+                      { label: 'Story', icon: '📖' },
+                      { label: 'Notes', icon: '🗒️' },
+                      { label: 'Homework', icon: '🎒' },
+                    ].map(({ label, icon }) => (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => selectWritingType(label.toLowerCase())}
+                        style={{
+                          padding: '8px 14px',
+                          borderRadius: '20px',
+                          border: `1px solid ${borderColor}`,
+                          backgroundColor: darkMode ? '#334155' : '#ffffff',
+                          color: panelText,
+                          fontSize: '13px',
+                          fontWeight: 500,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          transition: 'border-color 0.15s, background-color 0.15s',
+                        }}
+                        onMouseEnter={e => {
+                          (e.currentTarget as HTMLButtonElement).style.borderColor = '#2563eb';
+                          (e.currentTarget as HTMLButtonElement).style.backgroundColor = darkMode ? '#1e3a5f' : '#eff6ff';
+                        }}
+                        onMouseLeave={e => {
+                          (e.currentTarget as HTMLButtonElement).style.borderColor = borderColor;
+                          (e.currentTarget as HTMLButtonElement).style.backgroundColor = darkMode ? '#334155' : '#ffffff';
+                        }}
+                      >
+                        <span>{icon}</span> {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {writingType && messages.length === 0 && !loading && (
+                <div style={{ textAlign: 'center', opacity: 0.4, fontSize: '13px', marginTop: '40px' }}>
                   Starting up your writing assistant…
                 </div>
               )}
@@ -672,10 +725,10 @@ export function AgentChat({
                   type="button"
                   onClick={() => {
                     setMessages([]);
+                    setWritingType(null);
                     setHasGreeted(false);
                     setInsertedIndex(null);
                     resetNudges();
-                    getAgentResponse([]);
                   }}
                   style={{
                     background: 'none',
