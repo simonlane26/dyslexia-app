@@ -1,8 +1,16 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Send, Bot, Lock, FileText, Mic, MicOff } from 'lucide-react';
+import { X, Send, Bot, Lock, FileText, Mic, MicOff, ChevronRight } from 'lucide-react';
 import { ModernButton } from './ModernButton';
+
+const SECTION_MAPS: Record<string, string[]> = {
+  essay:    ['Introduction', 'Main Points', 'Conclusion'],
+  story:    ['Beginning', 'Middle', 'End'],
+  report:   ['Introduction', 'Findings', 'Summary'],
+  letter:   ['Opening', 'Main Message', 'Sign-off'],
+  homework: ['The Question', 'Your Answer', 'Checking It'],
+};
 
 interface Theme {
   bg: string;
@@ -46,6 +54,13 @@ export function AgentChat({
 }: AgentChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [writingType, setWritingType] = useState<string | null>(null);
+  // Assignment mode
+  const [assignmentSetupDone, setAssignmentSetupDone] = useState(false);
+  const [assignmentTitle, setAssignmentTitle] = useState('');
+  const [assignmentSubType, setAssignmentSubType] = useState('essay');
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  const [sectionUserCount, setSectionUserCount] = useState(0);
+  const assignmentTitleRef = useRef<HTMLInputElement>(null);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [draftLoading, setDraftLoading] = useState(false);
@@ -208,13 +223,29 @@ export function AgentChat({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading, draftLoading]);
 
-  async function getAgentResponse(history: Message[], type?: string) {
+  async function getAgentResponse(history: Message[], type?: string, sectionIdx?: number) {
+    const resolvedType = type ?? writingType;
+    const isAssignment = resolvedType === 'assignment';
+    const sections = isAssignment ? (SECTION_MAPS[assignmentSubType] ?? SECTION_MAPS.essay) : [];
+    const resolvedSectionIdx = sectionIdx ?? currentSectionIndex;
+
     setLoading(true);
     try {
       const res = await fetch('/api/agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ documentText, chatHistory: history, writingType: type ?? writingType }),
+        body: JSON.stringify({
+          documentText,
+          chatHistory: history,
+          writingType: resolvedType,
+          ...(isAssignment && {
+            assignmentTitle,
+            assignmentSubType,
+            currentSection: sections[resolvedSectionIdx],
+            totalSections: sections.length,
+            sectionIndex: resolvedSectionIdx,
+          }),
+        }),
       });
       const data = await res.json();
 
@@ -240,13 +271,49 @@ export function AgentChat({
 
   async function selectWritingType(type: string) {
     setWritingType(type);
+    if (type === 'assignment') {
+      // Show setup screen — don't start chat yet
+      setTimeout(() => assignmentTitleRef.current?.focus(), 100);
+      return;
+    }
     setHasGreeted(true);
-    // Send the type as the user's opening message
     const label = type.charAt(0).toUpperCase() + type.slice(1);
     const userMsg: Message = { role: 'user', content: `I'm writing a ${label}` };
     const history = [userMsg];
     setMessages(history);
     await getAgentResponse(history, type);
+  }
+
+  async function startAssignment() {
+    const title = assignmentTitle.trim();
+    if (!title) { assignmentTitleRef.current?.focus(); return; }
+    setAssignmentSetupDone(true);
+    setHasGreeted(true);
+    setCurrentSectionIndex(0);
+    setSectionUserCount(0);
+    const sections = SECTION_MAPS[assignmentSubType] ?? SECTION_MAPS.essay;
+    const userMsg: Message = {
+      role: 'user',
+      content: `I'm writing a ${assignmentSubType} called "${title}". Let's start with the ${sections[0]}.`,
+    };
+    const history = [userMsg];
+    setMessages(history);
+    await getAgentResponse(history, 'assignment', 0);
+  }
+
+  async function advanceSection() {
+    const sections = SECTION_MAPS[assignmentSubType] ?? SECTION_MAPS.essay;
+    const nextIdx = currentSectionIndex + 1;
+    if (nextIdx >= sections.length) return;
+    setCurrentSectionIndex(nextIdx);
+    setSectionUserCount(0);
+    const sectionMsg: Message = {
+      role: 'user',
+      content: `Let's move on to the ${sections[nextIdx]}.`,
+    };
+    const newHistory = [...messages, sectionMsg];
+    setMessages(newHistory);
+    await getAgentResponse(newHistory, 'assignment', nextIdx);
   }
 
   async function handleSend() {
@@ -257,6 +324,7 @@ export function AgentChat({
     const newHistory = [...messages, userMsg];
     setMessages(newHistory);
     setInput('');
+    if (writingType === 'assignment') setSectionUserCount(c => c + 1);
     await getAgentResponse(newHistory);
   }
 
@@ -302,10 +370,20 @@ export function AgentChat({
   const draftBorderColor = darkMode ? '#2563eb' : '#bfdbfe';
   const inputBg = darkMode ? '#0f172a' : '#ffffff';
 
-  // Show "Write this up" after 2 user messages, no draft yet, nothing loading
+  // Show "Write this up" after 2 user messages, no draft yet, nothing loading (non-assignment only)
   const userMessageCount = messages.filter(m => m.role === 'user').length;
   const hasDraft = messages.some(m => m.isDraft);
-  const showWriteItUp = userMessageCount >= 2 && !hasDraft && !loading && !draftLoading;
+  const showWriteItUp = userMessageCount >= 2 && !hasDraft && !loading && !draftLoading && writingType !== 'assignment';
+
+  // Assignment: show "Next section" after 2 exchanges in current section
+  const assignmentSections = SECTION_MAPS[assignmentSubType] ?? SECTION_MAPS.essay;
+  const showNextSection =
+    writingType === 'assignment' &&
+    assignmentSetupDone &&
+    sectionUserCount >= 2 &&
+    currentSectionIndex < assignmentSections.length - 1 &&
+    !loading &&
+    !draftLoading;
 
   return (
     <>
@@ -517,6 +595,7 @@ export function AgentChat({
                       { label: 'Story', icon: '📖' },
                       { label: 'Notes', icon: '🗒️' },
                       { label: 'Homework', icon: '🎒' },
+                      { label: 'Assignment', icon: '📋' },
                     ].map(({ label, icon }) => (
                       <button
                         key={label}
@@ -552,9 +631,135 @@ export function AgentChat({
                 </div>
               )}
 
-              {writingType && messages.length === 0 && !loading && (
+              {/* Assignment setup screen */}
+              {writingType === 'assignment' && !assignmentSetupDone && !loading && (
+                <div style={{ padding: '4px 0' }}>
+                  <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '4px', color: panelText }}>
+                    Tell me about your assignment
+                  </div>
+                  <div style={{ fontSize: '13px', opacity: 0.6, marginBottom: '16px' }}>
+                    I'll guide you through it section by section.
+                  </div>
+
+                  <div style={{ marginBottom: '12px' }}>
+                    <label style={{ fontSize: '12px', fontWeight: 600, opacity: 0.7, display: 'block', marginBottom: '6px' }}>
+                      Title or topic
+                    </label>
+                    <input
+                      ref={assignmentTitleRef}
+                      type="text"
+                      value={assignmentTitle}
+                      onChange={e => setAssignmentTitle(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && startAssignment()}
+                      placeholder="e.g. The Water Cycle, My Holiday, A Thank You Letter…"
+                      style={{
+                        width: '100%',
+                        padding: '9px 12px',
+                        borderRadius: '8px',
+                        border: `1px solid ${borderColor}`,
+                        backgroundColor: darkMode ? '#0f172a' : '#ffffff',
+                        color: panelText,
+                        fontSize: '14px',
+                        outline: 'none',
+                        fontFamily: 'inherit',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: '16px' }}>
+                    <label style={{ fontSize: '12px', fontWeight: 600, opacity: 0.7, display: 'block', marginBottom: '6px' }}>
+                      What type of writing?
+                    </label>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                      {(['essay', 'story', 'report', 'letter', 'homework'] as const).map(sub => (
+                        <button
+                          key={sub}
+                          type="button"
+                          onClick={() => setAssignmentSubType(sub)}
+                          style={{
+                            padding: '6px 12px',
+                            borderRadius: '16px',
+                            border: `1px solid ${assignmentSubType === sub ? '#2563eb' : borderColor}`,
+                            backgroundColor: assignmentSubType === sub ? '#2563eb' : (darkMode ? '#334155' : '#ffffff'),
+                            color: assignmentSubType === sub ? 'white' : panelText,
+                            fontSize: '12px',
+                            fontWeight: assignmentSubType === sub ? 600 : 400,
+                            cursor: 'pointer',
+                            textTransform: 'capitalize',
+                          }}
+                        >
+                          {sub}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={startAssignment}
+                    disabled={!assignmentTitle.trim()}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      borderRadius: '10px',
+                      border: 'none',
+                      background: assignmentTitle.trim() ? 'linear-gradient(135deg, #2563eb, #7c3aed)' : (darkMode ? '#334155' : '#e2e8f0'),
+                      color: assignmentTitle.trim() ? 'white' : (darkMode ? '#64748b' : '#94a3b8'),
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      cursor: assignmentTitle.trim() ? 'pointer' : 'not-allowed',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    Let's begin <ChevronRight size={16} />
+                  </button>
+                </div>
+              )}
+
+              {/* Section progress bar (assignment mode) */}
+              {writingType === 'assignment' && assignmentSetupDone && (() => {
+                const sections = SECTION_MAPS[assignmentSubType] ?? SECTION_MAPS.essay;
+                return (
+                  <div style={{ flexShrink: 0 }}>
+                    <div style={{ fontSize: '11px', opacity: 0.5, marginBottom: '6px', fontWeight: 600 }}>
+                      {assignmentTitle}
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      {sections.map((s, i) => (
+                        <div
+                          key={s}
+                          style={{
+                            flex: 1,
+                            textAlign: 'center',
+                            padding: '5px 4px',
+                            borderRadius: '8px',
+                            fontSize: '11px',
+                            fontWeight: i === currentSectionIndex ? 700 : 400,
+                            backgroundColor:
+                              i < currentSectionIndex ? (darkMode ? '#14532d33' : '#dcfce7') :
+                              i === currentSectionIndex ? '#2563eb' : 'transparent',
+                            color:
+                              i < currentSectionIndex ? '#16a34a' :
+                              i === currentSectionIndex ? 'white' :
+                              (darkMode ? '#64748b' : '#94a3b8'),
+                            border: i >= currentSectionIndex ? `1px solid ${borderColor}` : 'none',
+                          }}
+                        >
+                          {i < currentSectionIndex ? '✓' : s}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {writingType && writingType !== 'assignment' && messages.length === 0 && !loading && (
                 <div style={{ textAlign: 'center', opacity: 0.4, fontSize: '13px', marginTop: '40px' }}>
-                  Starting up your writing assistant…
+                  Starting up your writing mentor…
                 </div>
               )}
 
@@ -680,6 +885,47 @@ export function AgentChat({
               <div ref={messagesEndRef} />
             </div>
 
+            {/* Next section banner — assignment mode */}
+            {showNextSection && (
+              <div
+                style={{
+                  padding: '10px 16px',
+                  borderTop: `1px solid ${borderColor}`,
+                  backgroundColor: darkMode ? '#1e3a5f' : '#eff6ff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '10px',
+                  flexShrink: 0,
+                }}
+              >
+                <div style={{ fontSize: '13px', lineHeight: 1.4, opacity: 0.85 }}>
+                  Ready for the next part?
+                </div>
+                <button
+                  type="button"
+                  onClick={advanceSection}
+                  style={{
+                    background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '7px 14px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  {assignmentSections[currentSectionIndex + 1]} <ChevronRight size={14} />
+                </button>
+              </div>
+            )}
+
             {/* Write it up banner — appears after 2 user replies */}
             {showWriteItUp && (
               <div
@@ -726,6 +972,11 @@ export function AgentChat({
                   onClick={() => {
                     setMessages([]);
                     setWritingType(null);
+                    setAssignmentSetupDone(false);
+                    setAssignmentTitle('');
+                    setAssignmentSubType('essay');
+                    setCurrentSectionIndex(0);
+                    setSectionUserCount(0);
                     setHasGreeted(false);
                     setInsertedIndex(null);
                     resetNudges();

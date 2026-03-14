@@ -33,6 +33,60 @@ HOW TO HELP:
 
 ALWAYS remember: your job is to be a quiet, confident helper in the background. One question. Short. Warm. That's it.`;
 
+function buildAssignmentPrompt(
+  title: string,
+  subType: string,
+  currentSection: string,
+  sectionIndex: number,
+  totalSections: number,
+): string {
+  const sectionGuidance: Record<string, Record<string, string>> = {
+    essay: {
+      'Introduction': 'Help the writer say what their essay is about and what their main point will be. Keep it to 2–3 sentences.',
+      'Main Points':  'Help the writer explain their key ideas with examples. Ask one point at a time.',
+      'Conclusion':   'Help the writer wrap up by restating their main point in different words. Ask what they want the reader to remember.',
+    },
+    story: {
+      'Beginning': 'Help the writer set the scene and introduce the main character. Ask who, where, and when.',
+      'Middle':    'Help the writer describe what happens — the problem or challenge. Ask what goes wrong or what the character wants.',
+      'End':       'Help the writer resolve the story. Ask how the problem is solved and how the character feels.',
+    },
+    report: {
+      'Introduction': 'Help the writer explain what the report is about and why it matters.',
+      'Findings':     'Help the writer share the key facts or discoveries, one at a time.',
+      'Summary':      'Help the writer sum up the most important points and any recommendations.',
+    },
+    letter: {
+      'Opening':      'Help the writer start politely and explain why they are writing.',
+      'Main Message': 'Help the writer clearly say what they need or want the reader to know.',
+      'Sign-off':     'Help the writer close the letter warmly and professionally.',
+    },
+    homework: {
+      'The Question': 'Help the writer understand what the question is asking in their own words before they start.',
+      'Your Answer':  'Help the writer write their answer step by step, one idea at a time.',
+      'Checking It':  'Help the writer read back their answer and check it makes sense. Ask: does this answer the question?',
+    },
+  };
+
+  const typeMap = sectionGuidance[subType] ?? sectionGuidance.essay;
+  const guidance = typeMap[currentSection] ?? `Help the writer work on the ${currentSection} section.`;
+  const isLast = sectionIndex === totalSections - 1;
+
+  return `The writer is working on a structured ASSIGNMENT.
+Title: "${title}"
+Type: ${subType}
+Current section: ${currentSection} (section ${sectionIndex + 1} of ${totalSections})
+${isLast ? 'This is the FINAL section.' : 'After this section they will move on to the next.'}
+
+SECTION FOCUS: ${guidance}
+
+RULES:
+- Stay focused on THIS section only — do not jump ahead
+- Ask ONE question at a time about this section
+- Keep every reply to 1–3 short sentences
+- Be encouraging — celebrate what they've already written`;
+}
+
 const WRITING_TYPE_GUIDANCE: Record<string, string> = {
   email: `The writer is writing an EMAIL.
 First question to ask: "Who are you writing to?"
@@ -70,7 +124,26 @@ Then ask: "What does the assignment ask you to do?"
 Be encouraging. Break it into small steps. Never do the work for them.`,
 };
 
-function buildSystemPrompt(writingType?: string): string {
+function buildSystemPrompt(
+  writingType?: string,
+  assignmentOpts?: {
+    title: string;
+    subType: string;
+    currentSection: string;
+    sectionIndex: number;
+    totalSections: number;
+  },
+): string {
+  if (writingType === 'assignment' && assignmentOpts) {
+    const assignmentGuidance = buildAssignmentPrompt(
+      assignmentOpts.title,
+      assignmentOpts.subType,
+      assignmentOpts.currentSection,
+      assignmentOpts.sectionIndex,
+      assignmentOpts.totalSections,
+    );
+    return `${BASE_PROMPT}\n\n--- ASSIGNMENT CONTEXT ---\n${assignmentGuidance}`;
+  }
   const typeKey = (writingType || '').toLowerCase().trim();
   const typeGuidance = WRITING_TYPE_GUIDANCE[typeKey];
   if (typeGuidance) {
@@ -83,13 +156,20 @@ function buildMessages(
   documentText: string,
   chatHistory: { role: 'user' | 'assistant'; content: string }[],
   writingType?: string,
+  assignmentOpts?: {
+    title: string;
+    subType: string;
+    currentSection: string;
+    sectionIndex: number;
+    totalSections: number;
+  },
 ) {
   const docContext = documentText.trim()
     ? `The writer's document so far:\n"""\n${documentText.slice(0, 3000)}\n"""`
     : 'The writer has not started yet. The document is empty.';
 
   return [
-    { role: 'system' as const, content: buildSystemPrompt(writingType) },
+    { role: 'system' as const, content: buildSystemPrompt(writingType, assignmentOpts) },
     { role: 'system' as const, content: docContext },
     ...chatHistory,
   ];
@@ -123,6 +203,15 @@ export async function POST(req: NextRequest) {
   const chatHistory: { role: 'user' | 'assistant'; content: string }[] =
     Array.isArray(body?.chatHistory) ? body.chatHistory.slice(-20) : [];
   const writingType = typeof body?.writingType === 'string' ? body.writingType : undefined;
+  const assignmentOpts = writingType === 'assignment' && body?.assignmentTitle
+    ? {
+        title: String(body.assignmentTitle).slice(0, 200),
+        subType: String(body.assignmentSubType || 'essay'),
+        currentSection: String(body.currentSection || ''),
+        sectionIndex: Number(body.sectionIndex ?? 0),
+        totalSections: Number(body.totalSections ?? 3),
+      }
+    : undefined;
 
   // 4) Pick provider
   const useOpenAI = OPENAI_KEY && OPENAI_KEY.length > 20;
@@ -152,7 +241,7 @@ export async function POST(req: NextRequest) {
   const timeout = setTimeout(() => ctrl.abort(), 25_000);
 
   try {
-    const messages = buildMessages(documentText, chatHistory, writingType);
+    const messages = buildMessages(documentText, chatHistory, writingType, assignmentOpts);
     const upstream = await fetch(url, {
       method: 'POST',
       headers,
