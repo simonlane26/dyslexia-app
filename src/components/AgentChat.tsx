@@ -52,6 +52,10 @@ export function AgentChat({
   const [insertedIndex, setInsertedIndex] = useState<number | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [micSupported, setMicSupported] = useState(false);
+  const [nudge, setNudge] = useState<{ message: string; prefill?: string } | null>(null);
+  const milestonesHit = useRef<Set<number>>(new Set());
+  const longSentenceNudgeSent = useRef(false);
+  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const recognitionRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -114,6 +118,67 @@ export function AgentChat({
   useEffect(() => {
     if (!isOpen && isListening) stopListening();
   }, [isOpen, isListening, stopListening]);
+
+  // Proactive nudges — watch the document for triggers
+  useEffect(() => {
+    if (!isOpen || !isPro) return;
+
+    const words = documentText.trim() ? documentText.trim().split(/\s+/).length : 0;
+
+    // 1) Word count milestones
+    const milestones = [30, 75, 150];
+    for (const m of milestones) {
+      if (words >= m && !milestonesHit.current.has(m)) {
+        milestonesHit.current.add(m);
+        setNudge({
+          message: `You've written ${m} words — great going! Want me to check if it makes sense so far?`,
+          prefill: 'Can you check if my writing makes sense?',
+        });
+        return;
+      }
+    }
+
+    // 2) Long sentence detection (first occurrence only)
+    if (!longSentenceNudgeSent.current && documentText.trim()) {
+      const sentences = documentText.split(/[.!?]+/).filter(s => s.trim());
+      const hasLong = sentences.some(s => s.trim().split(/\s+/).length > 25);
+      if (hasLong) {
+        longSentenceNudgeSent.current = true;
+        setNudge({
+          message: 'One of your sentences is quite long. Want help splitting it into two?',
+          prefill: 'Can you help me split a long sentence?',
+        });
+      }
+    }
+  }, [documentText, isOpen, isPro]);
+
+  // 3) Idle nudge — no chat activity for 3 min while doc has content
+  useEffect(() => {
+    if (!isOpen || !isPro) return;
+    const words = documentText.trim() ? documentText.trim().split(/\s+/).length : 0;
+    if (words < 10) return;
+
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    idleTimerRef.current = setTimeout(() => {
+      // Only nudge if the panel is still open and no nudge is already showing
+      setNudge(prev => prev ?? {
+        message: 'How\'s the writing going? I\'m here if you get stuck.',
+        prefill: 'I\'m not sure what to write next.',
+      });
+    }, 3 * 60 * 1000);
+
+    return () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, isOpen, isPro]);
+
+  // Reset nudge trackers on "start over"
+  const resetNudges = () => {
+    milestonesHit.current = new Set();
+    longSentenceNudgeSent.current = false;
+    setNudge(null);
+  };
 
   // Close on Escape
   useEffect(() => {
@@ -374,7 +439,60 @@ export function AgentChat({
                 gap: '12px',
               }}
             >
-              {messages.length === 0 && !loading && (
+              {/* Proactive nudge banner */}
+              {nudge && (
+                <div
+                  style={{
+                    borderRadius: '10px',
+                    border: `1px solid ${darkMode ? '#7c3aed55' : '#ddd6fe'}`,
+                    backgroundColor: darkMode ? '#2d1b69' : '#faf5ff',
+                    padding: '10px 12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px',
+                    flexShrink: 0,
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                    <div style={{ fontSize: '13px', lineHeight: 1.5, color: panelText }}>
+                      ✨ {nudge.message}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setNudge(null)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: panelText, opacity: 0.4, flexShrink: 0, padding: '0 2px', fontSize: '14px', lineHeight: 1 }}
+                      aria-label="Dismiss"
+                    >
+                      ×
+                    </button>
+                  </div>
+                  {nudge.prefill && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setInput(nudge.prefill!);
+                        setNudge(null);
+                        setTimeout(() => inputRef.current?.focus(), 50);
+                      }}
+                      style={{
+                        alignSelf: 'flex-start',
+                        background: 'none',
+                        border: `1px solid ${darkMode ? '#7c3aed' : '#8b5cf6'}`,
+                        color: darkMode ? '#a78bfa' : '#7c3aed',
+                        borderRadius: '6px',
+                        padding: '4px 10px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Yes, help me →
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {messages.length === 0 && !loading && !nudge && (
                 <div
                   style={{
                     textAlign: 'center',
@@ -556,6 +674,7 @@ export function AgentChat({
                     setMessages([]);
                     setHasGreeted(false);
                     setInsertedIndex(null);
+                    resetNudges();
                     getAgentResponse([]);
                   }}
                   style={{
