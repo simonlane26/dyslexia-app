@@ -370,8 +370,8 @@ export function AgentChat({
               <Bot size={16} color="white" />
             </div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: '15px' }}>Writing Assistant</div>
-              <div style={{ fontSize: '11px', opacity: 0.6 }}>Pro feature — your personal writing guide</div>
+              <div style={{ fontWeight: 700, fontSize: '15px' }}>Writing Mentor</div>
+              <div style={{ fontSize: '11px', opacity: 0.6 }}>Pro feature — your personal writing mentor</div>
             </div>
           </div>
           <button
@@ -422,10 +422,10 @@ export function AgentChat({
             </div>
             <div>
               <div style={{ fontWeight: 700, fontSize: '18px', marginBottom: '8px' }}>
-                Writing Assistant is a Pro feature
+                Writing Mentor is a Pro feature
               </div>
               <div style={{ fontSize: '14px', opacity: 0.7, lineHeight: 1.6, maxWidth: '300px' }}>
-                Get your own personal writing guide. It helps you start, get unstuck, and build
+                Get your own personal writing mentor. It helps you start, get unstuck, and build
                 confidence — one question at a time. No red marks. No jargon.
               </div>
             </div>
@@ -506,7 +506,7 @@ export function AgentChat({
                     What are you writing today?
                   </div>
                   <div style={{ fontSize: '13px', opacity: 0.6, marginBottom: '16px' }}>
-                    Choose one and I'll ask the right questions.
+                    Choose one and we'll make a start.
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                     {[

@@ -277,20 +277,20 @@ export function FixedToolbar({
               <ModernButton
                 variant={agentOpen ? 'primary' : 'secondary'}
                 onClick={onAgentToggle}
-                title="Toggle Writing Assistant"
+                title="Toggle Writing Mentor"
                 size="sm"
               >
-                🤖 Assistant
+                🤖 Mentor
               </ModernButton>
             ) : (
               <div style={{ position: 'relative' }}>
                 <ModernButton
                   variant="secondary"
                   onClick={() => setProPopover(proPopover === 'agent' ? null : 'agent')}
-                  title="Writing Assistant — Pro feature"
+                  title="Writing Mentor — Pro feature"
                   size="sm"
                 >
-                  🤖 Assistant
+                  🤖 Mentor
                 </ModernButton>
                 {proPopover === 'agent' && (
                   <ProUpgradePopover
