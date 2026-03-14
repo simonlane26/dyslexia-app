@@ -1538,6 +1538,7 @@ function PageBody() {
         onNewDocument={newDocument}
         currentDocId={currentDocId}
         theme={theme}
+        agentOpen={agentOpen}
       />
 
       {/* Keyboard Shortcuts Help */}

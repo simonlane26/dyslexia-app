@@ -18,6 +18,7 @@ interface DocumentManagerProps {
   onNewDocument: () => void;
   currentDocId: string | null;
   theme: any;
+  agentOpen?: boolean;
 }
 
 export function DocumentManager({
@@ -25,6 +26,7 @@ export function DocumentManager({
   onNewDocument,
   currentDocId,
   theme,
+  agentOpen,
 }: DocumentManagerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -121,9 +123,10 @@ export function DocumentManager({
         style={{
           position: 'fixed',
           bottom: '20px',
-          right: '20px',
+          right: agentOpen ? '440px' : '20px',
           zIndex: 100,
           boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+          transition: 'right 0.3s ease',
         }}
       >
         <FileText size={18} />
