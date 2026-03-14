@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Send, Bot, Lock } from 'lucide-react';
+import { X, Send, Bot, Lock, FileText } from 'lucide-react';
 import { ModernButton } from './ModernButton';
 
 interface Theme {
@@ -20,6 +20,7 @@ interface Theme {
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  isDraft?: boolean;
 }
 
 interface AgentChatProps {
@@ -30,6 +31,7 @@ interface AgentChatProps {
   theme: Theme;
   darkMode: boolean;
   onUpgradeClick: () => void;
+  onInsertDraft: (text: string) => void;
 }
 
 export function AgentChat({
@@ -40,11 +42,14 @@ export function AgentChat({
   theme,
   darkMode,
   onUpgradeClick,
+  onInsertDraft,
 }: AgentChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [draftLoading, setDraftLoading] = useState(false);
   const [hasGreeted, setHasGreeted] = useState(false);
+  const [insertedIndex, setInsertedIndex] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -78,7 +83,7 @@ export function AgentChat({
   // Auto-scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading]);
+  }, [messages, loading, draftLoading]);
 
   async function getAgentResponse(history: Message[]) {
     setLoading(true);
@@ -121,12 +126,52 @@ export function AgentChat({
     await getAgentResponse(newHistory);
   }
 
+  async function handleWriteItUp() {
+    if (draftLoading || loading) return;
+    setDraftLoading(true);
+    try {
+      const res = await fetch('/api/agent/draft', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chatHistory: messages }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessages(prev => [
+          ...prev,
+          { role: 'assistant', content: 'Could not create a draft. Try again.' },
+        ]);
+        return;
+      }
+
+      setMessages(prev => [
+        ...prev,
+        { role: 'assistant', content: data.draft, isDraft: true },
+      ]);
+    } catch {
+      setMessages(prev => [
+        ...prev,
+        { role: 'assistant', content: 'Could not reach the server. Check your connection.' },
+      ]);
+    } finally {
+      setDraftLoading(false);
+    }
+  }
+
   const panelBg = darkMode ? '#1e293b' : '#f8fafc';
   const panelText = darkMode ? '#f1f5f9' : '#1e293b';
   const borderColor = darkMode ? '#334155' : '#e2e8f0';
-  const userBubbleBg = darkMode ? '#2563eb' : '#2563eb';
+  const userBubbleBg = '#2563eb';
   const assistantBubbleBg = darkMode ? '#334155' : '#f1f5f9';
+  const draftBubbleBg = darkMode ? '#1e3a5f' : '#eff6ff';
+  const draftBorderColor = darkMode ? '#2563eb' : '#bfdbfe';
   const inputBg = darkMode ? '#0f172a' : '#ffffff';
+
+  // Show "Write this up" after 2 user messages, no draft yet, nothing loading
+  const userMessageCount = messages.filter(m => m.role === 'user').length;
+  const hasDraft = messages.some(m => m.isDraft);
+  const showWriteItUp = userMessageCount >= 2 && !hasDraft && !loading && !draftLoading;
 
   return (
     <>
@@ -280,31 +325,110 @@ export function AgentChat({
                 </div>
               )}
 
-              {messages.map((msg, i) => (
-                <div
-                  key={i}
-                  style={{
-                    display: 'flex',
-                    justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                  }}
-                >
+              {messages.map((msg, i) =>
+                msg.isDraft ? (
+                  /* Draft card */
+                  <div key={i} style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                    <div
+                      style={{
+                        maxWidth: '95%',
+                        borderRadius: '12px',
+                        border: `1px solid ${draftBorderColor}`,
+                        backgroundColor: draftBubbleBg,
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <div
+                        style={{
+                          padding: '8px 12px',
+                          borderBottom: `1px solid ${draftBorderColor}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          color: '#2563eb',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                        }}
+                      >
+                        <FileText size={12} />
+                        Your draft
+                      </div>
+                      <div
+                        style={{
+                          padding: '12px',
+                          fontSize: '14px',
+                          lineHeight: 1.7,
+                          color: panelText,
+                        }}
+                      >
+                        {msg.content}
+                      </div>
+                      <div style={{ padding: '0 12px 12px' }}>
+                        {insertedIndex === i ? (
+                          <div
+                            style={{
+                              fontSize: '12px',
+                              fontWeight: 600,
+                              color: '#16a34a',
+                              padding: '6px 0',
+                            }}
+                          >
+                            Added to your writing
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              onInsertDraft(msg.content);
+                              setInsertedIndex(i);
+                            }}
+                            style={{
+                              background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '8px',
+                              padding: '8px 14px',
+                              fontSize: '13px',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              width: '100%',
+                            }}
+                          >
+                            Add to my writing
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Normal bubble */
                   <div
+                    key={i}
                     style={{
-                      maxWidth: '85%',
-                      padding: '10px 14px',
-                      borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                      backgroundColor: msg.role === 'user' ? userBubbleBg : assistantBubbleBg,
-                      color: msg.role === 'user' ? '#ffffff' : panelText,
-                      fontSize: '14px',
-                      lineHeight: 1.6,
+                      display: 'flex',
+                      justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
                     }}
                   >
-                    {msg.content}
+                    <div
+                      style={{
+                        maxWidth: '85%',
+                        padding: '10px 14px',
+                        borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                        backgroundColor: msg.role === 'user' ? userBubbleBg : assistantBubbleBg,
+                        color: msg.role === 'user' ? '#ffffff' : panelText,
+                        fontSize: '14px',
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      {msg.content}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              )}
 
-              {loading && (
+              {(loading || draftLoading) && (
                 <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
                   <div
                     style={{
@@ -315,13 +439,51 @@ export function AgentChat({
                       opacity: 0.6,
                     }}
                   >
-                    Thinking…
+                    {draftLoading ? 'Writing your draft…' : 'Thinking…'}
                   </div>
                 </div>
               )}
 
               <div ref={messagesEndRef} />
             </div>
+
+            {/* Write it up banner — appears after 2 user replies */}
+            {showWriteItUp && (
+              <div
+                style={{
+                  padding: '10px 16px',
+                  borderTop: `1px solid ${draftBorderColor}`,
+                  backgroundColor: draftBubbleBg,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '10px',
+                  flexShrink: 0,
+                }}
+              >
+                <div style={{ fontSize: '13px', lineHeight: 1.4, opacity: 0.85 }}>
+                  Ready to turn your ideas into a paragraph?
+                </div>
+                <button
+                  type="button"
+                  onClick={handleWriteItUp}
+                  style={{
+                    background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '7px 14px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                  }}
+                >
+                  Write it up
+                </button>
+              </div>
+            )}
 
             {/* Reset conversation */}
             {messages.length > 0 && (
@@ -331,6 +493,7 @@ export function AgentChat({
                   onClick={() => {
                     setMessages([]);
                     setHasGreeted(false);
+                    setInsertedIndex(null);
                     getAgentResponse([]);
                   }}
                   style={{
@@ -366,7 +529,7 @@ export function AgentChat({
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
                 placeholder="Type your reply…"
-                disabled={loading}
+                disabled={loading || draftLoading}
                 style={{
                   flex: 1,
                   padding: '10px 14px',
@@ -382,7 +545,7 @@ export function AgentChat({
               <button
                 type="button"
                 onClick={handleSend}
-                disabled={loading || !input.trim()}
+                disabled={loading || draftLoading || !input.trim()}
                 style={{
                   width: '40px',
                   height: '40px',
@@ -390,8 +553,8 @@ export function AgentChat({
                   border: 'none',
                   background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
                   color: 'white',
-                  cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
-                  opacity: loading || !input.trim() ? 0.5 : 1,
+                  cursor: loading || draftLoading || !input.trim() ? 'not-allowed' : 'pointer',
+                  opacity: loading || draftLoading || !input.trim() ? 0.5 : 1,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
