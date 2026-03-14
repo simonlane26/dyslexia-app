@@ -56,6 +56,8 @@ interface FixedToolbarProps {
   onUpgradeClick: () => void;
   coachPanelOpen: boolean;
   onCoachPanelToggle: () => void;
+  agentOpen: boolean;
+  onAgentToggle: () => void;
   accessibilityPanelOpen: boolean;
   onAccessibilityPanelToggle: () => void;
 
@@ -94,6 +96,8 @@ export function FixedToolbar({
   onUpgradeClick,
   coachPanelOpen,
   onCoachPanelToggle,
+  agentOpen,
+  onAgentToggle,
   accessibilityPanelOpen,
   onAccessibilityPanelToggle,
   isSaving,
@@ -130,7 +134,7 @@ export function FixedToolbar({
   }
 
   // Contextual Pro upgrade popover
-  const [proPopover, setProPopover] = useState<null | 'rewrite' | 'coach'>(null);
+  const [proPopover, setProPopover] = useState<null | 'rewrite' | 'coach' | 'agent'>(null);
 
   // Calculate stats for compact display
   const wordCount = text.trim() ? text.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
@@ -261,6 +265,36 @@ export function FixedToolbar({
                 {proPopover === 'coach' && (
                   <ProUpgradePopover
                     message="Pro helps you write with confidence and structure — gentle tips, no jargon, no red marks."
+                    onUpgrade={() => { setProPopover(null); onUpgradeClick(); }}
+                    onDismiss={() => setProPopover(null)}
+                    darkMode={darkMode}
+                  />
+                )}
+              </div>
+            )}
+
+            {isPro ? (
+              <ModernButton
+                variant={agentOpen ? 'primary' : 'secondary'}
+                onClick={onAgentToggle}
+                title="Toggle Writing Assistant"
+                size="sm"
+              >
+                🤖 Assistant
+              </ModernButton>
+            ) : (
+              <div style={{ position: 'relative' }}>
+                <ModernButton
+                  variant="secondary"
+                  onClick={() => setProPopover(proPopover === 'agent' ? null : 'agent')}
+                  title="Writing Assistant — Pro feature"
+                  size="sm"
+                >
+                  🤖 Assistant
+                </ModernButton>
+                {proPopover === 'agent' && (
+                  <ProUpgradePopover
+                    message="Your personal writing guide. Helps you start, get unstuck, and build confidence — one question at a time."
                     onUpgrade={() => { setProPopover(null); onUpgradeClick(); }}
                     onDismiss={() => setProPopover(null)}
                     darkMode={darkMode}

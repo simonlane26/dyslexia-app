@@ -31,6 +31,7 @@ import { ReadingGuide } from '@/components/ReadingGuide';
 import { FixedToolbar } from '@/components/FixedToolbar';
 import { CoachDrawer } from '@/components/CoachDrawer';
 import { AccessibilityDrawer } from '@/components/AccessibilityDrawer';
+import { AgentChat } from '@/components/AgentChat';
 import { useSchoolMode } from '@/hooks/useSchoolMode';
 import { getCopy } from '@/lib/schoolCopy';
 import {
@@ -83,6 +84,9 @@ function PageBody() {
 
   // Writing Coach Drawer
   const [coachPanelOpen, setCoachPanelOpen] = useState(false);
+
+  // AI Writing Assistant
+  const [agentOpen, setAgentOpen] = useState(false);
 
   // Accessibility Drawer
   const [accessibilityPanelOpen, setAccessibilityPanelOpen] = useState(false);
@@ -1204,6 +1208,8 @@ function PageBody() {
         onUpgradeClick={() => router.push('/pricing')}
         coachPanelOpen={coachPanelOpen}
         onCoachPanelToggle={() => setCoachPanelOpen(!coachPanelOpen)}
+        agentOpen={agentOpen}
+        onAgentToggle={() => setAgentOpen(!agentOpen)}
         accessibilityPanelOpen={accessibilityPanelOpen}
         onAccessibilityPanelToggle={() => setAccessibilityPanelOpen(!accessibilityPanelOpen)}
         isSaving={isSaving}
@@ -1566,6 +1572,17 @@ function PageBody() {
         }}
         copy={copy}
         isSchoolMode={schoolMode.isSchoolMode}
+      />
+
+      {/* AI Writing Assistant */}
+      <AgentChat
+        isOpen={agentOpen}
+        onClose={() => setAgentOpen(false)}
+        documentText={text}
+        isPro={isPro}
+        theme={theme}
+        darkMode={darkMode}
+        onUpgradeClick={() => router.push('/pricing')}
       />
 
       {/* Accessibility Drawer */}
