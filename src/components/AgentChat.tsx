@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { X, Send, Bot, Lock, FileText } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { X, Send, Bot, Lock, FileText, Mic, MicOff } from 'lucide-react';
 import { ModernButton } from './ModernButton';
 
 interface Theme {
@@ -50,8 +50,70 @@ export function AgentChat({
   const [draftLoading, setDraftLoading] = useState(false);
   const [hasGreeted, setHasGreeted] = useState(false);
   const [insertedIndex, setInsertedIndex] = useState<number | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [micSupported, setMicSupported] = useState(false);
+  const recognitionRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Check mic support
+  useEffect(() => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    setMicSupported(!!SpeechRecognition);
+  }, []);
+
+  const stopListening = useCallback(() => {
+    recognitionRef.current?.stop();
+    recognitionRef.current = null;
+    setIsListening(false);
+  }, []);
+
+  const startListening = useCallback(() => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-GB';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => setIsListening(true);
+
+    recognition.onresult = (e: any) => {
+      const transcript = e.results[0]?.[0]?.transcript ?? '';
+      if (transcript) setInput(prev => (prev ? prev + ' ' : '') + transcript);
+    };
+
+    recognition.onerror = () => {
+      setIsListening(false);
+      recognitionRef.current = null;
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+      recognitionRef.current = null;
+      // Focus input so user can review/edit before sending
+      setTimeout(() => inputRef.current?.focus(), 50);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  }, []);
+
+  const toggleMic = useCallback(() => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  }, [isListening, startListening, stopListening]);
+
+  // Stop mic if panel closes
+  useEffect(() => {
+    if (!isOpen && isListening) stopListening();
+  }, [isOpen, isListening, stopListening]);
 
   // Close on Escape
   useEffect(() => {
@@ -528,20 +590,46 @@ export function AgentChat({
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-                placeholder="Type your reply…"
+                placeholder={isListening ? 'Listening…' : 'Type or speak your reply…'}
                 disabled={loading || draftLoading}
                 style={{
                   flex: 1,
                   padding: '10px 14px',
                   borderRadius: '10px',
-                  border: `1px solid ${borderColor}`,
+                  border: `1px solid ${isListening ? '#ef4444' : borderColor}`,
                   backgroundColor: inputBg,
                   color: panelText,
                   fontSize: '14px',
                   outline: 'none',
                   fontFamily: 'inherit',
+                  transition: 'border-color 0.2s',
                 }}
               />
+              {micSupported && (
+                <button
+                  type="button"
+                  onClick={toggleMic}
+                  disabled={loading || draftLoading}
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    backgroundColor: isListening ? '#ef4444' : (darkMode ? '#334155' : '#e2e8f0'),
+                    color: isListening ? 'white' : panelText,
+                    cursor: loading || draftLoading ? 'not-allowed' : 'pointer',
+                    opacity: loading || draftLoading ? 0.5 : 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    transition: 'background-color 0.2s',
+                  }}
+                  aria-label={isListening ? 'Stop listening' : 'Speak your reply'}
+                >
+                  {isListening ? <MicOff size={16} /> : <Mic size={16} />}
+                </button>
+              )}
               <button
                 type="button"
                 onClick={handleSend}
