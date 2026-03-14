@@ -87,6 +87,28 @@ function PageBody() {
 
   // AI Writing Assistant
   const [agentOpen, setAgentOpen] = useState(false);
+  const agentAutoOpenFired = useRef(false);
+  const agentAutoOpenTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Auto-open the assistant after 3 min of editor inactivity (Pro only, once per session)
+  useEffect(() => {
+    if (!isPro) return;
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    if (words < 20 || agentOpen || agentAutoOpenFired.current) return;
+
+    if (agentAutoOpenTimer.current) clearTimeout(agentAutoOpenTimer.current);
+    agentAutoOpenTimer.current = setTimeout(() => {
+      if (!agentAutoOpenFired.current && !agentOpen) {
+        agentAutoOpenFired.current = true;
+        setAgentOpen(true);
+      }
+    }, 3 * 60 * 1000);
+
+    return () => {
+      if (agentAutoOpenTimer.current) clearTimeout(agentAutoOpenTimer.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [text, isPro]);
 
   // Accessibility Drawer
   const [accessibilityPanelOpen, setAccessibilityPanelOpen] = useState(false);
