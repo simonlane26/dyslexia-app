@@ -4,23 +4,17 @@
 import { useState } from 'react';
 import { FileText, Mail, BookOpen, MessageSquare, X, Sparkles } from 'lucide-react';
 import { ModernButton } from './ModernButton';
+import { useT } from '@/lib/i18n';
 
-interface Template {
-  id: string;
-  name: string;
-  description: string;
-  icon: JSX.Element;
-  content: string;
-  category: 'essay' | 'letter' | 'story' | 'other';
-}
+type Category = 'essay' | 'letter' | 'story' | 'other';
 
-const TEMPLATES: Template[] = [
+const TEMPLATE_DEFS = [
   {
     id: 'essay-5paragraph',
-    name: 'Five Paragraph Essay',
-    description: 'Classic essay structure with introduction, body, and conclusion',
+    nameKey: 'templates.essay5p.name' as const,
+    descKey: 'templates.essay5p.desc' as const,
     icon: <FileText size={20} />,
-    category: 'essay',
+    category: 'essay' as Category,
     content: `Introduction
 Write your opening paragraph here. Introduce your topic and state your main argument or thesis.
 
@@ -38,10 +32,10 @@ Summarize your main points and restate your thesis in a new way. End with a stro
   },
   {
     id: 'letter-formal',
-    name: 'Formal Letter',
-    description: 'Professional business letter format',
+    nameKey: 'templates.formal.name' as const,
+    descKey: 'templates.formal.desc' as const,
     icon: <Mail size={20} />,
-    category: 'letter',
+    category: 'letter' as Category,
     content: `[Your Name]
 [Your Address]
 [City, Postal Code]
@@ -66,10 +60,10 @@ Yours sincerely,
   },
   {
     id: 'letter-complaint',
-    name: 'Complaint Letter',
-    description: 'Template for writing a complaint or concern',
+    nameKey: 'templates.complaint.name' as const,
+    descKey: 'templates.complaint.desc' as const,
     icon: <MessageSquare size={20} />,
-    category: 'letter',
+    category: 'letter' as Category,
     content: `[Your Name]
 [Your Address]
 [Email]
@@ -93,10 +87,10 @@ Yours faithfully,
   },
   {
     id: 'story-structure',
-    name: 'Story Outline',
-    description: 'Basic story structure with beginning, middle, and end',
+    nameKey: 'templates.story.name' as const,
+    descKey: 'templates.story.desc' as const,
     icon: <BookOpen size={20} />,
-    category: 'story',
+    category: 'story' as Category,
     content: `Title: [Your Story Title]
 
 Beginning (Setup)
@@ -112,10 +106,10 @@ The End`,
   },
   {
     id: 'email-professional',
-    name: 'Professional Email',
-    description: 'Standard professional email format',
+    nameKey: 'templates.email.name' as const,
+    descKey: 'templates.email.desc' as const,
     icon: <Mail size={20} />,
-    category: 'letter',
+    category: 'letter' as Category,
     content: `Subject: [Clear subject line]
 
 Dear [Name],
@@ -134,10 +128,10 @@ Best regards,
   },
   {
     id: 'thank-you',
-    name: 'Thank You Note',
-    description: 'Express gratitude professionally',
+    nameKey: 'templates.thankYou.name' as const,
+    descKey: 'templates.thankYou.desc' as const,
     icon: <Sparkles size={20} />,
-    category: 'letter',
+    category: 'letter' as Category,
     content: `Dear [Name],
 
 I wanted to take a moment to thank you for [what they did].
@@ -151,7 +145,7 @@ Thank you again.
 Warm regards,
 [Your Name]`,
   },
-];
+] as const;
 
 interface WritingTemplatesProps {
   onSelectTemplate: (content: string) => void;
@@ -159,34 +153,26 @@ interface WritingTemplatesProps {
 }
 
 export function WritingTemplates({ onSelectTemplate, theme }: WritingTemplatesProps) {
+  const t = useT();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   const categories = [
-    { id: 'all', label: 'All Templates' },
-    { id: 'essay', label: 'Essays' },
-    { id: 'letter', label: 'Letters' },
-    { id: 'story', label: 'Stories' },
+    { id: 'all',    labelKey: 'templates.cat.all'     as const },
+    { id: 'essay',  labelKey: 'templates.cat.essays'  as const },
+    { id: 'letter', labelKey: 'templates.cat.letters' as const },
+    { id: 'story',  labelKey: 'templates.cat.stories' as const },
   ];
 
   const filteredTemplates = selectedCategory === 'all'
-    ? TEMPLATES
-    : TEMPLATES.filter(t => t.category === selectedCategory);
-
-  const handleSelectTemplate = (template: Template) => {
-    onSelectTemplate(template.content);
-    setIsOpen(false);
-  };
+    ? TEMPLATE_DEFS
+    : TEMPLATE_DEFS.filter(tmpl => tmpl.category === selectedCategory);
 
   if (!isOpen) {
     return (
-      <ModernButton
-        variant="secondary"
-        size="sm"
-        onClick={() => setIsOpen(true)}
-      >
+      <ModernButton variant="secondary" size="sm" onClick={() => setIsOpen(true)}>
         <FileText size={16} />
-        Use Template
+        {t('templates.button')}
       </ModernButton>
     );
   }
@@ -195,10 +181,7 @@ export function WritingTemplates({ onSelectTemplate, theme }: WritingTemplatesPr
     <div
       style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
+        top: 0, left: 0, right: 0, bottom: 0,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         zIndex: 1000,
         display: 'flex',
@@ -234,22 +217,18 @@ export function WritingTemplates({ onSelectTemplate, theme }: WritingTemplatesPr
         >
           <div>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: theme.text, margin: 0 }}>
-              Writing Templates
+              {t('templates.title')}
             </h2>
             <p style={{ fontSize: '14px', color: theme.text, opacity: 0.7, margin: '4px 0 0 0' }}>
-              Choose a template to get started quickly
+              {t('templates.subtitle')}
             </p>
           </div>
           <button
+            type="button"
             onClick={() => setIsOpen(false)}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '8px',
-              color: theme.text,
-              opacity: 0.7,
-            }}
+            title="Close"
+            aria-label="Close"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', color: theme.text, opacity: 0.7 }}
           >
             <X size={24} />
           </button>
@@ -268,6 +247,7 @@ export function WritingTemplates({ onSelectTemplate, theme }: WritingTemplatesPr
           {categories.map((cat) => (
             <button
               key={cat.id}
+              type="button"
               onClick={() => setSelectedCategory(cat.id)}
               style={{
                 padding: '8px 16px',
@@ -282,19 +262,13 @@ export function WritingTemplates({ onSelectTemplate, theme }: WritingTemplatesPr
                 whiteSpace: 'nowrap',
               }}
             >
-              {cat.label}
+              {t(cat.labelKey)}
             </button>
           ))}
         </div>
 
         {/* Templates Grid */}
-        <div
-          style={{
-            flex: 1,
-            overflowY: 'auto',
-            padding: '24px',
-          }}
-        >
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
           <div
             style={{
               display: 'grid',
@@ -302,10 +276,10 @@ export function WritingTemplates({ onSelectTemplate, theme }: WritingTemplatesPr
               gap: '16px',
             }}
           >
-            {filteredTemplates.map((template) => (
+            {filteredTemplates.map((tmpl) => (
               <div
-                key={template.id}
-                onClick={() => handleSelectTemplate(template)}
+                key={tmpl.id}
+                onClick={() => { onSelectTemplate(tmpl.content); setIsOpen(false); }}
                 style={{
                   padding: '20px',
                   borderRadius: '12px',
@@ -325,14 +299,7 @@ export function WritingTemplates({ onSelectTemplate, theme }: WritingTemplatesPr
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    marginBottom: '12px',
-                  }}
-                >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                   <div
                     style={{
                       padding: '8px',
@@ -344,29 +311,14 @@ export function WritingTemplates({ onSelectTemplate, theme }: WritingTemplatesPr
                       justifyContent: 'center',
                     }}
                   >
-                    {template.icon}
+                    {tmpl.icon}
                   </div>
-                  <h3
-                    style={{
-                      fontSize: '16px',
-                      fontWeight: 600,
-                      color: theme.text,
-                      margin: 0,
-                    }}
-                  >
-                    {template.name}
+                  <h3 style={{ fontSize: '16px', fontWeight: 600, color: theme.text, margin: 0 }}>
+                    {t(tmpl.nameKey)}
                   </h3>
                 </div>
-                <p
-                  style={{
-                    fontSize: '14px',
-                    color: theme.text,
-                    opacity: 0.7,
-                    margin: 0,
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {template.description}
+                <p style={{ fontSize: '14px', color: theme.text, opacity: 0.7, margin: 0, lineHeight: 1.5 }}>
+                  {t(tmpl.descKey)}
                 </p>
               </div>
             ))}

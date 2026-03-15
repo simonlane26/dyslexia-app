@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { X, Maximize2 } from 'lucide-react';
 import { ModernButton } from './ModernButton';
+import { useT } from '@/lib/i18n';
 
 interface FocusModeProps {
   text: string;
@@ -26,6 +27,7 @@ export function FocusMode({
   darkMode,
   editorTextColor,
 }: FocusModeProps) {
+  const t = useT();
   const [isOpen, setIsOpen] = useState(false);
   const [localText, setLocalText] = useState(text);
 
@@ -71,7 +73,7 @@ export function FocusMode({
         onClick={() => setIsOpen(true)}
       >
         <Maximize2 size={16} />
-        Focus Mode
+        {t('focus.button')}
       </ModernButton>
     );
   }
@@ -108,7 +110,7 @@ export function FocusMode({
             margin: 0,
           }}
         >
-          Focus Mode
+          {t('focus.title')}
         </h2>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           <span
@@ -118,9 +120,10 @@ export function FocusMode({
               opacity: 0.6,
             }}
           >
-            Press ESC to exit
+            {t('focus.esc')}
           </span>
           <button
+            type="button"
             onClick={handleClose}
             style={{
               background: 'none',
@@ -146,7 +149,7 @@ export function FocusMode({
             }}
           >
             <X size={16} />
-            Exit Focus Mode
+            {t('focus.exit')}
           </button>
         </div>
       </div>
@@ -155,7 +158,7 @@ export function FocusMode({
       <textarea
         value={localText}
         onChange={(e) => setLocalText(e.target.value)}
-        placeholder="Start writing... (Press ESC to exit Focus Mode)"
+        placeholder={t('focus.placeholder')}
         autoFocus
         style={{
           flex: 1,
@@ -184,8 +187,8 @@ export function FocusMode({
           fontSize: '14px',
         }}
       >
-        {localText.trim().split(/\s+/).filter((w) => w.length > 0).length} words •{' '}
-        {localText.length} characters
+        {t('focus.words', { n: localText.trim().split(/\s+/).filter((w) => w.length > 0).length })} •{' '}
+        {t('focus.chars', { n: localText.length })}
       </div>
     </div>
   );
