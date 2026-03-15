@@ -34,6 +34,7 @@ import { AccessibilityDrawer } from '@/components/AccessibilityDrawer';
 import { AgentChat } from '@/components/AgentChat';
 import { useSchoolMode } from '@/hooks/useSchoolMode';
 import { getCopy } from '@/lib/schoolCopy';
+import { useT } from '@/lib/i18n';
 import {
   WelcomeScreen,
   StruggleSelection,
@@ -154,6 +155,7 @@ function PageBody() {
   const [teacherFeedback, setTeacherFeedback] = useState<string | null>(null);
 
   // Hooks
+  const t = useT();
   const toast = useToast();
   const { user, isLoaded, isSignedIn } = useUser();
   const router = useRouter();
@@ -325,7 +327,7 @@ function PageBody() {
 
   const saveDocument = () => {
     if (!text.trim() && !simplifiedText.trim()) {
-      toast.warning('Cannot save empty document');
+      toast.warning(t('toast.cannotSaveEmpty'));
       return;
     }
 
@@ -345,7 +347,7 @@ function PageBody() {
       setCurrentDocId(doc.id);
       setCurrentDocumentId(doc.id);
       setLastSaved(doc.updatedAt);
-      toast.success('Document saved');
+      toast.success(t('toast.saved'));
 
       // Show first-save celebration if onboarding is complete
       if (onboarding.hasCompletedOnboarding && !localStorage.getItem('dyslexia-firstSaveCelebrated')) {
@@ -353,7 +355,7 @@ function PageBody() {
         onboarding.showFirstSaveCelebration();
       }
     } catch (error: any) {
-      toast.error(error.message || 'Failed to save document');
+      toast.error(error.message || t('toast.saveFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -378,7 +380,7 @@ function PageBody() {
 
   const newDocument = () => {
     if (text.trim() || simplifiedText.trim()) {
-      if (!confirm('Create new document? Unsaved changes will be lost.')) {
+      if (!confirm(t('confirm.newDoc'))) {
         return;
       }
     }
@@ -388,7 +390,7 @@ function PageBody() {
     setCurrentDocId(null);
     setCurrentDocumentId(null);
     setLastSaved(null);
-    toast.info('New document created');
+    toast.info(t('toast.newDoc'));
   };
 
   // ----- Keyboard Shortcuts -----
@@ -433,7 +435,7 @@ function PageBody() {
       ctrl: true,
       description: 'Clear all text',
       action: () => {
-        if (confirm('Clear all text?')) {
+        if (confirm(t('confirm.clearText'))) {
           setText('');
           setSimplifiedText('');
         }
@@ -540,7 +542,7 @@ function PageBody() {
     const SR: any =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) {
-      toast.error("Your browser doesn't support speech recognition.");
+      toast.error(t('toast.noSpeechSupport'));
       return;
     }
 
@@ -610,7 +612,7 @@ function PageBody() {
   /* -------------------- Simplify -------------------- */
   const simplifyText = async () => {
     if (!text.trim()) {
-      toast.warning('No text to simplify. Please write something first.');
+      toast.warning(t('toast.noTextToSimplify'));
       return;
     }
 
@@ -777,7 +779,7 @@ function PageBody() {
         setIsReading(false);
         setIsPaused(false);
         currentEngineRef.current = null;
-        toast.error('Audio playback error');
+        toast.error(t('toast.noTextToRead'));
       };
 
       await audio.play();
@@ -795,7 +797,7 @@ function PageBody() {
     if (!textToRead.trim()) return;
     const synth = window.speechSynthesis;
     if (!synth) {
-      toast.error('Browser speech synthesis is not supported here.');
+      toast.error(t('toast.noSpeechSynth'));
       return;
     }
 
@@ -895,27 +897,27 @@ function PageBody() {
 
   // Prefer ElevenLabs for Pro, fallback to browser
   const handleReadAloud = async () => {
-    const t = text.trim();
-    if (!t) {
-      toast.warning('No text to read.');
+    const ttsText = text.trim();
+    if (!ttsText) {
+      toast.warning(t('toast.noTextToRead'));
       return;
     }
     console.log('TTS path →', { isPro, voiceId, using: isPro && voiceId ? 'elevenlabs' : 'browser' });
     setIsPaused(false);
-    if (isPro && voiceId) await playWithElevenLabs(t);
-    else playWithBrowserVoice(t);
+    if (isPro && voiceId) await playWithElevenLabs(ttsText);
+    else playWithBrowserVoice(ttsText);
   };
 
   const handleReadAloudSimplified = async () => {
-    const t = simplifiedText?.trim();
-    if (!t) {
-      toast.warning('No simplified text to read. Click "Simplify" first.');
+    const ttsText = simplifiedText?.trim();
+    if (!ttsText) {
+      toast.warning(t('toast.noSimplifiedToRead'));
       return;
     }
     console.log('TTS path →', { isPro, voiceId, using: isPro && voiceId ? 'elevenlabs' : 'browser' });
     setIsPaused(false);
-    if (isPro && voiceId) await playWithElevenLabs(t);
-    else playWithBrowserVoice(t);
+    if (isPro && voiceId) await playWithElevenLabs(ttsText);
+    else playWithBrowserVoice(ttsText);
   };
 
   // Pause / resume / stop
@@ -1069,16 +1071,16 @@ function PageBody() {
     setFontSize(settings.fontSize);
     setHighContrast(settings.highContrast);
     setDarkMode(settings.darkMode);
-    toast.success('Preset applied successfully!');
+    toast.success(t('toast.presetApplied'));
   };
 
   // Load template
   const loadTemplate = (content: string) => {
-    if (text.trim() && !confirm('Load template? Current text will be replaced.')) {
+    if (text.trim() && !confirm(t('confirm.loadTemplate'))) {
       return;
     }
     setText(content);
-    toast.success('Template loaded!');
+    toast.success(t('toast.templateLoaded'));
   };
 
   // Undo/Redo functions
@@ -1087,7 +1089,7 @@ function PageBody() {
       const newIndex = historyIndex - 1;
       setHistoryIndex(newIndex);
       setText(textHistory[newIndex]);
-      toast.info('Undo');
+      toast.info(t('toast.undo'));
     }
   };
 
@@ -1096,7 +1098,7 @@ function PageBody() {
       const newIndex = historyIndex + 1;
       setHistoryIndex(newIndex);
       setText(textHistory[newIndex]);
-      toast.info('Redo');
+      toast.info(t('toast.redo'));
     }
   };
 
@@ -1106,7 +1108,7 @@ function PageBody() {
     const after = text.substring(offset + length);
     const newText = before + replacement + after;
     setText(newText);
-    toast.success('Applied suggestion!');
+    toast.success(t('toast.appliedSuggestion'));
   };
 
   // Handle rewrite sentence button
@@ -1133,14 +1135,14 @@ function PageBody() {
     const selectedText = selection?.toString().trim();
 
     if (!selectedText) {
-      toast.info('Select a sentence first to rewrite it!');
+      toast.info(t('toast.selectSentenceFirst'));
       return;
     }
 
     // Find the position of selected text in the full text
     const start = text.indexOf(selectedText);
     if (start === -1) {
-      toast.error('Could not find selected text. Please try selecting again.');
+      toast.error(t('toast.cantFindSelected'));
       return;
     }
 
@@ -1159,7 +1161,7 @@ function PageBody() {
     const after = text.substring(selectedRange.end);
     const newText = before + newSentence + after;
     setText(newText);
-    toast.success('Applied rewrite!');
+    toast.success(t('toast.appliedRewrite'));
 
     // Clear selection
     setSelectedRange(null);
@@ -1456,7 +1458,7 @@ function PageBody() {
               onChange={(e) => setText(e.target.value)}
               onMouseUp={handleTextareaMouseUp}
               onKeyUp={() => setFloatingRewrite(null)}
-              placeholder="Start writing here..."
+              placeholder={t('editor.placeholder')}
               className="w-full transition-all duration-200 resize-none rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               style={{
                 backgroundColor: darkMode ? '#374151' : bgColor,
@@ -1591,7 +1593,7 @@ function PageBody() {
         onApplySuggestion={(before, after) => {
           const updated = text.replace(before, after);
           setText(updated);
-          toast.success('Applied suggestion!');
+          toast.success(t('toast.appliedSuggestion'));
         }}
         copy={copy}
         isSchoolMode={schoolMode.isSchoolMode}

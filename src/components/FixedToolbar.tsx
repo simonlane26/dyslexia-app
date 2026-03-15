@@ -24,6 +24,7 @@ import { ExportMP3Button } from './ExportMP3Button';
 import { ExportDOCXButton } from './ExportDOCXButton';
 import { useState, useEffect } from 'react';
 import type { CopyMap } from '@/lib/schoolCopy';
+import { useT } from '@/lib/i18n';
 
 interface Theme {
   bg: string;
@@ -112,6 +113,7 @@ export function FixedToolbar({
   copy,
   isSchoolMode,
 }: FixedToolbarProps) {
+  const t = useT();
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
 
   // One-time feature tips (shown once via localStorage)
@@ -140,12 +142,12 @@ export function FixedToolbar({
   const wordCount = text.trim() ? text.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
 
   function getWordMessage(count: number): string {
-    if (count === 0) return 'Start writing...';
-    if (count <= 30) return `Great start — ${count} words written`;
-    if (count <= 100) return `Getting going — ${count} words written`;
-    if (count <= 300) return `Nice work — ${count} words written`;
-    if (count <= 600) return `Strong effort — ${count} words written`;
-    return `Keep it up — ${count.toLocaleString()} words written`;
+    if (count === 0) return t('wordcount.start');
+    if (count <= 30) return t('wordcount.great', { n: count });
+    if (count <= 100) return t('wordcount.going', { n: count });
+    if (count <= 300) return t('wordcount.nice', { n: count });
+    if (count <= 600) return t('wordcount.strong', { n: count });
+    return t('wordcount.keep', { n: count.toLocaleString() });
   }
 
   const groupLabelStyle: React.CSSProperties = {
@@ -181,7 +183,7 @@ export function FixedToolbar({
 
         {/* WRITING TOOLS */}
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={groupLabelStyle}>Writing Tools</span>
+          <span style={groupLabelStyle}>{t('toolbar.group.writing')}</span>
           <div
             style={{
               display: 'flex',
@@ -201,7 +203,7 @@ export function FixedToolbar({
                 title="Rewrite selected sentence with multiple tones"
                 size="sm"
               >
-                ✏️ Rewrite
+                {t('toolbar.rewrite')}
               </ModernButton>
             ) : (
               <div style={{ position: 'relative' }}>
@@ -212,13 +214,15 @@ export function FixedToolbar({
                   size="sm"
                   disabled={!text.trim()}
                 >
-                  ✏️ Rewrite
+                  {t('toolbar.rewrite')}
                 </ModernButton>
                 {proPopover === 'rewrite' && (
                   <ProUpgradePopover
-                    message="Rewrite lets you find new ways to say what you mean — try different tones until it feels right."
+                    message={t('pro.rewriteDesc')}
                     onUpgrade={() => { setProPopover(null); onUpgradeClick(); }}
                     onDismiss={() => setProPopover(null)}
+                    unlockLabel={t('pro.unlock')}
+                    laterLabel={t('pro.later')}
                     darkMode={darkMode}
                   />
                 )}
@@ -237,8 +241,9 @@ export function FixedToolbar({
               </ModernButton>
               {showSimplifyTip && (
                 <FeatureTip
-                  message="Paste or type anything, then hit this to make it simpler and easier to read."
+                  message={t('tip.simplify')}
                   onDismiss={dismissSimplifyTip}
+                  gotItLabel={t('tip.gotIt')}
                 />
               )}
             </div>
@@ -264,9 +269,11 @@ export function FixedToolbar({
                 </ModernButton>
                 {proPopover === 'coach' && (
                   <ProUpgradePopover
-                    message="Pro helps you write with confidence and structure — gentle tips, no jargon, no red marks."
+                    message={t('pro.coachDesc')}
                     onUpgrade={() => { setProPopover(null); onUpgradeClick(); }}
                     onDismiss={() => setProPopover(null)}
+                    unlockLabel={t('pro.unlock')}
+                    laterLabel={t('pro.later')}
                     darkMode={darkMode}
                   />
                 )}
@@ -280,7 +287,7 @@ export function FixedToolbar({
                 title="Toggle Writing Mentor"
                 size="sm"
               >
-                🤖 Mentor
+                {t('toolbar.mentor')}
               </ModernButton>
             ) : (
               <div style={{ position: 'relative' }}>
@@ -290,13 +297,15 @@ export function FixedToolbar({
                   title="Writing Mentor — Pro feature"
                   size="sm"
                 >
-                  🤖 Mentor
+                  {t('toolbar.mentor')}
                 </ModernButton>
                 {proPopover === 'agent' && (
                   <ProUpgradePopover
-                    message="Your personal writing guide. Helps you start, get unstuck, and build confidence — one question at a time."
+                    message={t('pro.mentorDesc')}
                     onUpgrade={() => { setProPopover(null); onUpgradeClick(); }}
                     onDismiss={() => setProPopover(null)}
+                    unlockLabel={t('pro.unlock')}
+                    laterLabel={t('pro.later')}
                     darkMode={darkMode}
                   />
                 )}
@@ -310,7 +319,7 @@ export function FixedToolbar({
 
         {/* READING SUPPORT */}
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={groupLabelStyle}>Reading Support</span>
+          <span style={groupLabelStyle}>{t('toolbar.group.reading')}</span>
           <div
             style={{
               display: 'flex',
@@ -328,7 +337,7 @@ export function FixedToolbar({
               title="Read text aloud"
               size="sm"
             >
-              🔊 Read Aloud
+              {t('toolbar.readAloud')}
             </ModernButton>
 
             <ModernButton
@@ -337,7 +346,7 @@ export function FixedToolbar({
               title="Toggle sentence highlighting"
               size="sm"
             >
-              🔍 Highlight
+              {t('toolbar.highlight')}
             </ModernButton>
 
             <ModernButton
@@ -346,7 +355,7 @@ export function FixedToolbar({
               title="Toggle reading guide"
               size="sm"
             >
-              📖 Guide
+              {t('toolbar.guide')}
             </ModernButton>
           </div>
         </div>
@@ -356,7 +365,7 @@ export function FixedToolbar({
 
         {/* INPUT */}
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={groupLabelStyle}>Input</span>
+          <span style={groupLabelStyle}>{t('toolbar.group.input')}</span>
           <div
             style={{
               display: 'flex',
@@ -375,7 +384,7 @@ export function FixedToolbar({
               size="sm"
             >
               {isListening ? <MicOff size={14} /> : <Mic size={14} />}
-              🎤 Dictate
+              {t('toolbar.dictate')}
             </ModernButton>
           </div>
         </div>
@@ -385,7 +394,7 @@ export function FixedToolbar({
 
         {/* DOCUMENT ACTIONS */}
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={groupLabelStyle}>Document</span>
+          <span style={groupLabelStyle}>{t('toolbar.group.document')}</span>
           <div
             style={{
               display: 'flex',
@@ -405,7 +414,7 @@ export function FixedToolbar({
               size="sm"
             >
               <Save size={14} />
-              {isSaving ? 'Saving...' : 'Save'}
+              {isSaving ? t('toolbar.saving') : t('toolbar.save')}
             </ModernButton>
 
             <div style={{ position: 'relative' }}>
@@ -416,7 +425,7 @@ export function FixedToolbar({
                 size="sm"
               >
                 <Download size={14} />
-                Export
+                {t('toolbar.export')}
                 <ChevronDown size={12} />
               </ModernButton>
 
@@ -460,7 +469,7 @@ export function FixedToolbar({
                 size="sm"
               >
                 <FileText size={14} />
-                Compare
+                {t('toolbar.compare')}
               </ModernButton>
             ) : (
               <ModernButton
@@ -470,7 +479,7 @@ export function FixedToolbar({
                 size="sm"
               >
                 <span style={{ fontSize: '12px', marginRight: '2px' }}>⭐</span>
-                Compare
+                {t('toolbar.compare')}
               </ModernButton>
             )}
 
@@ -485,8 +494,9 @@ export function FixedToolbar({
               </ModernButton>
               {showA11yTip && (
                 <FeatureTip
-                  message="Change font, colours, and text size here to make reading easier."
+                  message={t('tip.accessibility')}
                   onDismiss={dismissA11yTip}
+                  gotItLabel={t('tip.gotIt')}
                 />
               )}
             </div>
@@ -508,7 +518,7 @@ export function FixedToolbar({
         </span>
         {lastSaved && (
           <span style={{ fontSize: '11px', color: theme.text, opacity: 0.5 }}>
-            Saved {new Date(lastSaved).toLocaleTimeString()}
+            {t('wordcount.saved')} {new Date(lastSaved).toLocaleTimeString()}
           </span>
         )}
       </div>
@@ -516,7 +526,7 @@ export function FixedToolbar({
   );
 }
 
-function FeatureTip({ message, onDismiss }: { message: string; onDismiss: () => void }) {
+function FeatureTip({ message, onDismiss, gotItLabel = 'Got it' }: { message: string; onDismiss: () => void; gotItLabel?: string }) {
   return (
     <div
       style={{
@@ -552,7 +562,7 @@ function FeatureTip({ message, onDismiss }: { message: string; onDismiss: () => 
           cursor: 'pointer',
         }}
       >
-        Got it
+        {gotItLabel}
       </button>
       {/* Arrow */}
       <div
@@ -577,11 +587,15 @@ function ProUpgradePopover({
   onUpgrade,
   onDismiss,
   darkMode,
+  unlockLabel = 'Unlock with Pro →',
+  laterLabel = 'Maybe later',
 }: {
   message: string;
   onUpgrade: () => void;
   onDismiss: () => void;
   darkMode: boolean;
+  unlockLabel?: string;
+  laterLabel?: string;
 }) {
   return (
     <div
@@ -619,7 +633,7 @@ function ProUpgradePopover({
             cursor: 'pointer',
           }}
         >
-          Unlock with Pro →
+          {unlockLabel}
         </button>
         <button
           type="button"
@@ -633,7 +647,7 @@ function ProUpgradePopover({
             padding: '2px',
           }}
         >
-          Maybe later
+          {laterLabel}
         </button>
       </div>
       {/* Arrow */}

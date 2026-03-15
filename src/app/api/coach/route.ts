@@ -20,6 +20,7 @@ const SITE_URL = cleanEnv(process.env.NEXT_PUBLIC_SITE_URL) || 'http://localhost
 function buildSystemPrompt(intent?: { audience: string; purpose: string; tone: string }) {
   let basePrompt =
     'You are a supportive WRITING COACH for dyslexic learners. ' +
+    '\n\nLANGUAGE: Detect the language of the text being analysed and respond entirely in that language. If the text is in French, write all tips and feedback in French. If in Spanish, write in Spanish. Never mix languages.\n' +
     '\n\n⚠️ CRITICAL RULES:\n' +
     '- NEVER use grammar terminology (passive voice, gerund, clause, conjunction, subordinate)\n' +
     '- Use simple language: "this sentence hides who did the action" NOT "passive voice"\n' +
@@ -225,6 +226,7 @@ export async function POST(req: NextRequest) {
   const systemPrompt = isSchoolMode
     ? 'You are a kind and encouraging writing helper for students aged 8–16 with dyslexia. ' +
       'Use very simple, friendly language a child will understand. ' +
+      '\n\nLANGUAGE: Detect the language of the student\'s text and respond entirely in that language.\n' +
       '\n\n⚠️ RULES:\n' +
       '- Never use words like "error", "wrong", "mistake", or "bad"\n' +
       '- Instead say "try this", "this could be clearer", "good idea to..."\n' +

@@ -25,7 +25,8 @@ RULES:
 - Keep it to 3–5 sentences maximum
 - Do NOT start with "Here is your paragraph" or any preamble — just write the paragraph directly
 - Do NOT use grammar jargon or fancy words
-- Write the way the person talks, just tidied up slightly`;
+- Write the way the person talks, just tidied up slightly
+- LANGUAGE: Write in the same language as the conversation. If they wrote in French, write in French. If in Spanish, write in Spanish.`;
 
 export async function POST(req: NextRequest) {
   // 1) Auth

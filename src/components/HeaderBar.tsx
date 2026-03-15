@@ -4,11 +4,13 @@ import { useEffect, useMemo } from 'react';
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { useSchoolMode } from '@/hooks/useSchoolMode';
+import { LanguageSelector, useT } from '@/lib/i18n';
 
 export function HeaderBar() {
   const { user, isLoaded, isSignedIn } = useUser();
   const router = useRouter();
   const schoolMode = useSchoolMode();
+  const t = useT();
 
   // Refresh once so Pro badge reflects webhook updates quickly
   useEffect(() => {
@@ -28,13 +30,16 @@ export function HeaderBar() {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Language selector */}
+          <LanguageSelector compact />
+
           {/* Fallback UI while Clerk loads */}
           {!isLoaded && (
             <a
               href="/sign-in"
               className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
             >
-              Sign in
+              {t('header.signIn')}
             </a>
           )}
 
@@ -47,7 +52,7 @@ export function HeaderBar() {
                   onClick={() => router.push('/pricing')}
                   className="hidden sm:block text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition"
                 >
-                  Manage subscription
+                  {t('header.manageSubscription')}
                 </button>
               ) : (
                 <button
@@ -55,14 +60,14 @@ export function HeaderBar() {
                   onClick={() => router.push('/pricing')}
                   className="hidden sm:block rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:opacity-90"
                 >
-                  💎 Upgrade to Pro
+                  {t('header.upgradePro')}
                 </button>
               )}
 
               {/* Pro Member badge */}
               {isPro && (
                 <div className="items-center hidden gap-2 px-3 py-1 text-sm font-medium text-white rounded-full shadow-sm bg-gradient-to-r from-purple-600 to-pink-600 sm:flex">
-                  ✨ Pro Member
+                  {t('header.proMember')}
                 </div>
               )}
             </>
@@ -70,8 +75,8 @@ export function HeaderBar() {
 
           <SignedOut>
             <SignInButton mode="modal">
-              <button className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white">
-                Sign in
+              <button type="button" className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white">
+                {t('header.signIn')}
               </button>
             </SignInButton>
           </SignedOut>
@@ -79,7 +84,6 @@ export function HeaderBar() {
           <SignedIn>
             <UserButton
               appearance={{ elements: { userButtonAvatarBox: 'h-8 w-8' } }}
-              afterSignOutUrl="/"
             />
           </SignedIn>
 
@@ -90,7 +94,7 @@ export function HeaderBar() {
               onClick={() => router.push('/dashboard')}
               className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 transition hover:bg-slate-50 dark:hover:bg-slate-700"
             >
-              📊 Class Dashboard
+              {t('header.classDashboard')}
             </button>
           )}
 
@@ -101,7 +105,7 @@ export function HeaderBar() {
               onClick={() => router.push('/join-school')}
               className="rounded-lg border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/30 px-3 py-1.5 text-sm font-medium text-blue-700 dark:text-blue-300 transition hover:bg-blue-100 dark:hover:bg-blue-900/50"
             >
-              🏫 Join your school
+              {t('header.joinSchool')}
             </button>
           )}
         </div>

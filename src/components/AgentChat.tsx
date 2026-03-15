@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Send, Bot, Lock, FileText, Mic, MicOff, ChevronRight } from 'lucide-react';
 import { ModernButton } from './ModernButton';
+import { useT, useLanguage } from '@/lib/i18n';
 
 const SECTION_MAPS: Record<string, string[]> = {
   essay:    ['Introduction', 'Main Points', 'Conclusion'],
@@ -52,6 +53,8 @@ export function AgentChat({
   onUpgradeClick,
   onInsertDraft,
 }: AgentChatProps) {
+  const t = useT();
+  const { locale } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([]);
   const [writingType, setWritingType] = useState<string | null>(null);
   // Assignment mode
@@ -238,6 +241,7 @@ export function AgentChat({
           documentText,
           chatHistory: history,
           writingType: resolvedType,
+          language: locale,
           ...(isAssignment && {
             assignmentTitle,
             assignmentSubType,
@@ -448,7 +452,7 @@ export function AgentChat({
               <Bot size={16} color="white" />
             </div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: '15px' }}>Writing Mentor</div>
+              <div style={{ fontWeight: 700, fontSize: '15px' }}>{t('mentor.title')}</div>
               <div style={{ fontSize: '11px', opacity: 0.6 }}>Pro feature — your personal writing mentor</div>
             </div>
           </div>
@@ -500,7 +504,7 @@ export function AgentChat({
             </div>
             <div>
               <div style={{ fontWeight: 700, fontSize: '18px', marginBottom: '8px' }}>
-                Writing Mentor is a Pro feature
+                {t('mentor.proFeatureTitle')}
               </div>
               <div style={{ fontSize: '14px', opacity: 0.7, lineHeight: 1.6, maxWidth: '300px' }}>
                 Get your own personal writing mentor. It helps you start, get unstuck, and build
@@ -581,26 +585,26 @@ export function AgentChat({
               {!writingType && messages.length === 0 && !loading && (
                 <div style={{ padding: '8px 0' }}>
                   <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '6px', color: panelText }}>
-                    What are you writing today?
+                    {t('mentor.whatWriting')}
                   </div>
                   <div style={{ fontSize: '13px', opacity: 0.6, marginBottom: '16px' }}>
-                    Choose one and we'll make a start.
+                    {t('mentor.subtitle')}
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                     {[
-                      { label: 'Email', icon: '✉️' },
-                      { label: 'Essay', icon: '📝' },
-                      { label: 'Work message', icon: '💼' },
-                      { label: 'Social post', icon: '📱' },
-                      { label: 'Story', icon: '📖' },
-                      { label: 'Notes', icon: '🗒️' },
-                      { label: 'Homework', icon: '🎒' },
-                      { label: 'Assignment', icon: '📋' },
-                    ].map(({ label, icon }) => (
+                      { label: t('writingType.email'),       key: 'email',        icon: '✉️' },
+                      { label: t('writingType.essay'),       key: 'essay',        icon: '📝' },
+                      { label: t('writingType.workMessage'), key: 'work message', icon: '💼' },
+                      { label: t('writingType.socialPost'),  key: 'social post',  icon: '📱' },
+                      { label: t('writingType.story'),       key: 'story',        icon: '📖' },
+                      { label: t('writingType.notes'),       key: 'notes',        icon: '🗒️' },
+                      { label: t('writingType.homework'),    key: 'homework',     icon: '🎒' },
+                      { label: t('writingType.assignment'),  key: 'assignment',   icon: '📋' },
+                    ].map(({ label, key, icon }) => (
                       <button
-                        key={label}
+                        key={key}
                         type="button"
-                        onClick={() => selectWritingType(label.toLowerCase())}
+                        onClick={() => selectWritingType(key)}
                         style={{
                           padding: '8px 14px',
                           borderRadius: '20px',
@@ -635,15 +639,15 @@ export function AgentChat({
               {writingType === 'assignment' && !assignmentSetupDone && !loading && (
                 <div style={{ padding: '4px 0' }}>
                   <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '4px', color: panelText }}>
-                    Tell me about your assignment
+                    {t('assignment.setupTitle')}
                   </div>
                   <div style={{ fontSize: '13px', opacity: 0.6, marginBottom: '16px' }}>
-                    I'll guide you through it section by section.
+                    {t('mentor.subtitle')}
                   </div>
 
                   <div style={{ marginBottom: '12px' }}>
                     <label style={{ fontSize: '12px', fontWeight: 600, opacity: 0.7, display: 'block', marginBottom: '6px' }}>
-                      Title or topic
+                      {t('assignment.setupTitle')}
                     </label>
                     <input
                       ref={assignmentTitleRef}
@@ -651,7 +655,7 @@ export function AgentChat({
                       value={assignmentTitle}
                       onChange={e => setAssignmentTitle(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && startAssignment()}
-                      placeholder="e.g. The Water Cycle, My Holiday, A Thank You Letter…"
+                      placeholder={t('assignment.titlePlaceholder')}
                       style={{
                         width: '100%',
                         padding: '9px 12px',
@@ -669,7 +673,7 @@ export function AgentChat({
 
                   <div style={{ marginBottom: '16px' }}>
                     <label style={{ fontSize: '12px', fontWeight: 600, opacity: 0.7, display: 'block', marginBottom: '6px' }}>
-                      What type of writing?
+                      {t('assignment.subtype')}
                     </label>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                       {(['essay', 'story', 'report', 'letter', 'homework'] as const).map(sub => (
@@ -715,7 +719,7 @@ export function AgentChat({
                       gap: '6px',
                     }}
                   >
-                    Let's begin <ChevronRight size={16} />
+                    {t('assignment.start')} <ChevronRight size={16} />
                   </button>
                 </div>
               )}
@@ -813,7 +817,7 @@ export function AgentChat({
                               padding: '6px 0',
                             }}
                           >
-                            Added to your writing
+                            {t('mentor.added')}
                           </div>
                         ) : (
                           <button
@@ -834,7 +838,7 @@ export function AgentChat({
                               width: '100%',
                             }}
                           >
-                            Add to my writing
+                            {t('mentor.addToWriting')}
                           </button>
                         )}
                       </div>
@@ -959,7 +963,7 @@ export function AgentChat({
                     flexShrink: 0,
                   }}
                 >
-                  Write it up
+                  {t('mentor.writeItUp')}
                 </button>
               </div>
             )}
@@ -990,7 +994,7 @@ export function AgentChat({
                     color: panelText,
                   }}
                 >
-                  Start over
+                  {t('mentor.startOver')}
                 </button>
               </div>
             )}
@@ -1013,7 +1017,7 @@ export function AgentChat({
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-                placeholder={isListening ? 'Listening…' : 'Type or speak your reply…'}
+                placeholder={isListening ? t('mentor.listening') : t('mentor.typeOrSpeak')}
                 disabled={loading || draftLoading}
                 style={{
                   flex: 1,

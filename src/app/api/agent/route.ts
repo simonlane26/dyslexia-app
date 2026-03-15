@@ -31,7 +31,9 @@ HOW TO HELP:
 - If asked to tidy spelling/grammar: do it while keeping their exact words and voice
 - If they ask "does this make sense?": summarise what you understood from their text, then ask if that's what they meant
 
-ALWAYS remember: your job is to be a quiet, confident helper in the background. One question. Short. Warm. That's it.`;
+ALWAYS remember: your job is to be a quiet, confident helper in the background. One question. Short. Warm. That's it.
+
+LANGUAGE: Detect the language the writer is using from the document text and their messages. Always respond in that same language for the entire conversation. If the document is in French, reply in French. If in Spanish, reply in Spanish. Never switch languages unless the writer does first.`;
 
 function buildAssignmentPrompt(
   title: string,
@@ -152,6 +154,12 @@ function buildSystemPrompt(
   return BASE_PROMPT;
 }
 
+const LANGUAGE_NAMES: Record<string, string> = {
+  fr: 'French',
+  de: 'German',
+  es: 'Spanish',
+};
+
 function buildMessages(
   documentText: string,
   chatHistory: { role: 'user' | 'assistant'; content: string }[],
@@ -163,13 +171,22 @@ function buildMessages(
     sectionIndex: number;
     totalSections: number;
   },
+  language?: string,
 ) {
   const docContext = documentText.trim()
     ? `The writer's document so far:\n"""\n${documentText.slice(0, 3000)}\n"""`
     : 'The writer has not started yet. The document is empty.';
 
+  let systemPrompt = buildSystemPrompt(writingType, assignmentOpts);
+
+  // Explicit language override takes precedence over auto-detection
+  if (language && language !== 'en' && LANGUAGE_NAMES[language]) {
+    const langName = LANGUAGE_NAMES[language];
+    systemPrompt = `IMPORTANT: The user's interface is set to ${langName}. You MUST respond entirely in ${langName} for this entire conversation, regardless of what language the document text is in.\n\n${systemPrompt}`;
+  }
+
   return [
-    { role: 'system' as const, content: buildSystemPrompt(writingType, assignmentOpts) },
+    { role: 'system' as const, content: systemPrompt },
     { role: 'system' as const, content: docContext },
     ...chatHistory,
   ];
@@ -203,6 +220,7 @@ export async function POST(req: NextRequest) {
   const chatHistory: { role: 'user' | 'assistant'; content: string }[] =
     Array.isArray(body?.chatHistory) ? body.chatHistory.slice(-20) : [];
   const writingType = typeof body?.writingType === 'string' ? body.writingType : undefined;
+  const language = typeof body?.language === 'string' ? body.language : undefined;
   const assignmentOpts = writingType === 'assignment' && body?.assignmentTitle
     ? {
         title: String(body.assignmentTitle).slice(0, 200),
@@ -241,7 +259,7 @@ export async function POST(req: NextRequest) {
   const timeout = setTimeout(() => ctrl.abort(), 25_000);
 
   try {
-    const messages = buildMessages(documentText, chatHistory, writingType, assignmentOpts);
+    const messages = buildMessages(documentText, chatHistory, writingType, assignmentOpts, language);
     const upstream = await fetch(url, {
       method: 'POST',
       headers,

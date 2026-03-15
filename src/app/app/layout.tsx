@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { HeaderBar } from "@/components/HeaderBar";
 import { ToastProvider } from "@/components/ToastContainer";
+import { LanguageProvider } from "@/lib/i18n";
 
 export const dynamic = 'force-dynamic'; // prevents static prerender of `/`
 export const metadata: Metadata = {
@@ -14,10 +15,12 @@ export const metadata: Metadata = {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider>
-      <ToastProvider>
-        <HeaderBar />
-        {children}
-      </ToastProvider>
+      <LanguageProvider>
+        <ToastProvider>
+          <HeaderBar />
+          {children}
+        </ToastProvider>
+      </LanguageProvider>
     </ClerkProvider>
   );
 }
