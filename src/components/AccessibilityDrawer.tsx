@@ -6,6 +6,7 @@ import { AccessibilityPresets } from './AccessibilityPresets';
 import { WritingTemplates } from './WritingTemplates';
 import { FocusMode } from './FocusMode';
 import { useEffect } from 'react';
+import { useT, LanguageSelector } from '@/lib/i18n';
 
 interface Theme {
   bg: string;
@@ -97,6 +98,8 @@ export function AccessibilityDrawer({
   onSelectTemplate,
   editorTextColor,
 }: AccessibilityDrawerProps) {
+  const t = useT();
+
   // Close on Escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -177,7 +180,7 @@ export function AccessibilityDrawer({
               color: theme.text,
             }}
           >
-            ⚙️ Accessibility Settings
+            {t('a11y.title')}
           </h2>
           <ModernButton
             variant="secondary"
@@ -200,7 +203,7 @@ export function AccessibilityDrawer({
           {/* Quick Actions */}
           <div style={{ marginBottom: '24px' }}>
             <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: theme.text }}>
-              Quick Actions
+              {t('a11y.quickActions')}
             </h3>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               <AccessibilityPresets onApplyPreset={onApplyPreset} theme={theme} />
@@ -221,7 +224,7 @@ export function AccessibilityDrawer({
           {/* Font Settings */}
           <div style={{ marginBottom: '24px' }}>
             <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: theme.text }}>
-              Font
+              {t('a11y.font')}
             </h3>
             <select
               value={font}
@@ -246,7 +249,7 @@ export function AccessibilityDrawer({
             </select>
 
             <label style={{ display: 'block', fontSize: '13px', color: theme.text, marginBottom: '8px' }}>
-              Font Size: {fontSize}px
+              {t('a11y.fontSize', { n: fontSize })}
             </label>
             <input
               type="range"
@@ -261,7 +264,7 @@ export function AccessibilityDrawer({
           {/* Background Color */}
           <div style={{ marginBottom: '24px' }}>
             <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: theme.text }}>
-              Background Color
+              {t('a11y.bgColor')}
             </h3>
             <div
               style={{
@@ -304,7 +307,7 @@ export function AccessibilityDrawer({
           {/* Display Mode */}
           <div style={{ marginBottom: '24px' }}>
             <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: theme.text }}>
-              Display Mode
+              {t('a11y.displayMode')}
             </h3>
             <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
               <ModernButton
@@ -312,14 +315,14 @@ export function AccessibilityDrawer({
                 onClick={() => setDarkMode(false)}
                 size="sm"
               >
-                ☀️ Light
+                {t('a11y.light')}
               </ModernButton>
               <ModernButton
                 variant={darkMode ? 'primary' : 'secondary'}
                 onClick={() => setDarkMode(true)}
                 size="sm"
               >
-                🌙 Dark
+                {t('a11y.dark')}
               </ModernButton>
             </div>
 
@@ -329,14 +332,14 @@ export function AccessibilityDrawer({
                 checked={highContrast}
                 onChange={(e) => setHighContrast(e.target.checked)}
               />
-              <span style={{ fontSize: '14px', color: theme.text }}>High Contrast Mode</span>
+              <span style={{ fontSize: '14px', color: theme.text }}>{t('a11y.highContrast')}</span>
             </label>
           </div>
 
           {/* Voice Settings */}
           <div style={{ marginBottom: '24px' }}>
             <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: theme.text }}>
-              Text-to-Speech Voice
+              {t('a11y.ttsVoice')}
             </h3>
             <select
               value={voiceId}
@@ -351,18 +354,23 @@ export function AccessibilityDrawer({
                 fontSize: '14px',
               }}
             >
-              <option value="en-GB-Standard-A">British Female</option>
-              <option value="en-GB-Standard-B">British Male</option>
-              <option value="en-US-Standard-C">American Female</option>
-              <option value="en-US-Standard-D">American Male</option>
-              <option value="en-AU-Standard-A">Australian Female</option>
-              <option value="en-AU-Standard-B">Australian Male</option>
+              <option value="en-GB-Standard-A">{t('a11y.voice.britishFemale')}</option>
+              <option value="en-GB-Standard-B">{t('a11y.voice.britishMale')}</option>
+              <option value="en-US-Standard-C">{t('a11y.voice.americanFemale')}</option>
+              <option value="en-US-Standard-D">{t('a11y.voice.americanMale')}</option>
+              <option value="en-AU-Standard-A">{t('a11y.voice.australianFemale')}</option>
+              <option value="en-AU-Standard-B">{t('a11y.voice.australianMale')}</option>
             </select>
+          </div>
+
+          {/* Language */}
+          <div style={{ marginBottom: '24px' }}>
+            <LanguageSelector />
           </div>
 
           {/* Reset Button */}
           <ModernButton variant="danger" onClick={resetSettings} size="sm">
-            Reset All Settings
+            {t('a11y.reset')}
           </ModernButton>
         </div>
       </div>

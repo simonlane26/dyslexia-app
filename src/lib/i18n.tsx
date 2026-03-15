@@ -118,6 +118,25 @@ const en = {
   'assignment.nextSection': 'Next section →',
   'assignment.section': 'Section',
   'assignment.of': 'of',
+
+  // Accessibility drawer
+  'a11y.title': '⚙️ Accessibility Settings',
+  'a11y.quickActions': 'Quick Actions',
+  'a11y.font': 'Font',
+  'a11y.bgColor': 'Background Color',
+  'a11y.displayMode': 'Display Mode',
+  'a11y.ttsVoice': 'Text-to-Speech Voice',
+  'a11y.fontSize': 'Font Size: {n}px',
+  'a11y.light': '☀️ Light',
+  'a11y.dark': '🌙 Dark',
+  'a11y.highContrast': 'High Contrast Mode',
+  'a11y.reset': 'Reset All Settings',
+  'a11y.voice.britishFemale': 'British Female',
+  'a11y.voice.britishMale': 'British Male',
+  'a11y.voice.americanFemale': 'American Female',
+  'a11y.voice.americanMale': 'American Male',
+  'a11y.voice.australianFemale': 'Australian Female',
+  'a11y.voice.australianMale': 'Australian Male',
 };
 
 const fr: typeof en = {
@@ -219,6 +238,25 @@ const fr: typeof en = {
   'assignment.nextSection': 'Section suivante →',
   'assignment.section': 'Section',
   'assignment.of': 'sur',
+
+  // Accessibility drawer
+  'a11y.title': "⚙️ Paramètres d'accessibilité",
+  'a11y.quickActions': 'Actions rapides',
+  'a11y.font': 'Police',
+  'a11y.bgColor': 'Couleur de fond',
+  'a11y.displayMode': "Mode d'affichage",
+  'a11y.ttsVoice': 'Voix de synthèse vocale',
+  'a11y.fontSize': 'Taille de police : {n}px',
+  'a11y.light': '☀️ Clair',
+  'a11y.dark': '🌙 Sombre',
+  'a11y.highContrast': 'Mode contraste élevé',
+  'a11y.reset': 'Réinitialiser les paramètres',
+  'a11y.voice.britishFemale': 'Voix féminine britannique',
+  'a11y.voice.britishMale': 'Voix masculine britannique',
+  'a11y.voice.americanFemale': 'Voix féminine américaine',
+  'a11y.voice.americanMale': 'Voix masculine américaine',
+  'a11y.voice.australianFemale': 'Voix féminine australienne',
+  'a11y.voice.australianMale': 'Voix masculine australienne',
 };
 
 const de: typeof en = {
@@ -320,6 +358,25 @@ const de: typeof en = {
   'assignment.nextSection': 'Nächster Abschnitt →',
   'assignment.section': 'Abschnitt',
   'assignment.of': 'von',
+
+  // Accessibility drawer
+  'a11y.title': '⚙️ Barrierefreiheit',
+  'a11y.quickActions': 'Schnellaktionen',
+  'a11y.font': 'Schrift',
+  'a11y.bgColor': 'Hintergrundfarbe',
+  'a11y.displayMode': 'Anzeigemodus',
+  'a11y.ttsVoice': 'Text-zu-Sprache-Stimme',
+  'a11y.fontSize': 'Schriftgröße: {n}px',
+  'a11y.light': '☀️ Hell',
+  'a11y.dark': '🌙 Dunkel',
+  'a11y.highContrast': 'Hochkontrastmodus',
+  'a11y.reset': 'Einstellungen zurücksetzen',
+  'a11y.voice.britishFemale': 'Britisch Weiblich',
+  'a11y.voice.britishMale': 'Britisch Männlich',
+  'a11y.voice.americanFemale': 'Amerikanisch Weiblich',
+  'a11y.voice.americanMale': 'Amerikanisch Männlich',
+  'a11y.voice.australianFemale': 'Australisch Weiblich',
+  'a11y.voice.australianMale': 'Australisch Männlich',
 };
 
 const es: typeof en = {
@@ -421,6 +478,25 @@ const es: typeof en = {
   'assignment.nextSection': 'Siguiente sección →',
   'assignment.section': 'Sección',
   'assignment.of': 'de',
+
+  // Accessibility drawer
+  'a11y.title': '⚙️ Accesibilidad',
+  'a11y.quickActions': 'Acciones rápidas',
+  'a11y.font': 'Fuente',
+  'a11y.bgColor': 'Color de fondo',
+  'a11y.displayMode': 'Modo de pantalla',
+  'a11y.ttsVoice': 'Voz de texto a voz',
+  'a11y.fontSize': 'Tamaño de fuente: {n}px',
+  'a11y.light': '☀️ Claro',
+  'a11y.dark': '🌙 Oscuro',
+  'a11y.highContrast': 'Modo alto contraste',
+  'a11y.reset': 'Restablecer ajustes',
+  'a11y.voice.britishFemale': 'Voz femenina británica',
+  'a11y.voice.britishMale': 'Voz masculina británica',
+  'a11y.voice.americanFemale': 'Voz femenina americana',
+  'a11y.voice.americanMale': 'Voz masculina americana',
+  'a11y.voice.australianFemale': 'Voz femenina australiana',
+  'a11y.voice.australianMale': 'Voz masculina australiana',
 };
 
 // ─── Type helpers ─────────────────────────────────────────────────────────────
