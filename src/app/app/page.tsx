@@ -1609,6 +1609,7 @@ function PageBody() {
         darkMode={darkMode}
         onUpgradeClick={() => router.push('/pricing')}
         onInsertDraft={(draft) => setText(prev => prev ? prev + '\n\n' + draft : draft)}
+        voiceId={voiceId}
       />
 
       {/* Accessibility Drawer */}

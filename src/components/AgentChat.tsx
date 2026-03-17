@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Send, Bot, Lock, FileText, Mic, MicOff, ChevronRight } from 'lucide-react';
+import { X, Send, Bot, Lock, FileText, Mic, MicOff, ChevronRight, Volume2, Square } from 'lucide-react';
 import { ModernButton } from './ModernButton';
 import { useT, useLanguage } from '@/lib/i18n';
 
@@ -41,6 +41,7 @@ interface AgentChatProps {
   darkMode: boolean;
   onUpgradeClick: () => void;
   onInsertDraft: (text: string) => void;
+  voiceId?: string;
 }
 
 export function AgentChat({
@@ -52,6 +53,7 @@ export function AgentChat({
   darkMode,
   onUpgradeClick,
   onInsertDraft,
+  voiceId,
 }: AgentChatProps) {
   const t = useT();
   const { locale } = useLanguage();
@@ -78,6 +80,8 @@ export function AgentChat({
   const recognitionRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Check mic support
   useEffect(() => {
@@ -137,6 +141,45 @@ export function AgentChat({
   useEffect(() => {
     if (!isOpen && isListening) stopListening();
   }, [isOpen, isListening, stopListening]);
+
+  const stopSpeaking = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setSpeakingIndex(null);
+  }, []);
+
+  const speakMessage = useCallback(async (text: string, index: number) => {
+    // If already speaking this message, stop it
+    if (speakingIndex === index) { stopSpeaking(); return; }
+    // Stop any previous audio
+    stopSpeaking();
+    if (!voiceId) return;
+    setSpeakingIndex(index);
+    try {
+      const res = await fetch('/api/text-to-speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, voiceId }),
+      });
+      if (!res.ok) { setSpeakingIndex(null); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      audio.onended = () => { setSpeakingIndex(null); audioRef.current = null; };
+      audio.onerror = () => { setSpeakingIndex(null); audioRef.current = null; };
+      audio.play();
+    } catch {
+      setSpeakingIndex(null);
+    }
+  }, [voiceId, speakingIndex, stopSpeaking]);
+
+  // Stop audio when panel closes
+  useEffect(() => {
+    if (!isOpen) stopSpeaking();
+  }, [isOpen, stopSpeaking]);
 
   // Proactive nudges — watch the document for triggers
   useEffect(() => {
@@ -851,6 +894,9 @@ export function AgentChat({
                     style={{
                       display: 'flex',
                       justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                      flexDirection: 'column',
+                      alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                      gap: '4px',
                     }}
                   >
                     <div
@@ -866,6 +912,32 @@ export function AgentChat({
                     >
                       {msg.content}
                     </div>
+                    {msg.role === 'assistant' && voiceId && (
+                      <button
+                        type="button"
+                        onClick={() => speakMessage(msg.content, i)}
+                        title={speakingIndex === i ? 'Stop' : 'Read aloud'}
+                        aria-label={speakingIndex === i ? 'Stop' : 'Read aloud'}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '2px 4px',
+                          borderRadius: '4px',
+                          color: speakingIndex === i ? theme.primary : panelText,
+                          opacity: speakingIndex === i ? 1 : 0.35,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          fontSize: '11px',
+                          transition: 'opacity 0.15s',
+                        }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = speakingIndex === i ? '1' : '0.35'; }}
+                      >
+                        {speakingIndex === i ? <Square size={11} /> : <Volume2 size={11} />}
+                      </button>
+                    )}
                   </div>
                 )
               )}
