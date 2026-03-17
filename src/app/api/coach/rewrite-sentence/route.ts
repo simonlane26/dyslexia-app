@@ -3,6 +3,7 @@ import 'server-only';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
+import { auth } from '@clerk/nextjs/server';
 
 function getExtensionSecret() {
   const s = process.env.EXTENSION_TOKEN_SECRET;
@@ -192,18 +193,25 @@ export async function POST(req: NextRequest) {
     ...CORS_HEADERS,
   };
 
-  // Auth — require extension token (same pattern as /api/simplify)
+  // Auth — accept either a Clerk session (web app) or extension JWT token
   const authHeader = req.headers.get('authorization') ?? '';
   const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
   const secret = getExtensionSecret();
-  if (!bearerToken) {
-    return jsonError(401, { error: 'SIGN_IN_REQUIRED', message: 'Sign in at dyslexiawrite.com/extension-connect to use AI Rewrite.' }, baseHdrs);
-  }
-  if (secret) {
-    try {
-      await jwtVerify(bearerToken, secret);
-    } catch {
-      return jsonError(401, { error: 'INVALID_TOKEN', message: 'Token invalid or expired. Reconnect at dyslexiawrite.com/extension-connect.' }, baseHdrs);
+
+  if (bearerToken) {
+    // Extension path: validate JWT
+    if (secret) {
+      try {
+        await jwtVerify(bearerToken, secret);
+      } catch {
+        return jsonError(401, { error: 'INVALID_TOKEN', message: 'Token invalid or expired. Reconnect at dyslexiawrite.com/extension-connect.' }, baseHdrs);
+      }
+    }
+  } else {
+    // Web app path: validate Clerk session
+    const { userId } = await auth();
+    if (!userId) {
+      return jsonError(401, { error: 'SIGN_IN_REQUIRED', message: 'Please sign in to use AI Rewrite.' }, baseHdrs);
     }
   }
 
