@@ -17,7 +17,6 @@ function createMenus() {
 }
 
 chrome.runtime.onInstalled.addListener(createMenus);
-chrome.runtime.onStartup.addListener(createMenus);
 
 // ── Helper: ensure content script is injected ──────────────────────────────────
 async function ensureContentScript(tabId) {
