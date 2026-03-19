@@ -394,8 +394,9 @@
   }
 
   const COMPOSE_SELECTORS = {
-    gmail:   'div[aria-label="Message Body"][contenteditable="true"]',
-    outlook: 'div[aria-label*="Message body"][contenteditable="true"]',
+    // Gmail: class-based selectors work regardless of UI language (aria-label varies by locale)
+    gmail:   'div.Am.Al.editable[contenteditable="true"], div[g_editable="true"][contenteditable="true"], div[role="textbox"][aria-multiline="true"].Am[contenteditable="true"]',
+    outlook: 'div[aria-label*="Message body"][contenteditable="true"], div[aria-label*="Nachrichtentext"][contenteditable="true"], div[aria-label*="Corps du message"][contenteditable="true"], div[aria-label*="Cuerpo del mensaje"][contenteditable="true"]',
     slack:   'div.ql-editor[contenteditable="true"]',
     teams:   'div[data-tid="ckeditor"][contenteditable="true"]',
   };
