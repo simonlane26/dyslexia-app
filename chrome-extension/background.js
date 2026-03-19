@@ -42,8 +42,9 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     const text = (info.selectionText || '').trim();
     if (!text) return;
 
-    const ok = await ensureContentScript(tab.id);
-    if (!ok) return; // restricted page — silently bail
+    // Best-effort injection for tabs opened before the extension was installed.
+    // The manifest already injects content.js on all URLs, so this may be a no-op.
+    await ensureContentScript(tab.id);
 
     safeSend(tab.id, { type: 'DW_SIMPLIFY_START' });
 
@@ -72,8 +73,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
   // ── Whole-page simplify (new) ──────────────────────────────────────────────
   if (info.menuItemId === 'dw-simplify-page') {
-    const ok = await ensureContentScript(tab.id);
-    if (!ok) return; // restricted page — silently bail
+    await ensureContentScript(tab.id);
 
     const { dw_token, dw_simplify_level } = await chrome.storage.local.get(['dw_token', 'dw_simplify_level']);
     if (!dw_token) {
