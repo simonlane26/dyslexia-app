@@ -376,4 +376,358 @@
 
   });
 
+  // ── Compose Overlay — Gmail, Outlook, Slack, Teams ────────────────────────
+
+  const COMPOSE_PANEL_ID = 'dw-compose-panel';
+  const CHECK_API = 'https://www.dyslexiawrite.com/api/check-message';
+  const TONE_API  = 'https://www.dyslexiawrite.com/api/tone-check';
+
+  // ── Platform detection ──────────────────────────────────────────────────────
+
+  function detectPlatform() {
+    const h = location.hostname;
+    if (h.includes('mail.google.com'))                                   return 'gmail';
+    if (h.includes('outlook.live.com') || h.includes('outlook.office')) return 'outlook';
+    if (h.includes('slack.com'))                                         return 'slack';
+    if (h.includes('teams.microsoft.com'))                               return 'teams';
+    return null;
+  }
+
+  const COMPOSE_SELECTORS = {
+    gmail:   'div[aria-label="Message Body"][contenteditable="true"]',
+    outlook: 'div[aria-label*="Message body"][contenteditable="true"]',
+    slack:   'div.ql-editor[contenteditable="true"]',
+    teams:   'div[data-tid="ckeditor"][contenteditable="true"]',
+  };
+
+  // ── Local pre-filter ────────────────────────────────────────────────────────
+
+  const HOMOPHONES = {
+    'their': { check: ctx => /their (is|are|was|were|has|have)\b/.test(ctx), fix: 'there'  },
+    'there': { check: ctx => /there (car|house|book|phone|dog|friend|family)\b/.test(ctx), fix: 'their' },
+    'your':  { check: ctx => /\byour (going|welcome|right|wrong|sure)\b/.test(ctx),         fix: "you're" },
+    'its':   { check: ctx => /\bits (been|not|a |the |going|very|really)\b/.test(ctx),      fix: "it's"  },
+    'to':    { check: ctx => /\bto (much|many|late|early|soon)\b/.test(ctx),                fix: 'too'   },
+    'then':  { check: ctx => /\b(more|less|bigger|better|worse) then\b/.test(ctx),          fix: 'than'  },
+    'were':  { check: ctx => /\bwere (going|is|you)\b/.test(ctx),                           fix: "we're" },
+    'of':    { check: ctx => /\b(could|would|should|might) of\b/.test(ctx),                 fix: 'have'  },
+  };
+
+  const MISSPELLINGS = [
+    ['becuse','because'], ['becaus','because'], ['wich','which'], ['thort','thought'],
+    ['wensday','Wednesday'], ['wendnesday','Wednesday'], ['feburary','February'],
+    ['definately','definitely'], ['definate','definite'], ['seperate','separate'],
+    ['occured','occurred'], ['recieve','receive'], ['neccessary','necessary'],
+    ['accomodate','accommodate'], ['tomorow','tomorrow'], ['tommorow','tomorrow'],
+    ['beleive','believe'], ['wierd','weird'], ['untill','until'], ['alot','a lot'],
+    ['goverment','government'], ['enviroment','environment'], ['collegue','colleague'],
+    ['calender','calendar'], ['truely','truly'], ['arguement','argument'],
+    ['basicaly','basically'], ['probaly','probably'], ['supose','suppose'],
+    ['writting','writing'], ['begining','beginning'], ['comming','coming'],
+  ];
+
+  function localPreFilter(text) {
+    const results = [];
+    const lower = text.toLowerCase();
+    const words = lower.split(/\s+/);
+
+    words.forEach((word, idx) => {
+      const entry = HOMOPHONES[word];
+      if (!entry) return;
+      const ctx = words.slice(Math.max(0, idx - 4), idx + 5).join(' ');
+      if (entry.check(ctx)) {
+        results.push({ original: text.split(/\s+/)[idx], suggestion: entry.fix, reason: 'Common mix-up', source: 'local' });
+      }
+    });
+
+    for (const [wrong, right] of MISSPELLINGS) {
+      const re = new RegExp(`\\b${wrong}\\b`, 'gi');
+      let m;
+      while ((m = re.exec(text)) !== null) {
+        results.push({ original: m[0], suggestion: right, reason: 'Spelling', source: 'local' });
+      }
+    }
+
+    return results;
+  }
+
+  // ── Pattern learning ────────────────────────────────────────────────────────
+
+  function getPatterns() {
+    return new Promise(resolve =>
+      chrome.storage.local.get('dw_user_patterns', d => resolve(d.dw_user_patterns || []))
+    );
+  }
+
+  function logCorrection(original, correction) {
+    getPatterns().then(patterns => {
+      const existing = patterns.find(p => p.original === original.toLowerCase());
+      if (existing) {
+        existing.frequency = (existing.frequency || 1) + 1;
+        existing.lastSeen = Date.now();
+      } else {
+        patterns.push({ original: original.toLowerCase(), correction: correction.toLowerCase(), frequency: 1, lastSeen: Date.now() });
+      }
+      // Keep only the 50 most-frequent patterns
+      patterns.sort((a, b) => (b.frequency || 0) - (a.frequency || 0));
+      chrome.storage.local.set({ dw_user_patterns: patterns.slice(0, 50) });
+    });
+  }
+
+  // ── Apply a fix to a contenteditable area ──────────────────────────────────
+
+  function applyFix(original, fix, area) {
+    const walker = document.createTreeWalker(area, NodeFilter.SHOW_TEXT);
+    const re = new RegExp(escapeRegex(original), 'i');
+    let node;
+    while ((node = walker.nextNode())) {
+      if (re.test(node.textContent)) {
+        node.textContent = node.textContent.replace(re, fix);
+        area.dispatchEvent(new Event('input', { bubbles: true }));
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function escapeRegex(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  // ── Compose suggestion panel ────────────────────────────────────────────────
+
+  function removeComposePanel() {
+    document.getElementById(COMPOSE_PANEL_ID)?.remove();
+  }
+
+  function showComposePanel(suggestions, area, token) {
+    removeComposePanel();
+    if (suggestions.length === 0) return;
+
+    const panel = document.createElement('div');
+    panel.id = COMPOSE_PANEL_ID;
+    Object.assign(panel.style, {
+      position: 'fixed', top: '16px', left: '50%', transform: 'translateX(-50%)',
+      zIndex: '2147483647', background: 'white', borderRadius: '12px',
+      boxShadow: '0 4px 24px rgba(0,0,0,0.16)', fontFamily: 'Arial, sans-serif',
+      fontSize: '13px', width: '360px', border: '1px solid #e2e8f0',
+      animation: 'dw-fadein 0.2s ease', overflow: 'hidden',
+    });
+
+    const sugItems = suggestions.map((s, i) => `
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:1px solid #f1f5f9;">
+        <span style="flex:1;color:#1e293b;">
+          <span style="background:#fde68a;padding:1px 4px;border-radius:3px;">${esc(s.original)}</span>
+          <span style="color:#94a3b8;margin:0 4px;">→</span>
+          <span style="background:#d1fae5;padding:1px 4px;border-radius:3px;font-weight:600;">${esc(s.suggestion)}</span>
+          <span style="color:#94a3b8;font-size:11px;margin-left:4px;">${esc(s.reason || '')}</span>
+        </span>
+        <button type="button" data-idx="${i}"
+          style="background:#7c3aed;color:white;border:none;border-radius:5px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0;">
+          Fix
+        </button>
+      </div>
+    `).join('');
+
+    panel.innerHTML = `
+      <div style="background:linear-gradient(135deg,#7c3aed,#2563eb);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
+        <span style="color:white;font-weight:700;font-size:13px;">✍️ ${suggestions.length} suggestion${suggestions.length > 1 ? 's' : ''}</span>
+        <div style="display:flex;gap:6px;">
+          <button id="dw-comp-tone" type="button"
+            style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:6px;padding:3px 10px;cursor:pointer;font-size:12px;">
+            Check tone
+          </button>
+          <button id="dw-comp-close" type="button"
+            style="background:rgba(255,255,255,0.15);border:none;color:white;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:12px;">
+            ✕
+          </button>
+        </div>
+      </div>
+      <div id="dw-comp-suggestions">${sugItems}</div>
+      <div style="padding:8px 14px;background:#f8fafc;display:flex;gap:6px;justify-content:flex-end;">
+        <button id="dw-comp-fix-all" type="button"
+          style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:white;border:none;border-radius:6px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;">
+          Fix all
+        </button>
+        <button id="dw-comp-dismiss" type="button"
+          style="background:#e2e8f0;color:#475569;border:none;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;">
+          Dismiss
+        </button>
+      </div>
+      <div id="dw-tone-result" style="display:none;"></div>
+    `;
+
+    document.body.appendChild(panel);
+
+    // Individual fix buttons
+    panel.querySelectorAll('[data-idx]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const s = suggestions[Number(btn.dataset.idx)];
+        if (applyFix(s.original, s.suggestion, area)) {
+          logCorrection(s.original, s.suggestion);
+          btn.closest('div').remove();
+          // Update header count
+          const remaining = panel.querySelectorAll('[data-idx]').length;
+          if (remaining === 0) removeComposePanel();
+          else panel.querySelector('span[style*="font-weight:700"]').textContent =
+            `✍️ ${remaining} suggestion${remaining > 1 ? 's' : ''}`;
+        }
+      });
+    });
+
+    // Fix all
+    panel.querySelector('#dw-comp-fix-all').addEventListener('click', () => {
+      suggestions.forEach(s => {
+        if (applyFix(s.original, s.suggestion, area)) logCorrection(s.original, s.suggestion);
+      });
+      removeComposePanel();
+    });
+
+    // Dismiss
+    panel.querySelector('#dw-comp-dismiss').addEventListener('click', removeComposePanel);
+    panel.querySelector('#dw-comp-close').addEventListener('click', removeComposePanel);
+
+    // Tone check
+    panel.querySelector('#dw-comp-tone').addEventListener('click', async () => {
+      const toneBtn = panel.querySelector('#dw-comp-tone');
+      toneBtn.textContent = '…';
+      toneBtn.disabled = true;
+      try {
+        const text = area.innerText.trim();
+        const res = await fetch(TONE_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+          body: JSON.stringify({ text }),
+        });
+        const data = await res.json();
+        showToneResult(data, area, panel);
+      } catch {
+        toneBtn.textContent = 'Check tone';
+        toneBtn.disabled = false;
+      }
+    });
+  }
+
+  function showToneResult(result, area, panel) {
+    const { confidence, summary, suggestion, rewrite } = result || {};
+    const colors = {
+      'sounds great':        { bg: '#d1fae5', text: '#065f46', icon: '✓' },
+      'mostly good':         { bg: '#fef3c7', text: '#92400e', icon: '~' },
+      'might need adjusting':{ bg: '#fee2e2', text: '#991b1b', icon: '!' },
+    };
+    const c = colors[confidence] || colors['mostly good'];
+
+    const toneDiv = panel.querySelector('#dw-tone-result');
+    toneDiv.style.cssText = `display:block;padding:10px 14px;background:${c.bg};color:${c.text};font-size:13px;line-height:1.5;border-top:1px solid rgba(0,0,0,0.06);`;
+    toneDiv.innerHTML = `
+      <div style="font-weight:600;margin-bottom:4px;">${c.icon} ${esc(summary || '')}</div>
+      ${suggestion ? `<div style="opacity:0.8;font-size:12px;margin-bottom:8px;">${esc(suggestion)}</div>` : ''}
+      ${rewrite ? `
+        <div style="display:flex;gap:6px;">
+          <button id="dw-use-rewrite" type="button"
+            style="background:${c.text};color:white;border:none;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;">
+            Use friendlier version
+          </button>
+          <button id="dw-keep-mine" type="button"
+            style="background:transparent;border:none;color:${c.text};font-size:12px;cursor:pointer;">
+            Keep mine
+          </button>
+        </div>` : ''}
+    `;
+
+    if (rewrite) {
+      toneDiv.querySelector('#dw-use-rewrite').addEventListener('click', () => {
+        area.focus();
+        const sel = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(area);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        document.execCommand('insertText', false, rewrite);
+        removeComposePanel();
+      });
+      toneDiv.querySelector('#dw-keep-mine').addEventListener('click', () => {
+        toneDiv.style.display = 'none';
+      });
+    }
+  }
+
+  // ── Compose area attachment ─────────────────────────────────────────────────
+
+  function attachToCompose(area, token) {
+    if (area.dataset.dwCompose) return;
+    area.dataset.dwCompose = 'true';
+
+    let debounceTimer = null;
+    let lastChecked = '';
+
+    area.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(async () => {
+        const text = area.innerText.trim();
+        if (text === lastChecked || text.length < 20) return;
+        lastChecked = text;
+
+        // 1. Local pre-filter (instant)
+        const patterns = await getPatterns();
+        let suggestions = localPreFilter(text);
+
+        // Build a set of already-found originals to avoid dupes
+        const found = new Set(suggestions.map(s => s.original.toLowerCase()));
+
+        // 2. AI check for anything local didn't catch
+        try {
+          const res = await fetch(CHECK_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+            body: JSON.stringify({ text, userPatterns: patterns.slice(0, 10) }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            for (const s of (data.suggestions || [])) {
+              if (!found.has(s.original.toLowerCase())) {
+                suggestions.push(s);
+                found.add(s.original.toLowerCase());
+              }
+            }
+          }
+        } catch { /* network error — local results are enough */ }
+
+        if (suggestions.length > 0) showComposePanel(suggestions, area, token);
+        else removeComposePanel();
+      }, 1500);
+    });
+
+    // Remove panel when compose area is removed
+    new MutationObserver((_, obs) => {
+      if (!document.body.contains(area)) {
+        removeComposePanel();
+        obs.disconnect();
+      }
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+
+  // ── Watch for compose windows appearing ────────────────────────────────────
+
+  function watchForCompose(platform, token) {
+    const selector = COMPOSE_SELECTORS[platform];
+    if (!selector) return;
+
+    // Check existing elements
+    document.querySelectorAll(selector).forEach(el => attachToCompose(el, token));
+
+    // Watch for new ones
+    new MutationObserver(() => {
+      document.querySelectorAll(selector).forEach(el => attachToCompose(el, token));
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+
+  // ── Start compose monitoring if on a supported platform ────────────────────
+  const platform = detectPlatform();
+  if (platform) {
+    chrome.storage.local.get('dw_token', ({ dw_token }) => {
+      watchForCompose(platform, dw_token || null);
+    });
+  }
+
 })();

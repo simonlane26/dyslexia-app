@@ -43,6 +43,8 @@ export default clerkMiddleware(async (auth, req) => {
     const publicApis = [
       '/api/simplify',
       '/api/simplify-page',
+      '/api/check-message',
+      '/api/tone-check',
       '/api/coach/rewrite-sentence',
       '/api/coach', // Writing coach
     ];
