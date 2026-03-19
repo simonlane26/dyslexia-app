@@ -30,7 +30,7 @@ async function ensureContentScript(tabId) {
 }
 
 function safeSend(tabId, msg) {
-  try { chrome.tabs.sendMessage(tabId, msg); } catch { /* tab gone or restricted */ }
+  chrome.tabs.sendMessage(tabId, msg).catch(() => {});
 }
 
 // ── Context menu handler ───────────────────────────────────────────────────────
