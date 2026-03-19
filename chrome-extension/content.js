@@ -322,9 +322,11 @@
     if (simplified > 0) showToggleBar(simplified);
   }
 
-  // ── Message listener ────────────────────────────────────────────────────────
+  // ── Message listener (top frame only) ──────────────────────────────────────
 
-  chrome.runtime.onMessage.addListener((msg) => {
+  const isTopFrame = window === window.top;
+
+  if (isTopFrame) chrome.runtime.onMessage.addListener((msg) => {
 
     // Existing: right-click selection simplify
     if (msg.type === 'DW_SIMPLIFY_START') {
