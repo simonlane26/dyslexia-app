@@ -391,3 +391,83 @@ clearBtn.addEventListener('click', () => {
   updateWordCount();
   save();
 });
+
+// ── Page Simplify ──────────────────────────────────────────────────────────────
+const pageSimplifyPanel    = document.getElementById('pageSimplifyPanel');
+const pageSimplifyToggleBtn = document.getElementById('pageSimplifyToggleBtn');
+const doSimplifyPageBtn    = document.getElementById('doSimplifyPageBtn');
+const levelHint            = document.getElementById('levelHint');
+let selectedLevel = 2;
+
+const LEVEL_HINTS = {
+  1: 'Light touch — fixes jargon and very long sentences only.',
+  2: 'Rewrites in plain English with short sentences.',
+  3: 'Very simple — short words and sentences, everything explained.',
+};
+
+// Toggle panel visibility
+pageSimplifyToggleBtn.addEventListener('click', () => {
+  const isOpen = pageSimplifyPanel.classList.contains('open');
+  // Close other panels
+  simplifyPanel.style.display = 'none';
+  rewritePanel.style.display = 'none';
+  connectPanel.style.display = 'none';
+  pageSimplifyPanel.classList.toggle('open', !isOpen);
+});
+
+// Level selector
+document.getElementById('levelBtns').addEventListener('click', (e) => {
+  const btn = e.target.closest('.level-btn');
+  if (!btn) return;
+  selectedLevel = Number(btn.dataset.level);
+  document.querySelectorAll('.level-btn').forEach(b => b.classList.toggle('active', b === btn));
+  levelHint.textContent = LEVEL_HINTS[selectedLevel] || LEVEL_HINTS[2];
+  // Persist
+  chrome.storage.local.set({ dw_simplify_level: selectedLevel });
+});
+
+// Load saved level
+chrome.storage.local.get('dw_simplify_level', (data) => {
+  if (data.dw_simplify_level) {
+    selectedLevel = data.dw_simplify_level;
+    document.querySelectorAll('.level-btn').forEach(b => {
+      b.classList.toggle('active', Number(b.dataset.level) === selectedLevel);
+    });
+    levelHint.textContent = LEVEL_HINTS[selectedLevel] || LEVEL_HINTS[2];
+  }
+});
+
+// Simplify page button
+doSimplifyPageBtn.addEventListener('click', async () => {
+  if (!authToken) {
+    pageSimplifyPanel.classList.remove('open');
+    connectPanel.style.display = 'block';
+    return;
+  }
+
+  doSimplifyPageBtn.disabled = true;
+  doSimplifyPageBtn.textContent = '⟳ Working…';
+
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id) throw new Error('No active tab');
+
+    // Inject content script (in case tab was open before extension was installed)
+    try {
+      await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content.js'] });
+    } catch { /* already injected or restricted */ }
+
+    chrome.tabs.sendMessage(tab.id, {
+      type: 'DW_SIMPLIFY_PAGE',
+      token: authToken,
+      level: selectedLevel,
+    });
+
+    // Close popup so user can see the page being simplified
+    window.close();
+  } catch (e) {
+    doSimplifyPageBtn.disabled = false;
+    doSimplifyPageBtn.textContent = '🌐 Simplify this page';
+    alert('Could not reach the page. Try refreshing it first.');
+  }
+});

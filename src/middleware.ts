@@ -42,6 +42,7 @@ export default clerkMiddleware(async (auth, req) => {
     // Allow anonymous access to these endpoints
     const publicApis = [
       '/api/simplify',
+      '/api/simplify-page',
       '/api/coach/rewrite-sentence',
       '/api/coach', // Writing coach
     ];

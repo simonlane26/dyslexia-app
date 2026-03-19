@@ -212,6 +212,72 @@
       transition: opacity 0.3s;
     }
     .save-status.visible { opacity: 1; }
+
+    /* ── Page simplify section ── */
+    .page-simplify {
+      padding: 10px 12px;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      display: none;
+    }
+    .page-simplify.open { display: block; }
+    .level-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .level-row label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+    .level-btns {
+      display: flex;
+      gap: 4px;
+    }
+    .level-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .level-btn.active {
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      color: white;
+      border-color: transparent;
+    }
+    .level-hint {
+      font-size: 11px;
+      color: #94a3b8;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .simplify-page-btn {
+      width: 100%;
+      padding: 9px;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .simplify-page-btn:hover { opacity: 0.9; }
+    .simplify-page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   </style>
 </head>
 <body>
@@ -271,12 +337,27 @@
   <!-- Toolbar -->
   <div class="toolbar">
     <div class="toolbar-left">
-      <button class="tool-btn primary" id="readBtn">🔊 Read aloud</button>
-      <button class="tool-btn" id="simplifyBtn">✨ Simplify</button>
-      <button class="tool-btn" id="rewriteBtn">✏️ Rewrite</button>
-      <button class="tool-btn" id="clearBtn">✕ Clear</button>
+      <button type="button" class="tool-btn primary" id="readBtn">🔊 Read aloud</button>
+      <button type="button" class="tool-btn" id="simplifyBtn">✨ Simplify</button>
+      <button type="button" class="tool-btn" id="rewriteBtn">✏️ Rewrite</button>
+      <button type="button" class="tool-btn" id="pageSimplifyToggleBtn" title="Simplify the webpage you are viewing">🌐 Page</button>
+      <button type="button" class="tool-btn" id="clearBtn">✕ Clear</button>
     </div>
     <span class="word-count" id="wordCount">0 words</span>
+  </div>
+
+  <!-- Page simplify panel -->
+  <div id="pageSimplifyPanel" class="page-simplify">
+    <div class="level-row">
+      <label for="levelBtns">Level</label>
+      <div class="level-btns" id="levelBtns">
+        <button type="button" class="level-btn" data-level="1">1 — Light</button>
+        <button type="button" class="level-btn active" data-level="2">2 — Plain</button>
+        <button type="button" class="level-btn" data-level="3">3 — Simple</button>
+      </div>
+    </div>
+    <p class="level-hint" id="levelHint">Rewrites in plain English with short sentences.</p>
+    <button type="button" class="simplify-page-btn" id="doSimplifyPageBtn">🌐 Simplify this page</button>
   </div>
 
   <!-- Simplify result panel -->
