@@ -396,9 +396,9 @@
   }
 
   const COMPOSE_SELECTORS = {
-    // Gmail: class-based selectors work regardless of UI language (aria-label varies by locale)
-    gmail:   'div.Am.Al.editable[contenteditable="true"], div[g_editable="true"][contenteditable="true"], div[role="textbox"][aria-multiline="true"].Am[contenteditable="true"]',
-    outlook: 'div[aria-label*="Message body"][contenteditable="true"], div[aria-label*="Nachrichtentext"][contenteditable="true"], div[aria-label*="Corps du message"][contenteditable="true"], div[aria-label*="Cuerpo del mensaje"][contenteditable="true"]',
+    // Gmail: role+aria-multiline avoids matching subject/to fields; class fallbacks for older Gmail
+    gmail:   'div[role="textbox"][aria-multiline="true"][contenteditable="true"], div.Am.Al.editable[contenteditable="true"], div[g_editable="true"][contenteditable="true"]',
+    outlook: 'div[role="textbox"][aria-multiline="true"][contenteditable="true"], div[aria-label*="Message body"][contenteditable="true"], div[aria-label*="Nachrichtentext"][contenteditable="true"]',
     slack:   'div.ql-editor[contenteditable="true"]',
     teams:   'div[data-tid="ckeditor"][contenteditable="true"]',
   };
@@ -657,14 +657,32 @@
 
   // ── Compose area attachment ─────────────────────────────────────────────────
 
+  // Small badge shown on focus to confirm extension is active
+  function showDwBadge() {
+    if (document.getElementById('dw-compose-badge')) return;
+    const badge = document.createElement('div');
+    badge.id = 'dw-compose-badge';
+    badge.textContent = '✍️ DW';
+    Object.assign(badge.style, {
+      position: 'fixed', bottom: '8px', right: '8px', zIndex: '2147483647',
+      background: '#7c3aed', color: 'white', fontSize: '11px', fontWeight: '700',
+      padding: '3px 8px', borderRadius: '8px', pointerEvents: 'none',
+      fontFamily: 'Arial, sans-serif', opacity: '0.85',
+    });
+    document.body.appendChild(badge);
+    setTimeout(() => badge.remove(), 2000);
+  }
+
   function attachToCompose(area, token) {
     if (area.dataset.dwCompose) return;
     area.dataset.dwCompose = 'true';
 
+    area.addEventListener('focus', showDwBadge);
+
     let debounceTimer = null;
     let lastChecked = '';
 
-    area.addEventListener('input', () => {
+    function onActivity() {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(async () => {
         const text = area.innerText.trim();
@@ -699,7 +717,10 @@
         if (suggestions.length > 0) showComposePanel(suggestions, area, token);
         else removeComposePanel();
       }, 1500);
-    });
+    }
+
+    area.addEventListener('input', onActivity);
+    area.addEventListener('keyup', onActivity);
 
     // Remove panel when compose area is removed
     new MutationObserver((_, obs) => {
