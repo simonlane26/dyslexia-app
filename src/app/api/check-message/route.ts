@@ -41,13 +41,13 @@ STRICT RULES:
 - Do NOT suggest being more formal.
 - ONLY flag: homophones (their/there/they're, your/you're, its/it's, to/too/two, then/than, were/we're, of/have), common spelling mistakes, words that are clearly wrong, sentences that don't make sense.
 - Max 6 suggestions per response.
-- Never use grammar jargon. Keep reasons short and friendly (under 8 words).
+- For the "reason" field use ONLY one of these short labels: "Spelling", "Word mix-up", "Missing word", "Wrong word".
 - If the text reads fine, return an empty array.
 
 IMPORTANT: The user is dyslexic. Their phrasing might sound a little different but still be completely clear and correct. Do not penalise their natural voice.
 
 Respond ONLY with a valid JSON array (no markdown, no code blocks):
-[{"original": "exact text to replace", "suggestion": "corrected version", "reason": "short friendly reason"}]
+[{"original": "exact text to replace", "suggestion": "corrected version", "reason": "Spelling"}]
 
 If nothing needs fixing, respond with exactly: []`;
 
