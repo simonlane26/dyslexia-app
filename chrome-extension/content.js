@@ -116,9 +116,11 @@
 
   // Cache helpers
   function getCached(key) {
+    if (!extOk()) return Promise.resolve(null);
     return new Promise(resolve => chrome.storage.local.get(key, d => resolve(d[key] || null)));
   }
   function setCached(key, value) {
+    if (!extOk()) return Promise.resolve();
     return new Promise(resolve => chrome.storage.local.set({ [key]: value }, resolve));
   }
   async function hashText(text) {
@@ -454,16 +456,25 @@
     return results;
   }
 
+  // ── Extension context guard ─────────────────────────────────────────────────
+
+  function extOk() {
+    try { return !!chrome.runtime?.id; } catch { return false; }
+  }
+
   // ── Pattern learning ────────────────────────────────────────────────────────
 
   function getPatterns() {
+    if (!extOk()) return Promise.resolve([]);
     return new Promise(resolve =>
       chrome.storage.local.get('dw_user_patterns', d => resolve(d.dw_user_patterns || []))
     );
   }
 
   function logCorrection(original, correction) {
+    if (!extOk()) return;
     getPatterns().then(patterns => {
+      if (!extOk()) return;
       const existing = patterns.find(p => p.original === original.toLowerCase());
       if (existing) {
         existing.frequency = (existing.frequency || 1) + 1;
@@ -473,7 +484,7 @@
       }
       // Keep only the 50 most-frequent patterns
       patterns.sort((a, b) => (b.frequency || 0) - (a.frequency || 0));
-      chrome.storage.local.set({ dw_user_patterns: patterns.slice(0, 50) });
+      try { chrome.storage.local.set({ dw_user_patterns: patterns.slice(0, 50) }); } catch {}
     });
   }
 
@@ -683,8 +694,10 @@
     let lastChecked = '';
 
     function onActivity() {
+      if (!extOk()) return;
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(async () => {
+        if (!extOk()) return;
         const text = area.innerText.trim();
         if (text === lastChecked || text.length < 20) return;
         lastChecked = text;
