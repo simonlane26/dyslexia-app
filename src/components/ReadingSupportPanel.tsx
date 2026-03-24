@@ -81,8 +81,7 @@ export function ReadingSupportPanel({
 }: Props) {
   const [panelOpen, setPanelOpen] = useState(false);
   const [hoveredPara, setHoveredPara] = useState<number | null>(null);
-  const [guideTop, setGuideTop] = useState(0);
-  const [guideBot, setGuideBot] = useState(0);
+  const [guideOverlay, setGuideOverlay] = useState<{ top: number; topH: number; botTop: number; botH: number } | null>(null);
   const [currentSentIdx, setCurrentSentIdx] = useState(-1);
   const [audioState, setAudioState] = useState<'idle' | 'loading' | 'playing' | 'paused'>('idle');
   const [progress, setProgress] = useState(0);
@@ -93,8 +92,10 @@ export function ReadingSupportPanel({
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sentTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const outerRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const paraRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const hoveredParaRef = useRef<number | null>(null);
 
   const paragraphs = useMemo(() => parseParagraphs(text), [text]);
   const total = useMemo(() => totalSents(paragraphs), [paragraphs]);
@@ -182,16 +183,39 @@ export function ReadingSupportPanel({
     }, 2200);
   }
 
-  function handleParaHover(pIdx: number | null) {
-    setHoveredPara(pIdx);
-    if (pIdx === null || !bodyRef.current || !paraRefs.current[pIdx]) {
-      setGuideTop(0); setGuideBot(0); return;
+  function computeGuide(pIdx: number | null) {
+    if (pIdx === null || !outerRef.current || !bodyRef.current || !paraRefs.current[pIdx]) {
+      setGuideOverlay(null); return;
     }
+    const or = outerRef.current.getBoundingClientRect();
     const br = bodyRef.current.getBoundingClientRect();
     const pr = paraRefs.current[pIdx]!.getBoundingClientRect();
-    setGuideTop(Math.max(0, pr.top - br.top - 4));
-    setGuideBot(Math.max(0, br.height - (pr.bottom - br.top) - 4));
+    const bodyTop = br.top - or.top;
+    const bodyBot = br.bottom - or.top;
+    const paraTop = pr.top - or.top;
+    const paraBot = pr.bottom - or.top;
+    setGuideOverlay({
+      top: bodyTop,
+      topH: Math.max(0, paraTop - bodyTop - 4),
+      botTop: Math.min(paraBot + 4, bodyBot),
+      botH: Math.max(0, bodyBot - paraBot - 4),
+    });
   }
+
+  function handleParaHover(pIdx: number | null) {
+    hoveredParaRef.current = pIdx;
+    setHoveredPara(pIdx);
+    computeGuide(pIdx);
+  }
+
+  // Keep guide in sync while scrolling
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    const onScroll = () => computeGuide(hoveredParaRef.current);
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
 
   async function handleWordTap(e: React.MouseEvent, word: string) {
     e.stopPropagation();
@@ -320,13 +344,35 @@ export function ReadingSupportPanel({
 
   // ── GUIDED / SUPPORTED: unified reading card ────────────────────────────────
   return (
-    <div style={{
+    <div ref={outerRef} style={{
       border: `1px solid ${border}`, borderRadius: 12,
       overflow: 'hidden', position: 'relative',
       background: darkMode ? '#1a1a1a' : '#fff',
     }}>
       {strip}
       {settingsPanel}
+
+      {/* Guide overlays — outside scroll container so they stay in sync on scroll */}
+      {mode === 'guided' && guideOverlay && (
+        <>
+          <div style={{
+            position: 'absolute', left: 0, right: 0,
+            top: guideOverlay.top,
+            height: guideOverlay.topH,
+            background: darkMode ? '#e0e0e0' : '#1a1a1a',
+            opacity: 0.06, pointerEvents: 'none', zIndex: 2,
+            transition: 'height 0.2s ease, top 0.2s ease',
+          }} />
+          <div style={{
+            position: 'absolute', left: 0, right: 0,
+            top: guideOverlay.botTop,
+            height: guideOverlay.botH,
+            background: darkMode ? '#e0e0e0' : '#1a1a1a',
+            opacity: 0.06, pointerEvents: 'none', zIndex: 2,
+            transition: 'height 0.2s ease, top 0.2s ease',
+          }} />
+        </>
+      )}
 
       {/* Reading body */}
       <div
@@ -340,25 +386,6 @@ export function ReadingSupportPanel({
           position: 'relative',
         }}
       >
-        {/* Guide overlays */}
-        <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0,
-          height: hoveredPara !== null ? guideTop : 0,
-          background: darkMode ? '#e0e0e0' : '#1a1a1a',
-          opacity: hoveredPara !== null ? 0.06 : 0,
-          pointerEvents: 'none',
-          transition: 'height 0.25s ease, opacity 0.25s ease',
-          zIndex: 1,
-        }} />
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0,
-          height: hoveredPara !== null ? guideBot : 0,
-          background: darkMode ? '#e0e0e0' : '#1a1a1a',
-          opacity: hoveredPara !== null ? 0.06 : 0,
-          pointerEvents: 'none',
-          transition: 'height 0.25s ease, opacity 0.25s ease',
-          zIndex: 1,
-        }} />
 
         {/* Text paragraphs */}
         <div style={{ fontSize, lineHeight: 2.1, letterSpacing: '0.4px', wordSpacing: '4px', fontFamily, color: editorTextColor }}>
