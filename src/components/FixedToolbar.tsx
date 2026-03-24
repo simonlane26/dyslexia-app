@@ -111,6 +111,26 @@ export function FixedToolbar({
 }: FixedToolbarProps) {
   const t = useT();
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  const [toolbarState, setToolbarState] = useState<'full' | 'collapsed' | 'focus'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('dw-toolbar-state') as 'full' | 'collapsed' | 'focus') || 'full';
+    }
+    return 'full';
+  });
+
+  function setTbState(s: 'full' | 'collapsed' | 'focus') {
+    setToolbarState(s);
+    localStorage.setItem('dw-toolbar-state', s);
+  }
+
+  useEffect(() => {
+    function onEsc(e: KeyboardEvent) {
+      if (e.key !== 'Escape') return;
+      setTbState(toolbarState === 'focus' ? 'collapsed' : toolbarState === 'collapsed' ? 'full' : 'full');
+    }
+    window.addEventListener('keydown', onEsc);
+    return () => window.removeEventListener('keydown', onEsc);
+  }, [toolbarState]);
 
   // One-time feature tips (shown once via localStorage)
   const [showSimplifyTip, setShowSimplifyTip] = useState(false);
@@ -157,6 +177,8 @@ export function FixedToolbar({
     marginBottom: '4px',
   };
 
+  const tbTransition = 'max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease';
+
   return (
     <div
       style={{
@@ -165,15 +187,22 @@ export function FixedToolbar({
         zIndex: 20,
         backgroundColor: theme.surface,
         borderBottom: `1px solid ${theme.border}`,
-        padding: '10px 16px',
+        letterSpacing: '0.02em',
+      }}
+    >
+      {/* ── FULL TOOLBAR ──────────────────────────────────────────────────────── */}
+      <div style={{
+        maxHeight: toolbarState === 'full' ? '120px' : 0,
+        opacity: toolbarState === 'full' ? 1 : 0,
+        overflow: 'hidden',
+        transition: tbTransition,
+        padding: toolbarState === 'full' ? '10px 16px' : '0 16px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'flex-end',
         gap: '16px',
         flexWrap: 'wrap',
-        letterSpacing: '0.02em',
-      }}
-    >
+      }}>
       {/* Left side — grouped tools */}
       <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
 
@@ -509,7 +538,93 @@ export function FixedToolbar({
             {t('wordcount.saved')} {new Date(lastSaved).toLocaleTimeString()}
           </span>
         )}
+        <button
+          type="button"
+          onClick={() => setTbState('collapsed')}
+          title="Collapse toolbar"
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px',
+            color: darkMode ? '#555' : '#ccc', fontSize: 11, lineHeight: 1,
+            marginTop: 2,
+          }}
+        >▲</button>
       </div>
+      </div>{/* end full toolbar */}
+
+      {/* ── COLLAPSED MINI BAR ─────────────────────────────────────────────────── */}
+      <div style={{
+        maxHeight: toolbarState === 'collapsed' ? '46px' : 0,
+        opacity: toolbarState === 'collapsed' ? 1 : 0,
+        overflow: 'hidden',
+        transition: tbTransition,
+      }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '7px 12px',
+        }}>
+          <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+            <ModernButton variant="secondary" size="sm" onClick={onSimplify} disabled={loading || !text.trim()}>
+              ✨ {copy.simplifyLabel}
+            </ModernButton>
+            <ModernButton variant="secondary" size="sm" onClick={onReadAloud}>
+              {t('toolbar.readAloud')}
+            </ModernButton>
+            <ModernButton variant={isListening ? 'primary' : 'secondary'} size="sm" onClick={onDictateToggle}>
+              {isListening ? <MicOff size={12} /> : <Mic size={12} />}
+              {t('toolbar.dictate')}
+            </ModernButton>
+            <ModernButton variant="success" size="sm" onClick={onSave} disabled={isSaving}>
+              <Save size={12} />
+              {isSaving ? t('toolbar.saving') : t('toolbar.save')}
+            </ModernButton>
+          </div>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <button
+              type="button"
+              onClick={() => setTbState('focus')}
+              title="Focus mode"
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                fontSize: 11, color: darkMode ? '#555' : '#bbb', padding: '2px 4px',
+              }}
+            >Focus</button>
+            <button
+              type="button"
+              onClick={() => setTbState('full')}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 4,
+                background: 'none', border: `1px solid ${darkMode ? '#444' : '#e0e0e0'}`,
+                borderRadius: 6, cursor: 'pointer', padding: '3px 10px',
+                fontSize: 11, color: darkMode ? '#888' : '#888',
+              }}
+            >
+              <span style={{ letterSpacing: '0.15em' }}>•••</span> all tools ▼
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── FOCUS STRIP ────────────────────────────────────────────────────────── */}
+      <div
+        onClick={() => setTbState('collapsed')}
+        style={{
+          maxHeight: toolbarState === 'focus' ? '30px' : 0,
+          opacity: toolbarState === 'focus' ? 1 : 0,
+          overflow: 'hidden',
+          transition: tbTransition,
+          cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}
+      >
+        <span style={{ fontSize: 11, color: darkMode ? '#555' : '#bbb', padding: '5px 0', userSelect: 'none' }}>
+          tap to show tools · <kbd style={{
+            padding: '1px 5px', border: `1px solid ${darkMode ? '#444' : '#e0e0e0'}`,
+            borderRadius: 3, fontSize: 10, fontFamily: 'monospace',
+            color: darkMode ? '#555' : '#bbb',
+          }}>Esc</kbd> to exit focus mode
+        </span>
+      </div>
+
     </div>
   );
 }
