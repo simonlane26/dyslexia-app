@@ -47,8 +47,6 @@ interface FixedToolbarProps {
   onSimplify: () => void;
   loading: boolean;
   onRewrite: () => void;
-  readingGuideEnabled: boolean;
-  onReadingGuideToggle: () => void;
   highlightMode: boolean;
   onHighlightToggle: () => void;
   grammarCheckEnabled: boolean;
@@ -87,8 +85,6 @@ export function FixedToolbar({
   onSimplify,
   loading,
   onRewrite,
-  readingGuideEnabled,
-  onReadingGuideToggle,
   highlightMode,
   onHighlightToggle,
   grammarCheckEnabled,
@@ -349,14 +345,6 @@ export function FixedToolbar({
               {t('toolbar.highlight')}
             </ModernButton>
 
-            <ModernButton
-              variant={readingGuideEnabled ? 'primary' : 'secondary'}
-              onClick={onReadingGuideToggle}
-              title="Toggle reading guide"
-              size="sm"
-            >
-              {t('toolbar.guide')}
-            </ModernButton>
           </div>
         </div>
 

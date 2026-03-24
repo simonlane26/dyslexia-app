@@ -27,7 +27,7 @@ import { useKeyboardShortcuts, KeyboardShortcut } from '@/hooks/useKeyboardShort
 import { GrammarCheck } from '@/components/GrammarCheck';
 import { SentenceRewriteModal } from '@/components/SentenceRewriteModal';
 import { CoachIntent } from '@/components/CoachIntentModal';
-import { ReadingGuide } from '@/components/ReadingGuide';
+import { ReadingSupportPanel, type ReadingMode } from '@/components/ReadingSupportPanel';
 import { FixedToolbar } from '@/components/FixedToolbar';
 import { CoachDrawer } from '@/components/CoachDrawer';
 import { AccessibilityDrawer } from '@/components/AccessibilityDrawer';
@@ -79,9 +79,8 @@ function PageBody() {
   // Grammar checking
   const [grammarCheckEnabled, setGrammarCheckEnabled] = useState(false);
 
-  // Reading Guide
-  const [readingGuideEnabled, setReadingGuideEnabled] = useState(false);
-  const [readingGuideType, setReadingGuideType] = useState<'line' | 'sentence' | 'ruler'>('line');
+  // Reading Support Panel
+  const [readingMode, setReadingMode] = useState<ReadingMode>('clean');
 
   // Writing Coach Drawer
   const [coachPanelOpen, setCoachPanelOpen] = useState(false);
@@ -1222,8 +1221,6 @@ function PageBody() {
         onSimplify={simplifyText}
         loading={loading}
         onRewrite={handleRewriteSentence}
-        readingGuideEnabled={readingGuideEnabled}
-        onReadingGuideToggle={() => setReadingGuideEnabled(!readingGuideEnabled)}
         highlightMode={highlightMode}
         onHighlightToggle={() => setHighlightMode(!highlightMode)}
         grammarCheckEnabled={grammarCheckEnabled}
@@ -1410,69 +1407,70 @@ function PageBody() {
             )}
           </div>
 
-          {highlightMode && isReading ? (
-            <SentenceHighlighter
-              text={text}
-              currentSentenceIndex={currentSentenceIndex}
-              theme={theme}
-              fontSize={fontSize}
-              fontFamily={getFontFamily()}
-              editorTextColor={editorTextColor}
-              bgColor={bgColor}
-              darkMode={darkMode}
-              highContrast={highContrast}
-            />
-          ) : readingGuideEnabled ? (
-            <ReadingGuide
-              text={text}
-              onTextChange={setText}
-              theme={theme}
-              fontSize={fontSize}
-              fontFamily={getFontFamily()}
-              bgColor={bgColor}
-              editorTextColor={editorTextColor}
-              darkMode={darkMode}
-              highContrast={highContrast}
-              guideType={readingGuideType}
-            />
-          ) : grammarCheckEnabled ? (
-            <GrammarCheck
-              text={text}
-              onTextChange={setText}
-              onApplyFix={handleApplyGrammarFix}
-              enabled={grammarCheckEnabled}
-              theme={theme}
-              fontSize={fontSize}
-              fontFamily={getFontFamily()}
-              bgColor={bgColor}
-              editorTextColor={editorTextColor}
-              darkMode={darkMode}
-              highContrast={highContrast}
-              isSchoolMode={schoolMode.isSchoolMode}
-            />
-          ) : (
-            <textarea
-              ref={textareaRef}
-              id="text"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              onMouseUp={handleTextareaMouseUp}
-              onKeyUp={() => setFloatingRewrite(null)}
-              placeholder={t('editor.placeholder')}
-              className="w-full transition-all duration-200 resize-none rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              style={{
-                backgroundColor: darkMode ? '#374151' : bgColor,
-                fontFamily: getFontFamily(),
-                fontSize: `${fontSize}px`,
-                color: editorTextColor,
-                caretColor: editorTextColor,
-                border: `2px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : '#e5e7eb'}`,
-                minHeight: '60vh',
-                maxHeight: '70vh',
-                padding: '30px',
-              }}
-            />
-          )}
+          <ReadingSupportPanel
+            text={text}
+            documentTitle={documentTitle}
+            mode={readingMode}
+            onModeChange={setReadingMode}
+            theme={theme}
+            fontSize={fontSize}
+            fontFamily={getFontFamily()}
+            bgColor={bgColor}
+            editorTextColor={editorTextColor}
+            darkMode={darkMode}
+            highContrast={highContrast}
+          >
+            {highlightMode && isReading ? (
+              <SentenceHighlighter
+                text={text}
+                currentSentenceIndex={currentSentenceIndex}
+                theme={theme}
+                fontSize={fontSize}
+                fontFamily={getFontFamily()}
+                editorTextColor={editorTextColor}
+                bgColor={bgColor}
+                darkMode={darkMode}
+                highContrast={highContrast}
+              />
+            ) : grammarCheckEnabled ? (
+              <GrammarCheck
+                text={text}
+                onTextChange={setText}
+                onApplyFix={handleApplyGrammarFix}
+                enabled={grammarCheckEnabled}
+                theme={theme}
+                fontSize={fontSize}
+                fontFamily={getFontFamily()}
+                bgColor={bgColor}
+                editorTextColor={editorTextColor}
+                darkMode={darkMode}
+                highContrast={highContrast}
+                isSchoolMode={schoolMode.isSchoolMode}
+              />
+            ) : (
+              <textarea
+                ref={textareaRef}
+                id="text"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onMouseUp={handleTextareaMouseUp}
+                onKeyUp={() => setFloatingRewrite(null)}
+                placeholder={t('editor.placeholder')}
+                className="w-full transition-all duration-200 resize-none rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                style={{
+                  backgroundColor: darkMode ? '#374151' : bgColor,
+                  fontFamily: getFontFamily(),
+                  fontSize: `${fontSize}px`,
+                  color: editorTextColor,
+                  caretColor: editorTextColor,
+                  border: `2px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : '#e5e7eb'}`,
+                  minHeight: '60vh',
+                  maxHeight: '70vh',
+                  padding: '30px',
+                }}
+              />
+            )}
+          </ReadingSupportPanel>
 
           {/* Error display */}
           {error && (
