@@ -134,7 +134,7 @@ export function ReadingSupportPanel({
     setProgress(0);
     setCurrentSentIdx(0);
     try {
-      const res = await fetch('/api/stories/speak', {
+      const res = await fetch('/api/reading-speak', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: text.slice(0, 10000) }),
