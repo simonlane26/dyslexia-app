@@ -208,14 +208,15 @@ export function ReadingSupportPanel({
     computeGuide(pIdx);
   }
 
-  // Keep guide in sync while scrolling
+  // Keep guide in sync while scrolling — re-run when mode changes so we
+  // pick up bodyRef (it's null in clean mode on initial mount)
   useEffect(() => {
     const el = bodyRef.current;
     if (!el) return;
     const onScroll = () => computeGuide(hoveredParaRef.current);
     el.addEventListener('scroll', onScroll, { passive: true });
     return () => el.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [mode]);
 
   async function handleWordTap(e: React.MouseEvent, word: string) {
     e.stopPropagation();
