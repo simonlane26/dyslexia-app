@@ -13,11 +13,15 @@ import {
 } from '@/lib/documentStorage';
 import { useToast } from './ToastContainer';
 
+const FREE_DOC_LIMIT = 3;
+
 interface DocumentManagerProps {
   onLoadDocument: (doc: Document) => void;
   onNewDocument: () => void;
   currentDocId: string | null;
   theme: any;
+  isPro: boolean;
+  onUpgradeClick: () => void;
   agentOpen?: boolean;
 }
 
@@ -26,6 +30,8 @@ export function DocumentManager({
   onNewDocument,
   currentDocId,
   theme,
+  isPro,
+  onUpgradeClick,
   agentOpen,
 }: DocumentManagerProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -204,10 +210,17 @@ export function DocumentManager({
             flexWrap: 'wrap',
           }}
         >
-          <ModernButton variant="primary" size="sm" onClick={onNewDocument}>
-            <Plus size={16} />
-            New Document
-          </ModernButton>
+          {!isPro && documents.length >= FREE_DOC_LIMIT ? (
+            <ModernButton variant="secondary" size="sm" onClick={onUpgradeClick} title={`Free plan: ${FREE_DOC_LIMIT} documents max`}>
+              <Plus size={16} />
+              New Document ⭐
+            </ModernButton>
+          ) : (
+            <ModernButton variant="primary" size="sm" onClick={onNewDocument}>
+              <Plus size={16} />
+              New Document
+            </ModernButton>
+          )}
           <ModernButton variant="secondary" size="sm" onClick={handleExport}>
             <Download size={16} />
             Export All

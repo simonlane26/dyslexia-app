@@ -29,6 +29,8 @@ interface Props {
   documentTitle: string;
   mode: ReadingMode;
   onModeChange: (m: ReadingMode) => void;
+  isPro: boolean;
+  onUpgradeClick: () => void;
   theme: any;
   fontSize: number;
   fontFamily: string;
@@ -77,6 +79,8 @@ export function ReadingSupportPanel({
   editorTextColor,
   darkMode,
   highContrast,
+  isPro,
+  onUpgradeClick,
   children,
 }: Props) {
   const [panelOpen, setPanelOpen] = useState(false);
@@ -345,28 +349,35 @@ export function ReadingSupportPanel({
           background: darkMode ? '#2a2a2a' : '#f5f5f0',
           borderRadius: 8, padding: 3, marginBottom: 10,
         }}>
-          {(['clean', 'guided', 'supported'] as ReadingMode[]).map(m => (
-            <button
-              key={m}
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onModeChange(m); }}
-              style={{
-                flex: 1, padding: '6px 8px', borderRadius: 6, cursor: 'pointer',
-                border: mode === m ? `1px solid ${border}` : '1px solid transparent',
-                background: mode === m ? (darkMode ? '#333' : '#fff') : 'transparent',
-                color: mode === m ? (darkMode ? '#e0e0e0' : '#1a1a1a') : (darkMode ? '#777' : '#999'),
-                fontWeight: mode === m ? 500 : 400,
-                fontSize: 12, textAlign: 'center', transition: 'all 0.2s',
-              }}
-            >
-              <span style={{ display: 'block' }}>
-                {m.charAt(0).toUpperCase() + m.slice(1)}
-              </span>
-              <span style={{ display: 'block', fontSize: 10, marginTop: 1, color: darkMode ? '#555' : '#bbb', fontWeight: 400 }}>
-                {m === 'clean' ? 'Just the text' : m === 'guided' ? 'Visual support' : 'Full audio'}
-              </span>
-            </button>
-          ))}
+          {(['clean', 'guided', 'supported'] as ReadingMode[]).map(m => {
+            const proOnly = m === 'guided' || m === 'supported';
+            const locked = proOnly && !isPro;
+            return (
+              <button
+                key={m}
+                type="button"
+                onClick={(e) => { e.stopPropagation(); if (locked) { onUpgradeClick(); } else { onModeChange(m); } }}
+                style={{
+                  flex: 1, padding: '6px 8px', borderRadius: 6, cursor: 'pointer',
+                  border: mode === m ? `1px solid ${border}` : '1px solid transparent',
+                  background: mode === m ? (darkMode ? '#333' : '#fff') : 'transparent',
+                  color: mode === m ? (darkMode ? '#e0e0e0' : '#1a1a1a') : (darkMode ? '#777' : '#999'),
+                  fontWeight: mode === m ? 500 : 400,
+                  fontSize: 12, textAlign: 'center', transition: 'all 0.2s',
+                  opacity: locked ? 0.65 : 1,
+                  position: 'relative',
+                }}
+              >
+                <span style={{ display: 'block' }}>
+                  {m.charAt(0).toUpperCase() + m.slice(1)}
+                  {locked && <span style={{ marginLeft: 4, fontSize: 9, background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', color: '#fff', borderRadius: 3, padding: '1px 4px', fontWeight: 700, verticalAlign: 'middle' }}>Pro</span>}
+                </span>
+                <span style={{ display: 'block', fontSize: 10, marginTop: 1, color: darkMode ? '#555' : '#bbb', fontWeight: 400 }}>
+                  {m === 'clean' ? 'Just the text' : m === 'guided' ? 'Visual support' : 'Full audio'}
+                </span>
+              </button>
+            );
+          })}
         </div>
         {/* Feature tags */}
         <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>

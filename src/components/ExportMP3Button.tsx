@@ -8,6 +8,7 @@ import { addExportRecord } from '@/lib/exportHistory';
 
 interface ExportMP3ButtonProps {
   text: string;
+  isPro: boolean;
   filename?: string;
   voiceId?: string;
   documentTitle?: string;
@@ -16,6 +17,7 @@ interface ExportMP3ButtonProps {
 
 export function ExportMP3Button({
   text,
+  isPro,
   filename = 'reading.mp3',
   voiceId,
   documentTitle,
@@ -25,11 +27,6 @@ export function ExportMP3Button({
   const [loading, setLoading] = useState(false);
 
   if (!isLoaded) return null;
-
-  // TEMPORARY: Always enable for testing
-  const isPro = true;
-  /* (user?.publicMetadata as any)?.isPro === true ||
-    (user?.unsafeMetadata as any)?.isPro === true; */
 
   const handleExport = async () => {
     if (!text?.trim()) {

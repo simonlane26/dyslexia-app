@@ -12,6 +12,19 @@ export interface SentenceAlternative {
   explanation: string;
 }
 
+const FREE_DAILY_LIMIT = 3;
+
+function getTodayKey() {
+  return `dw-rewrite-count-${new Date().toISOString().slice(0, 10)}`;
+}
+function getFreeRewritesUsed(): number {
+  return parseInt(localStorage.getItem(getTodayKey()) || '0', 10);
+}
+function incrementFreeRewrites() {
+  const key = getTodayKey();
+  localStorage.setItem(key, String(getFreeRewritesUsed() + 1));
+}
+
 interface SentenceRewriteModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -19,6 +32,8 @@ interface SentenceRewriteModalProps {
   onApply: (newSentence: string) => void;
   theme: any;
   darkMode: boolean;
+  isPro: boolean;
+  onUpgradeClick: () => void;
   intent?: CoachIntent | null;
 }
 
@@ -35,15 +50,25 @@ export function SentenceRewriteModal({
   onApply,
   theme,
   darkMode,
+  isPro,
+  onUpgradeClick,
   intent,
 }: SentenceRewriteModalProps) {
   const [state, setState] = useState<RewriteState>({ kind: 'idle' });
   const [appliedIndex, setAppliedIndex] = useState<number | null>(null);
   const [expandedExplain, setExpandedExplain] = useState<number | null>(null);
+  const [freeUsed, setFreeUsed] = useState(0);
+
+  useEffect(() => {
+    if (isOpen) setFreeUsed(getFreeRewritesUsed());
+  }, [isOpen]);
+
+  const freeLeft = Math.max(0, FREE_DAILY_LIMIT - freeUsed);
+  const canRewrite = isPro || freeLeft > 0;
 
   // Fetch alternatives when modal opens
   useEffect(() => {
-    if (isOpen && selectedSentence) {
+    if (isOpen && selectedSentence && canRewrite) {
       fetchAlternatives();
     }
   }, [isOpen, selectedSentence]);
@@ -100,10 +125,12 @@ export function SentenceRewriteModal({
   }
 
   function handleApply(alternative: SentenceAlternative, index: number) {
+    if (!isPro) {
+      incrementFreeRewrites();
+      setFreeUsed(getFreeRewritesUsed());
+    }
     onApply(alternative.text);
     setAppliedIndex(index);
-
-    // Close modal after short delay so user sees the checkmark
     setTimeout(() => {
       onClose();
       setAppliedIndex(null);
@@ -195,6 +222,40 @@ export function SentenceRewriteModal({
 
         {/* Body */}
         <div style={{ padding: '24px' }}>
+          {/* Free-tier limit banner */}
+          {!isPro && (
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '10px 14px', marginBottom: '16px', borderRadius: '10px',
+              background: freeLeft === 0 ? 'rgba(239,68,68,0.08)' : 'rgba(139,92,246,0.07)',
+              border: `1px solid ${freeLeft === 0 ? 'rgba(239,68,68,0.25)' : 'rgba(139,92,246,0.2)'}`,
+            }}>
+              <span style={{ fontSize: '13px', color: freeLeft === 0 ? '#ef4444' : (darkMode ? '#a78bfa' : '#7c3aed') }}>
+                {freeLeft === 0
+                  ? 'Daily limit reached — upgrade for unlimited rewrites'
+                  : `${freeLeft} of ${FREE_DAILY_LIMIT} free rewrites left today · Simpler mode only`}
+              </span>
+              <button
+                type="button"
+                onClick={onUpgradeClick}
+                style={{
+                  background: 'linear-gradient(135deg,#7c3aed,#4f46e5)',
+                  border: 'none', borderRadius: '6px', color: '#fff',
+                  fontSize: '12px', fontWeight: 700, padding: '4px 10px', cursor: 'pointer',
+                }}
+              >
+                Upgrade
+              </button>
+            </div>
+          )}
+
+          {/* Limit reached — no alternatives */}
+          {!isPro && freeLeft === 0 && (
+            <div style={{ textAlign: 'center', padding: '32px 0', color: darkMode ? '#9ca3af' : '#6b7280', fontSize: '14px' }}>
+              Upgrade to Pro for unlimited rewrites and all modes.
+            </div>
+          )}
+
           {/* Original Sentence */}
           <div
             style={{
@@ -314,6 +375,8 @@ export function SentenceRewriteModal({
               </div>
               {state.alternatives.map((alt, index) => {
                 const isApplied = appliedIndex === index;
+                // Free users can only use the first (Simpler) alternative
+                const isLocked = !isPro && index > 0;
 
                 return (
                   <div
@@ -322,39 +385,22 @@ export function SentenceRewriteModal({
                       padding: '20px',
                       backgroundColor: isApplied
                         ? 'rgba(34, 197, 94, 0.1)'
-                        : darkMode
-                        ? '#374151'
-                        : '#f9fafb',
-                      border: `2px solid ${
-                        isApplied
-                          ? '#22c55e'
-                          : theme.border
-                      }`,
+                        : darkMode ? '#374151' : '#f9fafb',
+                      border: `2px solid ${isApplied ? '#22c55e' : theme.border}`,
                       borderRadius: '12px',
                       transition: 'all 0.2s',
+                      opacity: isLocked ? 0.6 : 1,
                     }}
                   >
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        justifyContent: 'space-between',
-                        marginBottom: '12px',
-                      }}
-                    >
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span style={{ fontSize: '24px' }}>{alt.icon}</span>
-                        <span
-                          style={{
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            color: theme.text,
-                          }}
-                        >
+                        <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>
                           {alt.label}
                         </span>
+                        {isLocked && <span style={{ fontSize: '11px', background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', color: '#fff', borderRadius: '4px', padding: '1px 6px', fontWeight: 700 }}>Pro</span>}
                       </div>
-                      {!isApplied && (
+                      {!isApplied && !isLocked && (
                         <ModernButton
                           onClick={() => handleApply(alt, index)}
                           variant="primary"
@@ -362,6 +408,16 @@ export function SentenceRewriteModal({
                         >
                           Apply
                         </ModernButton>
+                      )}
+                      {!isApplied && isLocked && (
+                        <button
+                          type="button"
+                          title="Upgrade to Pro"
+                          onClick={onUpgradeClick}
+                          style={{ background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', border: 'none', borderRadius: '6px', color: '#fff', fontSize: '12px', fontWeight: 700, padding: '6px 12px', cursor: 'pointer' }}
+                        >
+                          Upgrade →
+                        </button>
                       )}
                       {isApplied && (
                         <div

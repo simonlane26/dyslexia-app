@@ -233,27 +233,16 @@ export function FixedToolbar({
                 {t('toolbar.rewrite')}
               </ModernButton>
             ) : (
-              <div style={{ position: 'relative' }}>
-                <ModernButton
-                  variant="secondary"
-                  onClick={() => setProPopover(proPopover === 'rewrite' ? null : 'rewrite')}
-                  title="Rewrite — Pro feature"
-                  size="sm"
-                  disabled={!text.trim()}
-                >
-                  <span style={{ fontSize: '11px', marginRight: '2px' }}>⭐</span>{t('toolbar.rewrite')}
-                </ModernButton>
-                {proPopover === 'rewrite' && (
-                  <ProUpgradePopover
-                    message={t('pro.rewriteDesc')}
-                    onUpgrade={() => { setProPopover(null); onUpgradeClick(); }}
-                    onDismiss={() => setProPopover(null)}
-                    unlockLabel={t('pro.unlock')}
-                    laterLabel={t('pro.later')}
-                    darkMode={darkMode}
-                  />
-                )}
-              </div>
+              // Free users can open the rewrite modal — Simpler mode only (3/day), enforced in modal
+              <ModernButton
+                variant="secondary"
+                onClick={onRewrite}
+                disabled={!text.trim()}
+                title="Rewrite — Simpler mode free (3/day)"
+                size="sm"
+              >
+                {t('toolbar.rewrite')}
+              </ModernButton>
             )}
 
             <div style={{ position: 'relative' }}>
@@ -471,9 +460,9 @@ export function FixedToolbar({
                       gap: '4px',
                     }}
                   >
-                    <ExportPDFButton text={text} documentTitle={documentTitle} />
-                    <ExportMP3Button text={text} documentTitle={documentTitle} />
-                    <ExportDOCXButton text={text} documentTitle={documentTitle} />
+                    <ExportPDFButton text={text} documentTitle={documentTitle} isPro={isPro} />
+                    <ExportMP3Button text={text} documentTitle={documentTitle} isPro={isPro} />
+                    <ExportDOCXButton text={text} documentTitle={documentTitle} enabled={isPro} />
                   </div>
                 </>
               )}

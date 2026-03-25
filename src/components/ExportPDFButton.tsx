@@ -8,15 +8,14 @@ import { Download } from 'lucide-react';
 
 interface ExportPDFButtonProps {
   text: string;
+  isPro: boolean;
   simplifiedText?: string;
   documentTitle?: string;
   documentId?: string;
 }
 
-export function ExportPDFButton({ text, simplifiedText, documentTitle, documentId }: ExportPDFButtonProps) {
+export function ExportPDFButton({ text, isPro, simplifiedText, documentTitle, documentId }: ExportPDFButtonProps) {
   const { user } = useUser();
-  // TEMPORARY: Always enable for testing
-  const isPro = true; // user?.publicMetadata?.isPro === true;
 
   const exportPDF = () => {
     const doc = new jsPDF();

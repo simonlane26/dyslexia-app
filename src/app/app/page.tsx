@@ -1412,6 +1412,8 @@ function PageBody() {
             documentTitle={documentTitle}
             mode={readingMode}
             onModeChange={setReadingMode}
+            isPro={isPro}
+            onUpgradeClick={() => router.push('/pricing')}
             theme={theme}
             fontSize={fontSize}
             fontFamily={getFontFamily()}
@@ -1560,6 +1562,8 @@ function PageBody() {
         onNewDocument={newDocument}
         currentDocId={currentDocId}
         theme={theme}
+        isPro={isPro}
+        onUpgradeClick={() => router.push('/pricing')}
         agentOpen={agentOpen}
       />
 
@@ -1577,6 +1581,8 @@ function PageBody() {
         onApply={handleApplyRewrite}
         theme={theme}
         darkMode={darkMode}
+        isPro={isPro}
+        onUpgradeClick={() => router.push('/pricing')}
         intent={currentIntentForRewrite}
       />
 
