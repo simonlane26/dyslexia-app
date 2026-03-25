@@ -403,17 +403,18 @@ export default function ModernPricingPage() {
 
                 <div style={{ marginBottom: '32px' }}>
                   <FeatureItem>5 simplifications per day</FeatureItem>
+                  <FeatureItem>3 inline rewrites per day (Simpler only)</FeatureItem>
+                  <FeatureItem>3 saved documents</FeatureItem>
                   <FeatureItem
                     icon={
                       <Volume2 size={18} style={{ color: '#6b7280' }} />
                     }
                   >
-                    Rachelle voice only
+                    Read Aloud — Rachelle voice
                   </FeatureItem>
-                  <FeatureItem>Basic writing tools</FeatureItem>
-                  <FeatureItem>Dyslexia-friendly fonts</FeatureItem>
-                  <FeatureItem>Reading progress tracker</FeatureItem>
-                  <FeatureItem>Export history tracking</FeatureItem>
+                  <FeatureItem>Clean reading mode</FeatureItem>
+                  <FeatureItem>Tap-to-decode vocabulary</FeatureItem>
+                  <FeatureItem>Dyslexia-friendly fonts &amp; colours</FeatureItem>
                   <FeatureItem>Keyboard shortcuts</FeatureItem>
                 </div>
 
@@ -486,19 +487,31 @@ export default function ModernPricingPage() {
                     highlighted
                     icon={<Sparkles size={18} style={{ color: '#10b981' }} />}
                   >
-                    Unlimited Simplifications
+                    Unlimited simplifications &amp; rewrites
                   </FeatureItem>
                   <FeatureItem
                     highlighted
                     icon={<Sparkles size={18} style={{ color: '#10b981' }} />}
                   >
-                    AI Writing Coach with structured feedback
+                    All rewrite modes (Simpler, Clearer, More confident)
+                  </FeatureItem>
+                  <FeatureItem
+                    highlighted
+                    icon={<Sparkles size={18} style={{ color: '#10b981' }} />}
+                  >
+                    AI Writing Coach &amp; Mentor
                   </FeatureItem>
                   <FeatureItem
                     highlighted
                     icon={<Volume2 size={18} style={{ color: '#10b981' }} />}
                   >
-                    All voices (Molly, Liam, etc.)
+                    All voices (Molly, Liam, Elli &amp; more)
+                  </FeatureItem>
+                  <FeatureItem
+                    highlighted
+                    icon={<Palette size={18} style={{ color: '#10b981' }} />}
+                  >
+                    Guided &amp; Supported reading modes
                   </FeatureItem>
                   <FeatureItem
                     highlighted
@@ -506,14 +519,8 @@ export default function ModernPricingPage() {
                   >
                     Export as MP3, PDF, DOC
                   </FeatureItem>
-                  <FeatureItem
-                    highlighted
-                    icon={<Palette size={18} style={{ color: '#10b981' }} />}
-                  >
-                    Advanced accessibility tools
-                  </FeatureItem>
-                  <FeatureItem highlighted>Reading progress tracking</FeatureItem>
-                  <FeatureItem highlighted>Export history analytics</FeatureItem>
+                  <FeatureItem highlighted>Unlimited saved documents</FeatureItem>
+                  <FeatureItem highlighted>Chrome extension</FeatureItem>
                 </div>
 
                 <div
@@ -602,19 +609,31 @@ export default function ModernPricingPage() {
                     highlighted
                     icon={<Sparkles size={18} style={{ color: '#10b981' }} />}
                   >
-                    Unlimited simplification
+                    Unlimited simplifications &amp; rewrites
                   </FeatureItem>
                   <FeatureItem
                     highlighted
                     icon={<Sparkles size={18} style={{ color: '#10b981' }} />}
                   >
-                    AI Writing Coach with structured feedback
+                    All rewrite modes (Simpler, Clearer, More confident)
+                  </FeatureItem>
+                  <FeatureItem
+                    highlighted
+                    icon={<Sparkles size={18} style={{ color: '#10b981' }} />}
+                  >
+                    AI Writing Coach &amp; Mentor
                   </FeatureItem>
                   <FeatureItem
                     highlighted
                     icon={<Volume2 size={18} style={{ color: '#10b981' }} />}
                   >
-                    All voices (Molly, Liam, etc.)
+                    All voices (Molly, Liam, Elli &amp; more)
+                  </FeatureItem>
+                  <FeatureItem
+                    highlighted
+                    icon={<Palette size={18} style={{ color: '#10b981' }} />}
+                  >
+                    Guided &amp; Supported reading modes
                   </FeatureItem>
                   <FeatureItem
                     highlighted
@@ -622,14 +641,8 @@ export default function ModernPricingPage() {
                   >
                     Export as MP3, PDF, DOC
                   </FeatureItem>
-                  <FeatureItem
-                    highlighted
-                    icon={<Palette size={18} style={{ color: '#10b981' }} />}
-                  >
-                    Advanced accessibility tools
-                  </FeatureItem>
-                  <FeatureItem highlighted>Reading progress tracking</FeatureItem>
-                  <FeatureItem highlighted>Export history analytics</FeatureItem>
+                  <FeatureItem highlighted>Unlimited saved documents</FeatureItem>
+                  <FeatureItem highlighted>Chrome extension</FeatureItem>
                 </div>
 
                 <SignedIn>
