@@ -83,6 +83,7 @@ export function ReadingSupportPanel({
   const [hoveredPara, setHoveredPara] = useState<number | null>(null);
   const [guideOverlay, setGuideOverlay] = useState<{ top: number; topH: number; botTop: number; botH: number } | null>(null);
   const [currentSentIdx, setCurrentSentIdx] = useState(-1);
+  const [currentWordIdx, setCurrentWordIdx] = useState(-1);
   const [audioState, setAudioState] = useState<'idle' | 'loading' | 'playing' | 'paused'>('idle');
   const [progress, setProgress] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState('');
@@ -92,6 +93,8 @@ export function ReadingSupportPanel({
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sentTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const wordTimingsRef = useRef<{ startMs: number; endMs: number }[]>([]);
   const outerRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const paraRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -99,6 +102,20 @@ export function ReadingSupportPanel({
 
   const paragraphs = useMemo(() => parseParagraphs(text), [text]);
   const total = useMemo(() => totalSents(paragraphs), [paragraphs]);
+
+  // Map global word index → global sentence index (matches ElevenLabs word count)
+  const wordSentMap = useMemo(() => {
+    const map: number[] = [];
+    let sentIdx = 0;
+    for (const sents of paragraphs) {
+      for (const sent of sents) {
+        const words = tokenise(sent).filter(t => /^[a-zA-Z'-]+$/.test(t));
+        for (let i = 0; i < words.length; i++) map.push(sentIdx);
+        sentIdx++;
+      }
+    }
+    return map;
+  }, [paragraphs]);
 
   // Reset when mode changes
   useEffect(() => {
@@ -115,25 +132,60 @@ export function ReadingSupportPanel({
   function stopAudio() {
     if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
     if (sentTimerRef.current) { clearInterval(sentTimerRef.current); sentTimerRef.current = null; }
+    if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
+    wordTimingsRef.current = [];
     setAudioState('idle');
+    setCurrentWordIdx(-1);
+  }
+
+  function startRafLoop(audio: HTMLAudioElement) {
+    function tick() {
+      if (!audioRef.current || audio.paused || audio.ended) { rafRef.current = null; return; }
+      const nowMs = audio.currentTime * 1000;
+      const timings = wordTimingsRef.current;
+
+      // Find active word — scan backwards from last position for efficiency
+      let found = -1;
+      for (let i = timings.length - 1; i >= 0; i--) {
+        if (nowMs >= timings[i].startMs) { found = i; break; }
+      }
+
+      if (found !== -1) {
+        setCurrentWordIdx(found);
+        const sentIdx = wordSentMap[found] ?? -1;
+        setCurrentSentIdx(sentIdx);
+      }
+
+      const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+      setProgress(pct);
+      const rem = Math.max(0, (audio.duration || 0) - audio.currentTime);
+      const m = Math.floor(rem / 60);
+      const s = Math.floor(rem % 60);
+      setTimeRemaining(`${m}:${s < 10 ? '0' : ''}${s}`);
+
+      rafRef.current = requestAnimationFrame(tick);
+    }
+    rafRef.current = requestAnimationFrame(tick);
   }
 
   async function handlePlayPause() {
     if (audioState === 'playing') {
       audioRef.current?.pause();
-      if (sentTimerRef.current) { clearInterval(sentTimerRef.current); sentTimerRef.current = null; }
+      if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
       setAudioState('paused');
       return;
     }
-    if (audioState === 'paused') {
-      if (audioRef.current) { audioRef.current.play(); setAudioState('playing'); return; }
-      startTimerKaraoke(currentSentIdx);
+    if (audioState === 'paused' && audioRef.current) {
+      audioRef.current.play();
+      setAudioState('playing');
+      startRafLoop(audioRef.current);
       return;
     }
     // Start fresh
     setAudioState('loading');
     setProgress(0);
     setCurrentSentIdx(0);
+    setCurrentWordIdx(-1);
     try {
       const res = await fetch('/api/reading-speak', {
         method: 'POST',
@@ -142,22 +194,21 @@ export function ReadingSupportPanel({
       });
       if (!res.ok) throw new Error('TTS failed');
       const data = await res.json();
+      wordTimingsRef.current = data.wordTimings || [];
       const audio = new Audio(`data:audio/mp3;base64,${data.audioBase64}`);
       audioRef.current = audio;
-      audio.ontimeupdate = () => {
-        const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
-        setProgress(pct);
-        const rem = Math.max(0, (audio.duration || 0) - audio.currentTime);
-        const m = Math.floor(rem / 60);
-        const s = Math.floor(rem % 60);
-        setTimeRemaining(`${m}:${s < 10 ? '0' : ''}${s}`);
-        const idx = Math.min(Math.floor(pct / 100 * total), total - 1);
-        setCurrentSentIdx(idx);
+      audio.onended = () => {
+        if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
+        setAudioState('idle');
+        setCurrentSentIdx(-1);
+        setCurrentWordIdx(-1);
+        setProgress(100);
       };
-      audio.onended = () => { setAudioState('idle'); setCurrentSentIdx(-1); setProgress(100); };
       audio.play();
       setAudioState('playing');
+      startRafLoop(audio);
     } catch {
+      // Fallback: timer-based karaoke if TTS fails
       startTimerKaraoke(0);
     }
   }
@@ -390,70 +441,78 @@ export function ReadingSupportPanel({
 
         {/* Text paragraphs */}
         <div style={{ fontSize, lineHeight: 2.1, letterSpacing: '0.4px', wordSpacing: '4px', fontFamily, color: editorTextColor }}>
-          {paragraphs.map((sentences, pIdx) => {
-            const hasActive = sentences.some((_, sIdx) => getGlobalSentIdx(paragraphs, pIdx, sIdx) === currentSentIdx);
-            const paraOpacity =
-              mode === 'supported' && currentSentIdx >= 0 ? (hasActive ? 1 : 0.15)
-              : mode === 'guided' && hoveredPara !== null ? (hoveredPara === pIdx ? 1 : 0.2)
-              : 1;
+          {(() => {
+            let wIdx = 0; // global word counter — aligns with wordTimingsRef indices
+            return paragraphs.map((sentences, pIdx) => {
+              const hasActive = sentences.some((_, sIdx) => getGlobalSentIdx(paragraphs, pIdx, sIdx) === currentSentIdx);
+              const paraOpacity =
+                mode === 'supported' && currentSentIdx >= 0 ? (hasActive ? 1 : 0.15)
+                : mode === 'guided' && hoveredPara !== null ? (hoveredPara === pIdx ? 1 : 0.2)
+                : 1;
 
-            return (
-              <div
-                key={pIdx}
-                ref={el => { paraRefs.current[pIdx] = el; }}
-                onMouseEnter={() => mode === 'guided' && handleParaHover(pIdx)}
-                onMouseLeave={() => mode === 'guided' && handleParaHover(null)}
-                style={{
-                  marginBottom: 18, padding: '4px 6px', borderRadius: 4,
-                  opacity: paraOpacity,
-                  background: mode === 'guided' && hoveredPara === pIdx ? 'rgba(250,238,218,0.15)' : 'transparent',
-                  transition: 'all 0.4s',
-                }}
-              >
-                {sentences.map((sent, sIdx) => {
-                  const gIdx = getGlobalSentIdx(paragraphs, pIdx, sIdx);
-                  const isActive = gIdx === currentSentIdx;
-                  const isPast = mode === 'supported' && currentSentIdx >= 0 && gIdx < currentSentIdx;
+              return (
+                <div
+                  key={pIdx}
+                  ref={el => { paraRefs.current[pIdx] = el; }}
+                  onMouseEnter={() => mode === 'guided' && handleParaHover(pIdx)}
+                  onMouseLeave={() => mode === 'guided' && handleParaHover(null)}
+                  style={{
+                    marginBottom: 18, padding: '4px 6px', borderRadius: 4,
+                    opacity: paraOpacity,
+                    background: mode === 'guided' && hoveredPara === pIdx ? 'rgba(250,238,218,0.15)' : 'transparent',
+                    transition: 'all 0.4s',
+                  }}
+                >
+                  {sentences.map((sent, sIdx) => {
+                    const gIdx = getGlobalSentIdx(paragraphs, pIdx, sIdx);
+                    const isActive = gIdx === currentSentIdx;
 
-                  return (
-                    <span
-                      key={sIdx}
-                      style={{
-                        padding: '2px 4px', borderRadius: 3,
-                        background: isActive ? '#FAEEDA' : 'transparent',
-                        color: mode === 'supported' && currentSentIdx >= 0
-                          ? (isActive ? (darkMode ? '#e0e0e0' : '#1a1a1a') : '#999')
-                          : 'inherit',
-                        transition: 'all 0.3s',
-                      }}
-                    >
-                      {tokenise(sent).map((token, tIdx) => {
-                        const isWord = /^[a-zA-Z'-]+$/.test(token) && token.length >= 2;
-                        if (!isWord) return <span key={tIdx}>{token}</span>;
-                        return (
-                          <span
-                            key={tIdx}
-                            onClick={(e) => handleWordTap(e, token)}
-                            style={{
-                              cursor: 'pointer',
-                              borderBottom: '1.5px dotted #5DCAA5',
-                              padding: '1px 1px',
-                              borderRadius: 2,
-                              transition: 'background 0.15s',
-                            }}
-                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(93,202,165,0.12)'; }}
-                            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
-                          >
-                            {token}
-                          </span>
-                        );
-                      })}
-                    </span>
-                  );
-                })}
-              </div>
-            );
-          })}
+                    return (
+                      <span
+                        key={sIdx}
+                        style={{
+                          padding: '2px 4px', borderRadius: 3,
+                          background: isActive ? '#FAEEDA' : 'transparent',
+                          color: mode === 'supported' && currentSentIdx >= 0
+                            ? (isActive ? (darkMode ? '#e0e0e0' : '#1a1a1a') : '#999')
+                            : 'inherit',
+                          transition: 'all 0.3s',
+                        }}
+                      >
+                        {tokenise(sent).map((token, tIdx) => {
+                          const isWord = /^[a-zA-Z'-]+$/.test(token);
+                          if (!isWord) return <span key={tIdx}>{token}</span>;
+                          const thisWIdx = wIdx++;
+                          const isCurrentWord = mode === 'supported' && thisWIdx === currentWordIdx;
+                          const isSpoken = mode === 'supported' && currentWordIdx >= 0 && thisWIdx < currentWordIdx;
+                          return (
+                            <span
+                              key={tIdx}
+                              onClick={(e) => handleWordTap(e, token)}
+                              style={{
+                                cursor: 'pointer',
+                                borderBottom: '1.5px dotted #5DCAA5',
+                                padding: '1px 1px',
+                                borderRadius: 2,
+                                background: isCurrentWord ? 'rgba(255,200,80,0.55)' : 'transparent',
+                                opacity: isSpoken ? 0.45 : 1,
+                                fontWeight: isCurrentWord ? 600 : 'inherit',
+                                transition: 'background 0.1s, opacity 0.2s',
+                              }}
+                              onMouseEnter={e => { if (!isCurrentWord) (e.currentTarget as HTMLElement).style.background = 'rgba(93,202,165,0.12)'; }}
+                              onMouseLeave={e => { if (!isCurrentWord) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                            >
+                              {token}
+                            </span>
+                          );
+                        })}
+                      </span>
+                    );
+                  })}
+                </div>
+              );
+            });
+          })()}
         </div>
 
         {/* Decode panel */}
