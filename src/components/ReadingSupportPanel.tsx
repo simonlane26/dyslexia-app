@@ -460,7 +460,7 @@ export function ReadingSupportPanel({
                     marginBottom: 18, padding: '4px 6px', borderRadius: 4,
                     opacity: paraOpacity,
                     background: mode === 'guided' && hoveredPara === pIdx ? 'rgba(250,238,218,0.15)' : 'transparent',
-                    transition: 'all 0.4s',
+                    transition: audioState === 'playing' ? 'opacity 0s' : 'all 0.4s',
                   }}
                 >
                   {sentences.map((sent, sIdx) => {
@@ -476,7 +476,7 @@ export function ReadingSupportPanel({
                           color: mode === 'supported' && currentSentIdx >= 0
                             ? (isActive ? (darkMode ? '#e0e0e0' : '#1a1a1a') : '#999')
                             : 'inherit',
-                          transition: 'all 0.3s',
+                          transition: audioState === 'playing' ? 'none' : 'all 0.3s',
                         }}
                       >
                         {tokenise(sent).map((token, tIdx) => {
@@ -497,7 +497,7 @@ export function ReadingSupportPanel({
                                 background: isCurrentWord ? 'rgba(255,200,80,0.55)' : 'transparent',
                                 opacity: isSpoken ? 0.45 : 1,
                                 fontWeight: isCurrentWord ? 600 : 'inherit',
-                                transition: 'background 0.1s, opacity 0.2s',
+                                transition: audioState === 'playing' ? 'none' : 'background 0.1s, opacity 0.2s',
                               }}
                               onMouseEnter={e => { if (!isCurrentWord) (e.currentTarget as HTMLElement).style.background = 'rgba(93,202,165,0.12)'; }}
                               onMouseLeave={e => { if (!isCurrentWord) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
