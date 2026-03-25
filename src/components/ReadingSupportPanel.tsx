@@ -141,7 +141,8 @@ export function ReadingSupportPanel({
   function startRafLoop(audio: HTMLAudioElement) {
     function tick() {
       if (!audioRef.current || audio.paused || audio.ended) { rafRef.current = null; return; }
-      const nowMs = audio.currentTime * 1000;
+      // Lookahead compensates for rAF→state→paint latency (~2 frames)
+      const nowMs = audio.currentTime * 1000 + 80;
       const timings = wordTimingsRef.current;
 
       // Find active word — scan backwards from last position for efficiency
