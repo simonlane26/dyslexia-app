@@ -241,7 +241,7 @@ export function FixedToolbar({
                   size="sm"
                   disabled={!text.trim()}
                 >
-                  {t('toolbar.rewrite')}
+                  <span style={{ fontSize: '11px', marginRight: '2px' }}>⭐</span>{t('toolbar.rewrite')}
                 </ModernButton>
                 {proPopover === 'rewrite' && (
                   <ProUpgradePopover
@@ -292,7 +292,7 @@ export function FixedToolbar({
                   title={`${copy.aiCoachLabel} — Pro feature`}
                   size="sm"
                 >
-                  💡 {copy.aiCoachButton}
+                  <span style={{ fontSize: '11px', marginRight: '2px' }}>⭐</span>💡 {copy.aiCoachButton}
                 </ModernButton>
                 {proPopover === 'coach' && (
                   <ProUpgradePopover
@@ -324,7 +324,7 @@ export function FixedToolbar({
                   title="Writing Mentor — Pro feature"
                   size="sm"
                 >
-                  {t('toolbar.mentor')}
+                  <span style={{ fontSize: '11px', marginRight: '2px' }}>⭐</span>{t('toolbar.mentor')}
                 </ModernButton>
                 {proPopover === 'agent' && (
                   <ProUpgradePopover
