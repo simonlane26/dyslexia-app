@@ -94,7 +94,10 @@ export function ReadingSupportPanel({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sentTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const rafRef = useRef<number | null>(null);
+  const rafFrameRef = useRef(0);
   const wordTimingsRef = useRef<{ startMs: number; endMs: number }[]>([]);
+  const lastWordIdxRef = useRef(-1);
+  const lastSentIdxRef = useRef(-1);
   const outerRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const paraRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -139,30 +142,42 @@ export function ReadingSupportPanel({
   }
 
   function startRafLoop(audio: HTMLAudioElement) {
+    lastWordIdxRef.current = -1;
+    lastSentIdxRef.current = -1;
+    rafFrameRef.current = 0;
+
     function tick() {
       if (!audioRef.current || audio.paused || audio.ended) { rafRef.current = null; return; }
-      // Lookahead compensates for rAF→state→paint latency (~2 frames)
       const nowMs = audio.currentTime * 1000 + 80;
       const timings = wordTimingsRef.current;
 
-      // Find active word — scan backwards from last position for efficiency
+      // Find active word — scan backwards for last word that has started
       let found = -1;
       for (let i = timings.length - 1; i >= 0; i--) {
         if (nowMs >= timings[i].startMs) { found = i; break; }
       }
 
-      if (found !== -1) {
+      // Only setState when word/sentence actually changes — avoids re-render every frame
+      if (found !== -1 && found !== lastWordIdxRef.current) {
+        lastWordIdxRef.current = found;
         setCurrentWordIdx(found);
         const sentIdx = wordSentMap[found] ?? -1;
-        setCurrentSentIdx(sentIdx);
+        if (sentIdx !== lastSentIdxRef.current) {
+          lastSentIdxRef.current = sentIdx;
+          setCurrentSentIdx(sentIdx);
+        }
       }
 
-      const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
-      setProgress(pct);
-      const rem = Math.max(0, (audio.duration || 0) - audio.currentTime);
-      const m = Math.floor(rem / 60);
-      const s = Math.floor(rem % 60);
-      setTimeRemaining(`${m}:${s < 10 ? '0' : ''}${s}`);
+      // Throttle progress/time to ~10fps — no need to re-render every frame
+      rafFrameRef.current++;
+      if (rafFrameRef.current % 6 === 0) {
+        const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+        setProgress(pct);
+        const rem = Math.max(0, (audio.duration || 0) - audio.currentTime);
+        const m = Math.floor(rem / 60);
+        const s = Math.floor(rem % 60);
+        setTimeRemaining(`${m}:${s < 10 ? '0' : ''}${s}`);
+      }
 
       rafRef.current = requestAnimationFrame(tick);
     }

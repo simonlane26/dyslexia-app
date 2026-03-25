@@ -111,12 +111,13 @@ export function FixedToolbar({
 }: FixedToolbarProps) {
   const t = useT();
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
-  const [toolbarState, setToolbarState] = useState<'full' | 'collapsed' | 'focus'>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('dw-toolbar-state') as 'full' | 'collapsed' | 'focus') || 'full';
-    }
-    return 'full';
-  });
+  // Start as 'full' to match SSR, then load from localStorage after mount
+  const [toolbarState, setToolbarState] = useState<'full' | 'collapsed' | 'focus'>('full');
+
+  useEffect(() => {
+    const stored = localStorage.getItem('dw-toolbar-state') as 'full' | 'collapsed' | 'focus';
+    if (stored === 'collapsed' || stored === 'focus') setToolbarState(stored);
+  }, []);
 
   function setTbState(s: 'full' | 'collapsed' | 'focus') {
     setToolbarState(s);
@@ -192,9 +193,10 @@ export function FixedToolbar({
     >
       {/* ── FULL TOOLBAR ──────────────────────────────────────────────────────── */}
       <div style={{
-        maxHeight: toolbarState === 'full' ? '120px' : 0,
+        maxHeight: toolbarState === 'full' ? '200px' : 0,
         opacity: toolbarState === 'full' ? 1 : 0,
-        overflow: 'hidden',
+        // visible when full so popovers aren't clipped; hidden during animation/collapse
+        overflow: toolbarState === 'full' ? 'visible' : 'hidden',
         transition: tbTransition,
         padding: toolbarState === 'full' ? '10px 16px' : '0 16px',
         display: 'flex',
