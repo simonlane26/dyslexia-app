@@ -34,7 +34,7 @@ import { AccessibilityDrawer } from '@/components/AccessibilityDrawer';
 import { AgentChat } from '@/components/AgentChat';
 import { useSchoolMode } from '@/hooks/useSchoolMode';
 import { getCopy } from '@/lib/schoolCopy';
-import { useT } from '@/lib/i18n';
+import { useT, useLanguage } from '@/lib/i18n';
 import {
   WelcomeScreen,
   StruggleSelection,
@@ -155,6 +155,7 @@ function PageBody() {
 
   // Hooks
   const t = useT();
+  const { locale } = useLanguage();
   const toast = useToast();
   const { user, isLoaded, isSignedIn } = useUser();
   const router = useRouter();
@@ -170,7 +171,23 @@ function PageBody() {
   const [darkMode, setDarkMode] = useState(false);
 
   // 🔊 Voice settings (chosen in SettingsPanel)
-  const [voiceId, setVoiceId] = useState('21m00Tcm4TlvDq8ikWAM'); // ElevenLabs default
+  const [voiceId, setVoiceId] = useState('EXAVITQu4vr4xnSDxMaL'); // Rachelle (default)
+
+  // Auto-switch voice when language changes
+  useEffect(() => {
+    const langVoices: Record<string, string> = {
+      fr: 'tMyQcCxfGDdIt7wJ2RQw', // Marie Alice
+      de: 'dFA3XRddYScy6ylAYTIO',  // Helmut
+      es: 'm7yTemJqdIqrcNleANfX',  // Anna Maria
+    };
+    const langVoiceIds = new Set(Object.values(langVoices));
+    if (langVoices[locale]) {
+      setVoiceId(langVoices[locale]);
+    } else if (langVoiceIds.has(voiceId)) {
+      setVoiceId('EXAVITQu4vr4xnSDxMaL'); // Back to Rachelle when switching to English
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale]);
 
   // Playback refs
   const audioRef = useRef<HTMLAudioElement | null>(null);

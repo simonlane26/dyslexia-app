@@ -15,6 +15,9 @@ const ALLOWED_VOICE_IDS = new Set([
   'wUwsnXivqGrDWuz1Fc89',
   'NFG5qt843uXKj4pFvR7C',
   'BL7YSL1bAkmW8U0JnU8o',
+  'tMyQcCxfGDdIt7wJ2RQw', // Marie Alice (French)
+  'dFA3XRddYScy6ylAYTIO', // Helmut (German)
+  'm7yTemJqdIqrcNleANfX', // Anna Maria (Spanish)
 ]);
 
 interface ElevenLabsAlignment {

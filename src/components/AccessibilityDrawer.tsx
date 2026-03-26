@@ -6,7 +6,7 @@ import { AccessibilityPresets } from './AccessibilityPresets';
 import { WritingTemplates } from './WritingTemplates';
 import { FocusMode } from './FocusMode';
 import { useEffect } from 'react';
-import { useT, LanguageSelector } from '@/lib/i18n';
+import { useT, useLanguage, LanguageSelector } from '@/lib/i18n';
 
 interface Theme {
   bg: string;
@@ -99,6 +99,7 @@ export function AccessibilityDrawer({
   editorTextColor,
 }: AccessibilityDrawerProps) {
   const t = useT();
+  const { locale } = useLanguage();
 
   // Close on Escape key
   useEffect(() => {
@@ -344,6 +345,7 @@ export function AccessibilityDrawer({
             <select
               value={voiceId}
               onChange={(e) => setVoiceId(e.target.value)}
+              title={t('a11y.ttsVoice')}
               style={{
                 width: '100%',
                 padding: '10px',
@@ -354,12 +356,22 @@ export function AccessibilityDrawer({
                 fontSize: '14px',
               }}
             >
-              <option value="en-GB-Standard-A">{t('a11y.voice.britishFemale')}</option>
-              <option value="en-GB-Standard-B">{t('a11y.voice.britishMale')}</option>
-              <option value="en-US-Standard-C">{t('a11y.voice.americanFemale')}</option>
-              <option value="en-US-Standard-D">{t('a11y.voice.americanMale')}</option>
-              <option value="en-AU-Standard-A">{t('a11y.voice.australianFemale')}</option>
-              <option value="en-AU-Standard-B">{t('a11y.voice.australianMale')}</option>
+              {locale === 'fr' ? (
+                <option value="tMyQcCxfGDdIt7wJ2RQw">Marie Alice (Français)</option>
+              ) : locale === 'de' ? (
+                <option value="dFA3XRddYScy6ylAYTIO">Helmut (Deutsch)</option>
+              ) : locale === 'es' ? (
+                <option value="m7yTemJqdIqrcNleANfX">Anna Maria (Español)</option>
+              ) : (
+                <>
+                  <option value="EXAVITQu4vr4xnSDxMaL">Rachelle</option>
+                  <option value="ZT9u07TYPVl83ejeLakq">{t('a11y.voice.britishFemale')}</option>
+                  <option value="jkSXBeN4g5pNelNQ3YWw">{t('a11y.voice.britishMale')}</option>
+                  <option value="wUwsnXivqGrDWuz1Fc89">{t('a11y.voice.americanFemale')}</option>
+                  <option value="NFG5qt843uXKj4pFvR7C">{t('a11y.voice.americanMale')}</option>
+                  <option value="BL7YSL1bAkmW8U0JnU8o">{t('a11y.voice.australianFemale')}</option>
+                </>
+              )}
             </select>
           </div>
 
