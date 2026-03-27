@@ -18,6 +18,7 @@ export function HeaderBar() {
   }, [isLoaded, user]);
 
   const isPro = useMemo(() => user?.publicMetadata?.isPro === true, [user?.publicMetadata]);
+  const isWorkplaceAdmin = useMemo(() => user?.publicMetadata?.workplaceRole === 'admin', [user?.publicMetadata]);
 
   return (
     <header className="sticky top-0 z-30 w-full border-b bg-white/70 backdrop-blur border-slate-200 dark:bg-slate-900/70 dark:border-slate-800">
@@ -45,6 +46,17 @@ export function HeaderBar() {
 
           {isLoaded && isSignedIn && (
             <>
+              {/* Workspace admin link */}
+              {isWorkplaceAdmin && (
+                <button
+                  type="button"
+                  onClick={() => router.push('/workplace/admin')}
+                  className="hidden sm:block text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition"
+                >
+                  Workspace Admin
+                </button>
+              )}
+
               {/* Manage subscription / Upgrade — left of Pro badge */}
               {isPro ? (
                 <button
