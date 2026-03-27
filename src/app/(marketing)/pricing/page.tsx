@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import React, { type CSSProperties } from 'react';
-import { Check, Star, Users, School, Sparkles, Volume2, Download, Palette } from 'lucide-react';
+import { Check, Star, Users, School, Sparkles, Volume2, Download, Palette, Briefcase } from 'lucide-react';
 
 /* ---------- Modern Button ---------- */
 
@@ -665,6 +665,133 @@ export default function ModernPricingPage() {
                 </SignedOut>
               </div>
             </PricingCard>
+          </div>
+        </div>
+
+        {/* Workplace Plans */}
+        <div style={{ marginBottom: '80px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', justifyContent: 'center' }}>
+            <Briefcase size={24} style={{ color: '#185FA5' }} />
+            <h2 style={{ fontSize: '2rem', fontWeight: 700, color: '#1e293b', margin: 0 }}>
+              For Workplaces
+            </h2>
+          </div>
+          <p style={{ textAlign: 'center', color: '#64748b', fontSize: '14px', marginBottom: '40px' }}>
+            Access to Work eligible — employees can claim the full cost through DWP
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', maxWidth: '1000px', margin: '0 auto' }}>
+            {/* Starter */}
+            <PricingCard>
+              <div style={{ padding: '32px', position: 'relative' }}>
+                <div style={{ position: 'absolute', top: '16px', left: '50%', transform: 'translateX(-50%)', background: '#FEF3C7', color: '#92400E', fontSize: '11px', fontWeight: 600, padding: '3px 12px', borderRadius: '20px', whiteSpace: 'nowrap', zIndex: 1 }}>
+                  Coming Soon
+                </div>
+                <div style={{ textAlign: 'center', marginBottom: '32px', marginTop: '24px' }}>
+                  <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>Starter</h3>
+                  <div style={{ color: '#64748b', fontSize: '13px', marginBottom: '12px' }}>Individual employees</div>
+                  <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0F6E56', marginBottom: '2px' }}>£120</div>
+                  <div style={{ color: '#64748b', fontSize: '13px' }}>per user / year</div>
+                  <div style={{ color: '#9ca3af', fontSize: '11px', fontStyle: 'italic', marginTop: '2px' }}>£10/month per user · 1–5 users</div>
+                </div>
+                <div style={{ marginBottom: '32px' }}>
+                  <FeatureItem highlighted>Full Pro features per user</FeatureItem>
+                  <FeatureItem>Chrome extension included</FeatureItem>
+                  <FeatureItem>All ElevenLabs voices</FeatureItem>
+                  <FeatureItem>Usage reports per employee</FeatureItem>
+                  <FeatureItem>Email &amp; chat support</FeatureItem>
+                  <FeatureItem highlighted>Access to Work eligible</FeatureItem>
+                </div>
+                <ModernButton variant="ghost" size="lg" style={{ width: '100%', opacity: 0.6, cursor: 'default' }} disabled>
+                  Coming Soon
+                </ModernButton>
+              </div>
+            </PricingCard>
+
+            {/* Business */}
+            <PricingCard featured>
+              <div style={{ padding: '32px', position: 'relative' }}>
+                <div style={{ position: 'absolute', top: '16px', left: '50%', transform: 'translateX(-50%)', background: '#FEF3C7', color: '#92400E', fontSize: '11px', fontWeight: 600, padding: '3px 12px', borderRadius: '20px', whiteSpace: 'nowrap', zIndex: 1 }}>
+                  Coming Soon
+                </div>
+                <div style={{ position: 'absolute', top: '20px', right: '20px', background: 'linear-gradient(135deg, #534AB7 0%, #7C3AED 100%)', color: 'white', padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 600 }}>
+                  Most Popular
+                </div>
+                <div style={{ textAlign: 'center', marginBottom: '32px', marginTop: '24px' }}>
+                  <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>Business</h3>
+                  <div style={{ color: '#64748b', fontSize: '13px', marginBottom: '12px' }}>Teams and departments</div>
+                  <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#534AB7', marginBottom: '2px' }}>£95</div>
+                  <div style={{ color: '#64748b', fontSize: '13px' }}>per user / year</div>
+                  <div style={{ color: '#9ca3af', fontSize: '11px', fontStyle: 'italic', marginTop: '2px' }}>£7.92/month per user · 6–50 users</div>
+                </div>
+                <div style={{ marginBottom: '32px' }}>
+                  <FeatureItem highlighted>Everything in Starter</FeatureItem>
+                  <FeatureItem highlighted>Admin dashboard</FeatureItem>
+                  <FeatureItem>Bulk user management</FeatureItem>
+                  <FeatureItem>Usage analytics for HR</FeatureItem>
+                  <FeatureItem>SSO integration</FeatureItem>
+                  <FeatureItem>Onboarding session included</FeatureItem>
+                  <FeatureItem>Priority support</FeatureItem>
+                </div>
+                <ModernButton variant="ghost" size="lg" style={{ width: '100%', opacity: 0.6, cursor: 'default' }} disabled>
+                  Coming Soon
+                </ModernButton>
+              </div>
+            </PricingCard>
+
+            {/* Enterprise */}
+            <PricingCard>
+              <div style={{ padding: '32px', position: 'relative' }}>
+                <div style={{ position: 'absolute', top: '16px', left: '50%', transform: 'translateX(-50%)', background: '#FEF3C7', color: '#92400E', fontSize: '11px', fontWeight: 600, padding: '3px 12px', borderRadius: '20px', whiteSpace: 'nowrap', zIndex: 1 }}>
+                  Coming Soon
+                </div>
+                <div style={{ textAlign: 'center', marginBottom: '32px', marginTop: '24px' }}>
+                  <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>Enterprise</h3>
+                  <div style={{ color: '#64748b', fontSize: '13px', marginBottom: '12px' }}>Organisation-wide</div>
+                  <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#185FA5', marginBottom: '2px' }}>Custom</div>
+                  <div style={{ color: '#64748b', fontSize: '13px' }}>volume pricing</div>
+                  <div style={{ color: '#9ca3af', fontSize: '11px', fontStyle: 'italic', marginTop: '2px' }}>From £60/user/year at scale · 50+ users</div>
+                </div>
+                <div style={{ marginBottom: '32px' }}>
+                  <FeatureItem highlighted>Everything in Business</FeatureItem>
+                  <FeatureItem highlighted>Unlimited users</FeatureItem>
+                  <FeatureItem>Accessibility passport reports</FeatureItem>
+                  <FeatureItem>Custom branding</FeatureItem>
+                  <FeatureItem>API access</FeatureItem>
+                  <FeatureItem>Dedicated account manager</FeatureItem>
+                  <FeatureItem>Equality Act compliance pack</FeatureItem>
+                  <FeatureItem>Quarterly impact reports</FeatureItem>
+                </div>
+                <ModernButton variant="ghost" size="lg" style={{ width: '100%', opacity: 0.6, cursor: 'default' }} disabled>
+                  Coming Soon
+                </ModernButton>
+              </div>
+            </PricingCard>
+          </div>
+
+          {/* Comparison + Access to Work note */}
+          <div style={{ maxWidth: '1000px', margin: '32px auto 0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+            <div style={{ background: '#f8f8f5', borderRadius: '12px', padding: '20px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#1e293b', marginBottom: '12px' }}>How we compare to TextHelp Read&amp;Write</div>
+              {[
+                { label: 'TextHelp single licence (3yr)', value: '£378–500/user/year', highlight: false },
+                { label: 'DyslexiaWrite Starter', value: '£120/user/year', highlight: false },
+                { label: 'DyslexiaWrite Business', value: '£95/user/year', highlight: false },
+                { label: 'Your saving vs TextHelp', value: '68–81% cheaper', highlight: true },
+              ].map((row) => (
+                <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', padding: '6px 0', borderBottom: '1px solid #e8e8e8' }}>
+                  <span style={{ color: '#64748b' }}>{row.label}</span>
+                  <span style={{ fontWeight: 600, color: row.highlight ? '#1D9E75' : '#1e293b' }}>{row.value}</span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ background: '#E1F5EE', borderRadius: '12px', padding: '20px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#085041', marginBottom: '8px' }}>Access to Work funding</div>
+              <div style={{ fontSize: '12px', color: '#0F6E56', lineHeight: 1.6 }}>
+                DyslexiaWrite is eligible for Access to Work funding. Employees can claim the full licence cost through the DWP scheme — meaning the employer pays nothing. We provide all documentation needed for the application.
+              </div>
+            </div>
           </div>
         </div>
 
