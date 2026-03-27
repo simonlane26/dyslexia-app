@@ -44,9 +44,10 @@ async function revokeClerkWorkplace(clerkUserId: string) {
 // DELETE /api/workplace/members/[userId] — remove a member by their DB row id
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   void req;
+  const { userId: memberId } = await params;
   const { userId: adminId } = await auth();
   if (!adminId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -65,7 +66,7 @@ export async function DELETE(
   const { data: member } = await db
     .from('workplace_members')
     .select('id, clerk_user_id, role')
-    .eq('id', params.userId)
+    .eq('id', memberId)
     .eq('workplace_id', workplaceId)
     .maybeSingle();
 
