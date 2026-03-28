@@ -407,7 +407,7 @@ export function WorkplaceAdminDashboard() {
       </div>
 
       <p style={{ textAlign: 'center', fontSize: 12, color: '#9ca3af', marginTop: 24 }}>
-        Need more licences or help? Email <a href="mailto:support@dyslexiawriter.com" style={{ color: '#185FA5' }}>support@dyslexiawriter.com</a>
+        Need more licences or help? Email <a href="mailto:Dyslexiawrite@gmail.com" style={{ color: '#185FA5' }}>Dyslexiawrite@gmail.com</a>
       </p>
     </div>
   );
