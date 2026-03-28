@@ -27,6 +27,18 @@ export function LandingHeader() {
           >
             Pricing
           </Link>
+          <Link
+            href="/enterprise"
+            className="hidden text-sm font-medium transition text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100 sm:block"
+          >
+            For Employers
+          </Link>
+          <Link
+            href="/access-to-work"
+            className="hidden text-sm font-medium transition text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100 sm:block"
+          >
+            Access to Work
+          </Link>
 
           <div className="flex items-center gap-3">
             <SignedOut>
