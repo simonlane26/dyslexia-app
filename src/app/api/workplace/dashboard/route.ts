@@ -67,6 +67,28 @@ export async function GET() {
   const totalSimplifications = activeMembers.reduce((sum, m) => sum + (m.simplifications_used ?? 0), 0);
   const totalRewrites = activeMembers.reduce((sum, m) => sum + (m.rewrites_used ?? 0), 0);
 
+  // Decoder stats for current calendar month
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+
+  const { data: decoderRows } = await db
+    .from('decoder_logs')
+    .select('document_type')
+    .eq('workplace_id', workplaceId)
+    .gte('decoded_at', monthStart.toISOString());
+
+  const totalDecoded = (decoderRows ?? []).length;
+  const typeCounts: Record<string, number> = {};
+  for (const row of decoderRows ?? []) {
+    const t = row.document_type || 'Document';
+    typeCounts[t] = (typeCounts[t] ?? 0) + 1;
+  }
+  const topDocumentTypes = Object.entries(typeCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([type, count]) => ({ type, count }));
+
   return NextResponse.json({
     workplace,
     members: members ?? [],
@@ -77,6 +99,10 @@ export async function GET() {
       activeThisWeek,
       totalSimplifications,
       totalRewrites,
+    },
+    decoderStats: {
+      totalDecoded,
+      topDocumentTypes,
     },
   });
 }

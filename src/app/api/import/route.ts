@@ -6,6 +6,9 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import OpenAI from 'openai';
 import { analyseDocument } from '@/lib/document-decoder';
+import { createSupabaseServerClient } from '@/lib/supabase';
+
+const FREE_DECODE_LIMIT = 2;
 
 function toArrayBuffer(buf: Buffer): ArrayBuffer {
   const { buffer, byteOffset, byteLength } = buf;
@@ -31,10 +34,40 @@ export async function POST(req: Request) {
 
     if (!file) return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
 
-    // Decode mode requires auth (uses OpenAI)
+    let userId: string | null = null;
+    let isPro = false;
+    let workplaceId: string | null = null;
+
     if (mode === 'decode') {
-      const { userId } = await auth();
+      const session = await auth();
+      userId = session.userId ?? null;
       if (!userId) return NextResponse.json({ error: 'Sign in to use Document Decoder' }, { status: 401 });
+
+      const meta = (session.sessionClaims?.publicMetadata ?? {}) as Record<string, unknown>;
+      isPro = !!meta.isPro;
+      workplaceId = (meta.workplaceId as string) ?? null;
+
+      // Rate-limit free users to FREE_DECODE_LIMIT per calendar month
+      if (!isPro) {
+        const month = new Date().toISOString().slice(0, 7); // 'YYYY-MM'
+        let db;
+        try { db = createSupabaseServerClient(); } catch { /* no Supabase — skip limit */ }
+        if (db) {
+          const { data: usage } = await db
+            .from('decoder_usage')
+            .select('count')
+            .eq('user_id', userId)
+            .eq('month', month)
+            .maybeSingle();
+          const used = (usage as any)?.count ?? 0;
+          if (used >= FREE_DECODE_LIMIT) {
+            return NextResponse.json(
+              { error: 'limit_reached', used, limit: FREE_DECODE_LIMIT },
+              { status: 429 }
+            );
+          }
+        }
+      }
     }
 
     const arrayBuffer = await file.arrayBuffer();
@@ -90,6 +123,25 @@ export async function POST(req: Request) {
 
     if (mode === 'decode') {
       const analysis = await analyseDocument(clean);
+
+      // Record usage and log (fire-and-forget — don't block the response)
+      if (userId) {
+        const month = new Date().toISOString().slice(0, 7);
+        let db;
+        try { db = createSupabaseServerClient(); } catch { /* skip */ }
+        if (db) {
+          // Increment monthly counter (also handles first use via upsert)
+          void db.rpc('increment_decoder_usage', { p_user_id: userId, p_month: month });
+
+          // Log per-decode row for workplace analytics
+          void db.from('decoder_logs').insert({
+            user_id: userId,
+            workplace_id: workplaceId || null,
+            document_type: analysis.documentType || 'Document',
+          });
+        }
+      }
+
       return NextResponse.json({ text: clean, analysis, decoded: true });
     }
 

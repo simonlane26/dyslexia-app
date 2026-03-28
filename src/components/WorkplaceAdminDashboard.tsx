@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { UserPlus, Trash2, Users, Activity, Zap, RefreshCw, Copy, Check } from 'lucide-react';
+import { UserPlus, Trash2, Users, Activity, Zap, RefreshCw, Copy, Check, FileSearch } from 'lucide-react';
 
 interface Workplace {
   id: string;
@@ -34,10 +34,16 @@ interface Stats {
   totalRewrites: number;
 }
 
+interface DecoderStats {
+  totalDecoded: number;
+  topDocumentTypes: { type: string; count: number }[];
+}
+
 interface DashboardData {
   workplace: Workplace;
   members: Member[];
   stats: Stats;
+  decoderStats: DecoderStats;
 }
 
 const PLAN_LABELS: Record<string, string> = {
@@ -176,7 +182,7 @@ export function WorkplaceAdminDashboard() {
 
   if (!data) return null;
 
-  const { workplace, members, stats } = data;
+  const { workplace, members, stats, decoderStats } = data;
   const activeMembers = members.filter(m => m.is_active);
   const licencePct = Math.round((stats.licencesUsed / stats.licencesTotal) * 100);
 
@@ -217,6 +223,7 @@ export function WorkplaceAdminDashboard() {
         <StatCard label="Active this week" value={stats.activeThisWeek} sub="unique users" color="#0F6E56" />
         <StatCard label="Simplifications" value={stats.totalSimplifications.toLocaleString()} sub="all time" color="#534AB7" />
         <StatCard label="Rewrites" value={stats.totalRewrites.toLocaleString()} sub="all time" color="#D85A30" />
+        <StatCard label="Documents decoded" value={decoderStats?.totalDecoded ?? 0} sub="this month" color="#0891b2" />
       </div>
 
       {/* Licence bar */}
@@ -271,6 +278,37 @@ export function WorkplaceAdminDashboard() {
           If the user already has an account, Pro access is granted immediately. Otherwise, it activates when they sign up.
         </p>
       </div>
+
+      {/* Document Decoder insights */}
+      {decoderStats && decoderStats.topDocumentTypes.length > 0 && (
+        <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', padding: '20px 24px', marginBottom: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <FileSearch size={18} style={{ color: '#0891b2' }} />
+            <h2 style={{ fontSize: 16, fontWeight: 600, color: '#111827', margin: 0 }}>Document Decoder — this month</h2>
+          </div>
+          <p style={{ fontSize: 13, color: '#6b7280', margin: '0 0 16px' }}>
+            Employees decoded <strong>{decoderStats.totalDecoded}</strong> document{decoderStats.totalDecoded !== 1 ? 's' : ''} this month.
+            The types below are causing the most confusion — consider rewriting them in plain English.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {decoderStats.topDocumentTypes.map(({ type, count }, i) => {
+              const pct = Math.round((count / decoderStats.totalDecoded) * 100);
+              const barColors = ['#0891b2', '#185FA5', '#534AB7', '#0F6E56', '#D85A30'];
+              return (
+                <div key={type}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#374151', marginBottom: 4 }}>
+                    <span style={{ fontWeight: 500 }}>{type}</span>
+                    <span style={{ color: '#6b7280' }}>{count} decode{count !== 1 ? 's' : ''}</span>
+                  </div>
+                  <div style={{ height: 6, background: '#F3F4F6', borderRadius: 3, overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${pct}%`, background: barColors[i % barColors.length], borderRadius: 3, transition: 'width 0.3s' }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Members table */}
       <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', overflow: 'hidden' }}>

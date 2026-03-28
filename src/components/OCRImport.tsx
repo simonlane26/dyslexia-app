@@ -146,6 +146,12 @@ export default function OCRImport({ onTextAction }: OCRProps) {
       form.append('mode', mode);
       const res = await fetch('/api/import', { method: 'POST', body: form });
       const data = await res.json();
+      if (res.status === 429) {
+        setError(`You've used your ${data.limit} free decodes this month. Upgrade to Pro for unlimited decoding.`);
+        setProgress('');
+        setRunning(false);
+        return;
+      }
       if (!res.ok) throw new Error(data.error || 'Upload failed');
 
       if (mode === 'decode' && data.decoded) {
