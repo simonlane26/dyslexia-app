@@ -1,17 +1,15 @@
-export const runtime = 'nodejs';         // Node runtime (pdf-parse & mammoth need Node)
-export const dynamic = 'force-dynamic';  // allow file uploads
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
+import OpenAI from 'openai';
+import { analyseDocument } from '@/lib/document-decoder';
 
-// Normalize a Node Buffer into a *real* ArrayBuffer (never SharedArrayBuffer)
 function toArrayBuffer(buf: Buffer): ArrayBuffer {
   const { buffer, byteOffset, byteLength } = buf;
-  // If it's already a plain ArrayBuffer, slice a view
-  if (buffer instanceof ArrayBuffer) {
-    return buffer.slice(byteOffset, byteOffset + byteLength);
-  }
-  // Otherwise (SharedArrayBuffer), copy into a new ArrayBuffer
+  if (buffer instanceof ArrayBuffer) return buffer.slice(byteOffset, byteOffset + byteLength);
   const ab = new ArrayBuffer(byteLength);
   new Uint8Array(ab).set(new Uint8Array(buf));
   return ab;
@@ -29,8 +27,14 @@ export async function POST(req: Request) {
 
     const form = await req.formData();
     const file = form.get('file') as File | null;
-    if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+    const mode = (form.get('mode') as string) || 'import'; // 'import' | 'decode'
+
+    if (!file) return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+
+    // Decode mode requires auth (uses OpenAI)
+    if (mode === 'decode') {
+      const { userId } = await auth();
+      if (!userId) return NextResponse.json({ error: 'Sign in to use Document Decoder' }, { status: 401 });
     }
 
     const arrayBuffer = await file.arrayBuffer();
@@ -41,7 +45,6 @@ export async function POST(req: Request) {
     let extractedText = '';
 
     if (mime.includes('pdf') || name.endsWith('.pdf')) {
-      // Dynamically import to avoid build-time evaluation
       const pdfParseMod = await import('pdf-parse');
       const pdfParse = (pdfParseMod as any).default || (pdfParseMod as any);
       const data = await pdfParse(nodeBuffer);
@@ -54,25 +57,49 @@ export async function POST(req: Request) {
       const mammoth = (mammothMod as any).default || (mammothMod as any);
       const res = await mammoth.extractRawText({ arrayBuffer: toArrayBuffer(nodeBuffer) });
       extractedText = (res?.value as string) ?? '';
+    } else if (mime.startsWith('image/') || /\.(jpg|jpeg|png|webp|gif)$/.test(name)) {
+      // GPT-4o vision OCR for images
+      const base64 = nodeBuffer.toString('base64');
+      const openai = new OpenAI();
+      const ocrResponse = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'image_url',
+              image_url: { url: `data:${mime || 'image/jpeg'};base64,${base64}`, detail: 'high' },
+            },
+            {
+              type: 'text',
+              text: 'Extract ALL text from this document image exactly as written. Preserve structure, dates, amounts, and reference numbers precisely.',
+            },
+          ],
+        }],
+        max_tokens: 4000,
+      });
+      extractedText = ocrResponse.choices[0]?.message?.content || '';
     } else {
       return NextResponse.json(
-        { error: 'Unsupported file type. Please upload a PDF or DOCX.' },
+        { error: 'Unsupported file type. Upload a PDF, DOCX, or image (JPG/PNG).' },
         { status: 415 }
       );
     }
 
     const clean = extractedText.replace(/\r/g, '').replace(/[ \t]+\n/g, '\n').trim();
+
+    if (mode === 'decode') {
+      const analysis = await analyseDocument(clean);
+      return NextResponse.json({ text: clean, analysis, decoded: true });
+    }
+
     return NextResponse.json({ text: clean });
   } catch (err: any) {
     console.error('Import error:', err);
-    return NextResponse.json(
-      { error: err?.message || 'Failed to parse file' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: err?.message || 'Failed to parse file' }, { status: 500 });
   }
 }
 
 export async function GET() {
   return NextResponse.json({ status: 'ok' });
 }
-
