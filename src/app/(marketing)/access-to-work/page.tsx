@@ -203,7 +203,7 @@ export default function AccessToWorkPage() {
           </div>
           <div style={S.priceNote}><strong style={{ color: '#085041' }}>You pay nothing.</strong> The DWP covers the full cost through your Access to Work grant. We invoice them directly on your behalf.</div>
           <a
-            href={`mailto:enterprise@dyslexiawrite.com?subject=Access%20to%20Work%20licence%20claim&body=Hi%2C%0A%0AI%20have%20an%20Access%20to%20Work%20grant%20and%20would%20like%20to%20claim%20a%20${encodeURIComponent(plans[selectedPlan].per)}%20DyslexiaWrite%20licence.%0A%0AMy%20Access%20to%20Work%20reference%20number%20is%3A%20%0AMy%20name%20is%3A%20%0A%0AThank%20you`}
+            href={`mailto:Dyslexiawrite@gmail.com?subject=Access%20to%20Work%20licence%20claim&body=Hi%2C%0A%0AI%20have%20an%20Access%20to%20Work%20grant%20and%20would%20like%20to%20claim%20a%20${encodeURIComponent(plans[selectedPlan].per)}%20DyslexiaWrite%20licence.%0A%0AMy%20Access%20to%20Work%20reference%20number%20is%3A%20%0AMy%20name%20is%3A%20%0A%0AThank%20you`}
             style={S.claimBtn}
           >
             Claim with Access to Work grant
@@ -239,7 +239,7 @@ export default function AccessToWorkPage() {
           <h3 style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: 20, fontWeight: 600, color: '#3C3489', marginBottom: 8 }}>Need help with your application?</h3>
           <p style={{ fontSize: 14, color: '#534AB7', lineHeight: 1.6, marginBottom: 16 }}>We know the Access to Work process can feel daunting. We're happy to support you at every step — just get in touch.</p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="mailto:support@dyslexiawrite.com?subject=Access%20to%20Work%20help" style={{ padding: '10px 20px', borderRadius: 8, fontSize: 14, fontWeight: 500, background: '#534AB7', color: '#fff', textDecoration: 'none' }}>Email us for help</a>
+            <a href="mailto:Dyslexiawrite@gmail.com?subject=Access%20to%20Work%20help" style={{ padding: '10px 20px', borderRadius: 8, fontSize: 14, fontWeight: 500, background: '#534AB7', color: '#fff', textDecoration: 'none' }}>Email us for help</a>
             <Link href="/enterprise" style={{ padding: '10px 20px', borderRadius: 8, fontSize: 14, fontWeight: 500, background: '#fff', color: '#3C3489', textDecoration: 'none', border: '1px solid #CECBF6' }}>For employers →</Link>
           </div>
         </div>
