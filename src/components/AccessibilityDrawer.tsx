@@ -5,6 +5,7 @@ import { ModernButton } from './ModernButton';
 import { AccessibilityPresets } from './AccessibilityPresets';
 import { WritingTemplates } from './WritingTemplates';
 import { FocusMode } from './FocusMode';
+import { AccessibilityPassport } from './AccessibilityPassport';
 import { useEffect } from 'react';
 import { useT, useLanguage, LanguageSelector } from '@/lib/i18n';
 
@@ -380,10 +381,23 @@ export function AccessibilityDrawer({
             <LanguageSelector />
           </div>
 
+          {/* Accessibility Passport — Pro / workplace users only */}
+          {isPro && (
+            <AccessibilityPassport
+              font={font}
+              fontSize={fontSize}
+              bgColour={COLOR_SWATCHES.find(s => s.value === bgColor)?.name ?? bgColor}
+              darkMode={darkMode}
+              voiceId={voiceId}
+            />
+          )}
+
           {/* Reset Button */}
-          <ModernButton variant="danger" onClick={resetSettings} size="sm">
-            {t('a11y.reset')}
-          </ModernButton>
+          <div style={{ marginTop: 16 }}>
+            <ModernButton variant="danger" onClick={resetSettings} size="sm">
+              {t('a11y.reset')}
+            </ModernButton>
+          </div>
         </div>
       </div>
     </>
