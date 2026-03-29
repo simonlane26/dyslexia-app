@@ -3,16 +3,17 @@ export const runtime = 'nodejs';
 
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
+import { logFeatureUse } from '@/lib/log-feature-use';
 
 const MAX_TEXT_LENGTH = 1000;
 
 const ALLOWED_VOICE_IDS = new Set([
-  'ZT9u07TYPVl83ejeLakq',
-  'jkSXBeN4g5pNelNQ3YWw',
-  'EXAVITQu4vr4xnSDxMaL',
-  'wUwsnXivqGrDWuz1Fc89',
-  'NFG5qt843uXKj4pFvR7C',
-  'BL7YSL1bAkmW8U0JnU8o',
+  'ZT9u07TYPVl83ejeLakq', // Rachelle
+  'jkSXBeN4g5pNelNQ3YWw', // Molly
+  'EXAVITQu4vr4xnSDxMaL', // Sarah
+  'wUwsnXivqGrDWuz1Fc89', // Liam
+  'NFG5qt843uXKj4pFvR7C', // Adam Stone
+  'BL7YSL1bAkmW8U0JnU8o', // Jen
   'tMyQcCxfGDdIt7wJ2RQw', // Marie Alice (French)
   'dFA3XRddYScy6ylAYTIO', // Helmut (German)
   'm7yTemJqdIqrcNleANfX', // Anna Maria (Spanish)
@@ -48,6 +49,7 @@ export async function POST(req: Request) {
     }
 
     const audio = await r.arrayBuffer();
+    logFeatureUse(userId, 'readAloud');
     return new NextResponse(audio, {
       status: 200,
       headers: {

@@ -673,6 +673,7 @@ function PageBody() {
       const data = payload || {};
       if (data.simplifiedText) {
         setSimplifiedText(data.simplifiedText);
+        void fetch('/api/passport/log', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ feature: 'simplify' }) });
         if (schoolMode.isSchoolMode) {
           setSessionSimplifications((n) => n + 1);
         }

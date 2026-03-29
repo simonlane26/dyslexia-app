@@ -178,7 +178,7 @@ export default function CoachPanel({
       // Validate structured response
       if (data && Array.isArray(data.tips)) {
         setState({ kind: 'ok', data: data as CoachResponse });
-
+        void fetch('/api/passport/log', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ feature: 'coach' }) });
         // Track progress in localStorage
         trackProgress(data.stats);
       } else {
