@@ -1,7 +1,7 @@
 import {
   Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
   WidthType, AlignmentType, HeadingLevel, BorderStyle, ShadingType,
-  PageBreak, TabStopType, TabStopLeader,
+  PageBreak,
 } from 'docx';
 
 export interface PassportData {
@@ -33,7 +33,7 @@ const LIGHT_GREY = 'F3F4F6';
 const MID_GREY = '6B7280';
 const DARK = '111827';
 
-function h(text: string, level: HeadingLevel = HeadingLevel.HEADING_2): Paragraph {
+function h(text: string, level: (typeof HeadingLevel)[keyof typeof HeadingLevel] = HeadingLevel.HEADING_2): Paragraph {
   return new Paragraph({
     text,
     heading: level,
@@ -140,7 +140,7 @@ const MANAGER_TIPS: Record<string, string> = {
   grammarCheck: 'Avoid dense, jargon-heavy emails — short paragraphs and headers help.',
 };
 
-export async function generatePassportDocx(data: PassportData): Promise<Buffer> {
+export async function generatePassportDocx(data: PassportData): Promise<ArrayBuffer> {
   const topFeatures = data.usage.featureUsage.slice(0, 3);
 
   const doc = new Document({
@@ -293,5 +293,6 @@ export async function generatePassportDocx(data: PassportData): Promise<Buffer> 
     }],
   });
 
-  return Packer.toBuffer(doc);
+  const buf = await Packer.toBuffer(doc);
+  return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
 }
