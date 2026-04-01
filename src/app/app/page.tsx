@@ -35,13 +35,7 @@ import { AgentChat } from '@/components/AgentChat';
 import { useSchoolMode } from '@/hooks/useSchoolMode';
 import { getCopy } from '@/lib/schoolCopy';
 import { useT, useLanguage } from '@/lib/i18n';
-import {
-  WelcomeScreen,
-  StruggleSelection,
-  AccessibilityQuickSetup,
-  CoachIntroduction,
-  SuccessCelebration,
-} from '@/components/Onboarding';
+import { SuccessCelebration } from '@/components/Onboarding';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import {
   saveLocalDocument,
@@ -161,6 +155,14 @@ function PageBody() {
   const router = useRouter();
   const onboarding = useOnboarding();
   const schoolMode = useSchoolMode();
+
+  // Redirect new users to the onboarding wizard
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (onboarding.currentStep !== null) {
+      router.replace('/onboarding');
+    }
+  }, [isLoaded, onboarding.currentStep, router]);
   const copy = getCopy(schoolMode.isSchoolMode);
 
   // UI settings
@@ -1751,53 +1753,6 @@ function PageBody() {
             )}
           </div>
         </>
-      )}
-
-      {/* Onboarding Screens */}
-      {onboarding.currentStep === 'welcome' && (
-        <WelcomeScreen
-          onStartWriting={() => onboarding.goToNextStep()}
-          onCustomizeSettings={() => {
-            onboarding.goToNextStep();
-            onboarding.goToNextStep(); // Skip struggle selection, go straight to accessibility
-          }}
-          theme={theme}
-          darkMode={darkMode}
-        />
-      )}
-
-      {onboarding.currentStep === 'struggles' && (
-        <StruggleSelection
-          onComplete={(selectedStruggles) => {
-            onboarding.setStruggles(selectedStruggles);
-            onboarding.goToNextStep();
-          }}
-          onSkip={() => onboarding.goToNextStep()}
-          theme={theme}
-          darkMode={darkMode}
-        />
-      )}
-
-      {onboarding.currentStep === 'accessibility' && (
-        <AccessibilityQuickSetup
-          onComplete={(settings) => {
-            // Apply the accessibility settings
-            setBgColor(settings.bgColor);
-            setFont(settings.font);
-            setFontSize(settings.fontSize);
-            onboarding.goToNextStep();
-          }}
-          theme={theme}
-          darkMode={darkMode}
-        />
-      )}
-
-      {onboarding.currentStep === 'coach' && (
-        <CoachIntroduction
-          onComplete={() => onboarding.skipToEnd()}
-          theme={theme}
-          darkMode={darkMode}
-        />
       )}
 
       {/* Success Celebrations */}
