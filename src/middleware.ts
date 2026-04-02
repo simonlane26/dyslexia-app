@@ -1,9 +1,7 @@
-// src/middleware.ts
-import { clerkMiddleware } from '@clerk/nextjs/server';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
-// Public pages (add/remove as needed)
-const PUBLIC_PATHS = [
+const isPublicPage = createRouteMatcher([
   '/',
   '/pricing',
   '/privacy',
@@ -15,62 +13,45 @@ const PUBLIC_PATHS = [
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/sso-callback(.*)',
-  '/favicon.ico',
-  '/robots.txt',
-  '/sitemap.xml',
-];
+]);
 
-function isPublic(pathname: string) {
-  return PUBLIC_PATHS.some((pattern) => new RegExp(`^${pattern}$`).test(pathname));
-}
+// API routes that don't require authentication
+const isPublicApi = createRouteMatcher([
+  '/api/simplify',
+  '/api/simplify-page',
+  '/api/check-message',
+  '/api/tone-check',
+  '/api/coach/rewrite-sentence',
+  '/api/coach',
+]);
 
 export default clerkMiddleware(async (auth, req) => {
   const { pathname } = req.nextUrl;
 
-  // Skip Next internals & static assets
-  if (pathname.startsWith('/_next') || /\.[\w-]+$/.test(pathname)) {
-    return NextResponse.next();
-  }
+  // Public API endpoints — no auth required
+  if (isPublicApi(req)) return NextResponse.next();
 
-  if (isPublic(pathname)) {
-    return NextResponse.next();
-  }
-
-  const session = await auth();
-
+  // Protected API endpoints — return JSON 401 (never redirect)
   if (pathname.startsWith('/api/')) {
-    // Allow anonymous access to these endpoints
-    const publicApis = [
-      '/api/simplify',
-      '/api/simplify-page',
-      '/api/check-message',
-      '/api/tone-check',
-      '/api/coach/rewrite-sentence',
-      '/api/coach', // Writing coach
-    ];
-
-    if (publicApis.includes(pathname)) {
-      return NextResponse.next();
-    }
-
-    // Other APIs: never redirect; return JSON 401 if unauthenticated
-    if (!session.userId) {
+    const { userId } = await auth();
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     return NextResponse.next();
   }
 
-  // App pages: redirect to Clerk sign in if needed
-  if (!session.userId) {
-    return session.redirectToSignIn({ returnBackUrl: req.url });
-  }
+  // Public pages — no auth required
+  if (isPublicPage(req)) return NextResponse.next();
 
-  return NextResponse.next();
+  // All other pages are protected — Clerk redirects to sign-in if needed
+  await auth.protect();
 });
 
 export const config = {
   matcher: [
-    '/((?!.*\\..*|_next).*)', // all app routes except static files
-    '/api/(.*)',              // all API routes
+    // Skip Next.js internals and static files
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
   ],
 };

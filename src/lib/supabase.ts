@@ -39,3 +39,39 @@ export interface WritingSession {
   session_duration_minutes: number | null;
   created_at: string;
 }
+
+export interface StorySeries {
+  id: string;
+  clerk_user_id: string;
+  title: string;
+  theme: string;
+  character_name: string;
+  setting: string | null;
+  reading_level: number;
+  current_episode: number;
+  is_complete: boolean;
+  cover_url: string | null;
+  created_at: string;
+  last_read_at: string;
+}
+
+export interface StoryEpisode {
+  id: string;
+  series_id: string;
+  episode_number: number;
+  text: string;
+  recap: string | null;
+  next_teaser: string | null;
+  word_count: number;
+  new_vocabulary: string[];
+  last_word_index: number | null;
+  completed_at: string | null;
+  created_at: string;
+}
+
+export interface WordTiming {
+  word: string;
+  startMs: number;
+  endMs: number;
+  wordIndex: number;
+}

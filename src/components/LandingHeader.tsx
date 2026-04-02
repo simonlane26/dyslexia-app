@@ -39,11 +39,17 @@ export function LandingHeader() {
           >
             Access to Work
           </Link>
+          <Link
+            href="/schools"
+            className="hidden text-sm font-medium transition text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100 sm:block"
+          >
+            For Schools
+          </Link>
 
           <div className="flex items-center gap-3">
             <SignedOut>
               <SignInButton mode="modal">
-                <button className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white">
+                <button type="button" className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white">
                   Sign in
                 </button>
               </SignInButton>

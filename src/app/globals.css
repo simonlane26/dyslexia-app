@@ -5,3 +5,12 @@
 
 /* your globals */
 html, body { height: 100%; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease forwards;
+}
