@@ -17,7 +17,7 @@ export const maxDuration = 60;
 type Provider = 'openai' | 'openrouter' | 'none';
 
 const SYSTEM_PROMPT =
-  'You simplify text for dyslexic readers. Keep meaning the same; prefer short sentences and simple words. Remove filler. Keep names and facts. Output only the simplified text. IMPORTANT: Always respond in the same language as the input text — if the input is French, output French; if Spanish, output Spanish.';
+  'You simplify text for dyslexic readers. Keep meaning the same; prefer short sentences and simple words. Remove filler. Keep names and facts. Output only the simplified text. IMPORTANT: Detect the language of the input and respond in that exact same language. Do not translate.';
 
 const SCHOOL_SYSTEM_PROMPT =
   'You make writing easier to read for children aged 8\u201316 with dyslexia. Use very short sentences. Use simple, everyday words. Keep the same meaning. Do not add explanations or comments \u2014 output only the easier version of the text. IMPORTANT: Always respond in the same language as the input text.';
