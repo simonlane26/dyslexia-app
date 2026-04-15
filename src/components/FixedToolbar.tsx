@@ -460,9 +460,9 @@ export function FixedToolbar({
                       gap: '4px',
                     }}
                   >
-                    <ExportPDFButton text={text} documentTitle={documentTitle} isPro={isPro} />
+                    <ExportPDFButton text={text} simplifiedText={simplifiedText} documentTitle={documentTitle} isPro={isPro} />
                     <ExportMP3Button text={text} documentTitle={documentTitle} isPro={isPro} />
-                    <ExportDOCXButton text={text} documentTitle={documentTitle} enabled={isPro} />
+                    <ExportDOCXButton text={text} simplifiedText={simplifiedText} documentTitle={documentTitle} enabled={isPro} />
                   </div>
                 </>
               )}
