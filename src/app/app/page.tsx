@@ -89,6 +89,7 @@ function PageBody() {
 
   // Sentence rewriting
   const [showRewriteModal, setShowRewriteModal] = useState(false);
+  const [showCompare, setShowCompare] = useState(false);
   const [selectedSentence, setSelectedSentence] = useState('');
   const [selectedRange, setSelectedRange] = useState<{ start: number; end: number } | null>(null);
   const [currentIntentForRewrite, setCurrentIntentForRewrite] = useState<CoachIntent | null>(null);
@@ -1258,9 +1259,7 @@ function PageBody() {
         lastSaved={lastSaved}
         text={text}
         documentTitle={documentTitle}
-        onCompare={() => {
-          // Will be handled by TextComparison component that we'll keep
-        }}
+        onCompare={() => setShowCompare(true)}
         simplifiedText={simplifiedText}
         theme={theme}
         darkMode={darkMode}
@@ -1594,6 +1593,19 @@ function PageBody() {
       <OnboardingTutorial theme={theme} />
 
       {/* Sentence Rewrite Modal */}
+      <TextComparison
+        isOpen={showCompare}
+        onClose={() => setShowCompare(false)}
+        originalText={text}
+        simplifiedText={simplifiedText}
+        theme={theme}
+        fontSize={fontSize}
+        fontFamily={getFontFamily()}
+        bgColor={bgColor}
+        darkMode={darkMode}
+        editorTextColor={editorTextColor}
+      />
+
       <SentenceRewriteModal
         isOpen={showRewriteModal}
         onClose={() => setShowRewriteModal(false)}

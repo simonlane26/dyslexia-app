@@ -1,9 +1,7 @@
 // src/components/TextComparison.tsx
 'use client';
 
-import { useState } from 'react';
 import { X, ArrowRight, GitCompare } from 'lucide-react';
-import { ModernButton } from './ModernButton';
 
 interface TextComparisonProps {
   originalText: string;
@@ -14,6 +12,8 @@ interface TextComparisonProps {
   bgColor: string;
   darkMode: boolean;
   editorTextColor: string;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export function TextComparison({
@@ -25,8 +25,9 @@ export function TextComparison({
   bgColor,
   darkMode,
   editorTextColor,
+  isOpen,
+  onClose,
 }: TextComparisonProps) {
-  const [isOpen, setIsOpen] = useState(false);
 
   // Calculate statistics
   const getStats = (text: string) => {
@@ -54,19 +55,7 @@ export function TextComparison({
     return Math.round(diff * 10) / 10;
   };
 
-  if (!isOpen) {
-    return (
-      <ModernButton
-        variant="secondary"
-        size="sm"
-        onClick={() => setIsOpen(true)}
-        disabled={!simplifiedText}
-      >
-        <GitCompare size={16} />
-        Compare
-      </ModernButton>
-    );
-  }
+  if (!isOpen) return null;
 
   return (
     <div
@@ -83,7 +72,7 @@ export function TextComparison({
         justifyContent: 'center',
         padding: '20px',
       }}
-      onClick={() => setIsOpen(false)}
+      onClick={onClose}
     >
       <div
         style={{
@@ -116,7 +105,7 @@ export function TextComparison({
             </h2>
           </div>
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={onClose}
             style={{
               background: 'none',
               border: 'none',
