@@ -15,10 +15,15 @@ const isPublicPage = createRouteMatcher([
   '/sso-callback(.*)',
 ]);
 
-// API routes that don't require authentication
-const isPublicApi = createRouteMatcher([
+// API routes that handle their own auth (extension JWT or Clerk session)
+// Must NOT early-return so Clerk attaches session data before the route runs
+const isSelfAuthApi = createRouteMatcher([
   '/api/simplify',
   '/api/simplify-page',
+]);
+
+// API routes that are fully public (no auth, no session needed)
+const isPublicApi = createRouteMatcher([
   '/api/check-message',
   '/api/tone-check',
   '/api/coach/rewrite-sentence',
@@ -28,8 +33,15 @@ const isPublicApi = createRouteMatcher([
 export default clerkMiddleware(async (auth, req) => {
   const { pathname } = req.nextUrl;
 
-  // Public API endpoints — no auth required
+  // Fully public API endpoints — skip auth entirely
   if (isPublicApi(req)) return NextResponse.next();
+
+  // Self-authenticating endpoints — Clerk processes session but doesn't require it
+  // The route handler checks Bearer JWT or Clerk userId itself
+  if (isSelfAuthApi(req)) {
+    await auth(); // ensures session is attached to the request
+    return NextResponse.next();
+  }
 
   // Protected API endpoints — return JSON 401 (never redirect)
   if (pathname.startsWith('/api/')) {

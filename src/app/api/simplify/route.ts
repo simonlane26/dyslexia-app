@@ -2,6 +2,7 @@ import 'server-only';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
+import { auth } from '@clerk/nextjs/server';
 
 function getExtensionSecret() {
   const s = process.env.EXTENSION_TOKEN_SECRET;
@@ -89,18 +90,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Text too long (max 10,000 characters)' }, { status: 400, headers: H });
     }
 
-    // 2) Auth — require extension token
+    // 2) Auth — accept extension JWT or Clerk session
     const authHeader = req.headers.get('authorization') ?? '';
     const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
     const secret = getExtensionSecret();
-    if (!bearerToken) {
-      return NextResponse.json({ error: 'SIGN_IN_REQUIRED', message: 'Sign in at dyslexiawrite.com/extension-connect to use AI Simplify.' }, { status: 401, headers: H });
-    }
-    if (secret) {
-      try {
-        await jwtVerify(bearerToken, secret);
-      } catch {
-        return NextResponse.json({ error: 'INVALID_TOKEN', message: 'Token invalid or expired. Reconnect at dyslexiawrite.com/extension-connect.' }, { status: 401, headers: H });
+    if (bearerToken) {
+      if (secret) {
+        try {
+          await jwtVerify(bearerToken, secret);
+        } catch {
+          return NextResponse.json({ error: 'INVALID_TOKEN', message: 'Token invalid or expired. Reconnect at dyslexiawrite.com/extension-connect.' }, { status: 401, headers: H });
+        }
+      }
+    } else {
+      const { userId } = await auth();
+      if (!userId) {
+        return NextResponse.json({ error: 'SIGN_IN_REQUIRED', message: 'Sign in to use AI Simplify.' }, { status: 401, headers: H });
       }
     }
 
