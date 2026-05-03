@@ -204,8 +204,8 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ word: clean, context: '', readingLevel: 2 }),
       });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json();
+      if (res.ok && data.definition) {
         const wordData: WordData = { phonetic: data.phonetic ?? '', syllables: data.syllables ?? [], definition: data.definition ?? '', example: data.example ?? '', count: 1 };
         setLookedUpWords(prev => ({ ...prev, [clean]: wordData }));
         setWordPopup(prev => prev?.word === clean ? { ...prev, data: wordData, loading: false } : prev);
@@ -218,9 +218,14 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
             body: JSON.stringify({ word: clean, phonetic: data.phonetic, syllables: data.syllables, definition: data.definition, example: data.example, sourceType: 'editor' }),
           });
         }
+      } else {
+        // API returned an error — show fallback in popup
+        const fallback: WordData = { phonetic: '', syllables: [clean], definition: 'Definition unavailable right now. Try again shortly.', example: '', count: 1 };
+        setWordPopup(prev => prev?.word === clean ? { ...prev, data: fallback, loading: false } : prev);
       }
     } catch {
-      setWordPopup(prev => prev?.word === clean ? { ...prev, loading: false } : prev);
+      const fallback: WordData = { phonetic: '', syllables: [clean], definition: 'Could not look up this word. Check your connection and try again.', example: '', count: 1 };
+      setWordPopup(prev => prev?.word === clean ? { ...prev, data: fallback, loading: false } : prev);
     }
   }
 
@@ -567,14 +572,19 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
                   ))}
                 </div>
               )}
-              <div style={{ fontSize: 13, color: muted, lineHeight: 1.5, marginBottom: 8 }}>{wordPopup.data.definition}</div>
+              <div style={{ fontSize: 13, color: textColor, lineHeight: 1.5, marginBottom: 8 }}>{wordPopup.data.definition}</div>
+              {wordPopup.data.example && (
+                <div style={{ fontSize: 12, color: muted, fontStyle: 'italic', marginBottom: 8 }}>"{wordPopup.data.example}"</div>
+              )}
               <button type="button" onClick={() => speakWord(wordPopup.word)}
                 style={{ padding: '5px 12px', borderRadius: 6, background: tealLight, color: '#085041', border: 'none', fontFamily: 'inherit', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}
               >
                 <Volume2 size={12} /> Listen
               </button>
             </>
-          ) : null}
+          ) : (
+            <p style={{ fontSize: 13, color: muted, margin: 0 }}>Tap any word to look it up.</p>
+          )}
         </div>
       )}
 
