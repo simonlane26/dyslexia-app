@@ -24,6 +24,7 @@ import { OnboardingTutorial } from '@/components/OnboardingTutorial';
 import { TextComparison } from '@/components/TextComparison';
 import { WordHelper } from '@/components/WordHelper';
 import { VocabularyPanel } from '@/components/VocabularyPanel';
+import { MemoryReader } from '@/components/MemoryReader';
 import { useToast } from '@/components/ToastContainer';
 import { useKeyboardShortcuts, KeyboardShortcut } from '@/hooks/useKeyboardShortcuts';
 import { GrammarCheck } from '@/components/GrammarCheck';
@@ -96,6 +97,7 @@ function PageBody() {
   const [tappedWordContext, setTappedWordContext] = useState('');
   const [showCompare, setShowCompare] = useState(false);
   const [vocabOpen, setVocabOpen] = useState(false);
+  const [showMemoryReader, setShowMemoryReader] = useState(false);
   const [selectedSentence, setSelectedSentence] = useState('');
   const [selectedRange, setSelectedRange] = useState<{ start: number; end: number } | null>(null);
   const [currentIntentForRewrite, setCurrentIntentForRewrite] = useState<CoachIntent | null>(null);
@@ -1604,6 +1606,28 @@ function PageBody() {
               >
                 {simplifiedText}
               </div>
+              <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowMemoryReader(true)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 16px',
+                    backgroundColor: '#7c3aed',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <BookOpen size={16} />
+                  Read with support
+                </button>
+              </div>
             </div>
           </Card>
         </div>
@@ -1656,6 +1680,18 @@ function PageBody() {
         darkMode={darkMode}
         editorTextColor={editorTextColor}
       />
+
+      {showMemoryReader && (
+        <MemoryReader
+          text={simplifiedText || text}
+          documentId={currentDocId ?? undefined}
+          isPro={isPro}
+          onClose={() => setShowMemoryReader(false)}
+          darkMode={darkMode}
+          fontSize={fontSize}
+          fontFamily={getFontFamily()}
+        />
+      )}
 
       <SentenceRewriteModal
         isOpen={showRewriteModal}
