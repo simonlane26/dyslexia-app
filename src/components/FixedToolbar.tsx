@@ -59,6 +59,7 @@ interface FixedToolbarProps {
   onAgentToggle: () => void;
   accessibilityPanelOpen: boolean;
   onAccessibilityPanelToggle: () => void;
+  onVocabToggle: () => void;
 
   // Right side - Document actions
   isSaving: boolean;
@@ -97,6 +98,7 @@ export function FixedToolbar({
   onAgentToggle,
   accessibilityPanelOpen,
   onAccessibilityPanelToggle,
+  onVocabToggle,
   isSaving,
   onSave,
   lastSaved,
@@ -329,6 +331,15 @@ export function FixedToolbar({
             )}
           </div>
         </div>
+
+            <ModernButton
+              variant="secondary"
+              onClick={onVocabToggle}
+              title="My Vocabulary — words you've decoded"
+              size="sm"
+            >
+              📖 Vocabulary
+            </ModernButton>
 
         {/* Divider */}
         <div style={{ width: '1px', height: '48px', backgroundColor: theme.border, opacity: 0.5, marginBottom: '2px' }} />

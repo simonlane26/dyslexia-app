@@ -22,6 +22,8 @@ import { WordCounter } from '@/components/WordCounter';
 import { SentenceHighlighter } from '@/components/SentenceHighlighter';
 import { OnboardingTutorial } from '@/components/OnboardingTutorial';
 import { TextComparison } from '@/components/TextComparison';
+import { WordHelper } from '@/components/WordHelper';
+import { VocabularyPanel } from '@/components/VocabularyPanel';
 import { useToast } from '@/components/ToastContainer';
 import { useKeyboardShortcuts, KeyboardShortcut } from '@/hooks/useKeyboardShortcuts';
 import { GrammarCheck } from '@/components/GrammarCheck';
@@ -89,7 +91,11 @@ function PageBody() {
 
   // Sentence rewriting
   const [showRewriteModal, setShowRewriteModal] = useState(false);
+  const [showWordHelper, setShowWordHelper] = useState(false);
+  const [tappedWord, setTappedWord] = useState('');
+  const [tappedWordContext, setTappedWordContext] = useState('');
   const [showCompare, setShowCompare] = useState(false);
+  const [vocabOpen, setVocabOpen] = useState(false);
   const [selectedSentence, setSelectedSentence] = useState('');
   const [selectedRange, setSelectedRange] = useState<{ start: number; end: number } | null>(null);
   const [currentIntentForRewrite, setCurrentIntentForRewrite] = useState<CoachIntent | null>(null);
@@ -1031,6 +1037,32 @@ function PageBody() {
     return msgs[tier % msgs.length];
   }
 
+  // Double-click a word in the editor to decode it
+  const handleEditorDoubleClick = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+    const textarea = e.currentTarget;
+    const pos = textarea.selectionStart;
+    const content = textarea.value;
+    if (!content) return;
+
+    // Find word boundaries around cursor position
+    let start = pos;
+    let end = pos;
+    while (start > 0 && /[a-zA-Z'-]/.test(content[start - 1])) start--;
+    while (end < content.length && /[a-zA-Z'-]/.test(content[end])) end++;
+
+    const word = content.slice(start, end).replace(/^['-]+|['-]+$/g, '');
+    if (word.length < 2) return;
+
+    // Get surrounding sentence as context
+    const sentenceStart = Math.max(0, content.lastIndexOf('.', start - 1) + 1);
+    const sentenceEnd = content.indexOf('.', end);
+    const context = content.slice(sentenceStart, sentenceEnd > -1 ? sentenceEnd + 1 : undefined).trim();
+
+    setTappedWord(word);
+    setTappedWordContext(context);
+    setShowWordHelper(true);
+  };
+
   // Show floating rewrite popup on textarea selection
   const handleTextareaMouseUp = (e: React.MouseEvent<HTMLTextAreaElement>) => {
     const textarea = textareaRef.current;
@@ -1254,6 +1286,7 @@ function PageBody() {
         onAgentToggle={() => setAgentOpen(!agentOpen)}
         accessibilityPanelOpen={accessibilityPanelOpen}
         onAccessibilityPanelToggle={() => setAccessibilityPanelOpen(!accessibilityPanelOpen)}
+        onVocabToggle={() => setVocabOpen(v => !v)}
         isSaving={isSaving}
         onSave={saveDocument}
         lastSaved={lastSaved}
@@ -1475,6 +1508,7 @@ function PageBody() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onMouseUp={handleTextareaMouseUp}
+                onDoubleClick={handleEditorDoubleClick}
                 onKeyUp={() => setFloatingRewrite(null)}
                 placeholder={t('editor.placeholder')}
                 className="w-full transition-all duration-200 resize-none rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -1593,6 +1627,23 @@ function PageBody() {
       <OnboardingTutorial theme={theme} />
 
       {/* Sentence Rewrite Modal */}
+      <VocabularyPanel
+        isOpen={vocabOpen}
+        onClose={() => setVocabOpen(false)}
+        theme={theme}
+        darkMode={darkMode}
+      />
+
+      {showWordHelper && tappedWord && (
+        <WordHelper
+          word={tappedWord}
+          context={tappedWordContext}
+          readingLevel={2}
+          sourceType="editor"
+          onClose={() => { setShowWordHelper(false); setTappedWord(''); setTappedWordContext(''); }}
+        />
+      )}
+
       <TextComparison
         isOpen={showCompare}
         onClose={() => setShowCompare(false)}
