@@ -37,12 +37,8 @@ function getProvider(): { url: string; key: string; model: string; headers: Reco
 }
 
 export async function POST(req: NextRequest) {
-  const { userId, sessionClaims } = await auth();
+  const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-  const meta = (sessionClaims?.publicMetadata ?? {}) as Record<string, any>;
-  const isPro = meta.isPro === true || ['workplace_starter','workplace_business','workplace_enterprise','school_starter','school_mid','school_full'].includes(meta.plan);
-  if (!isPro) return NextResponse.json({ error: 'Pro required' }, { status: 403 });
 
   const body = await req.json().catch(() => null);
   const text = String(body?.text ?? '').trim();
