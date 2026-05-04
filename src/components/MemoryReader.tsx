@@ -9,7 +9,7 @@ interface Chunk { id: number; text: string; }
 interface KeyFact { icon: string; text: string; }
 interface Summary { num: number; text: string; chunkIndex: number; }
 interface WordData { phonetic: string; syllables: string[]; definition: string; example: string; count: number; }
-interface PopupState { word: string; data: WordData | null; loading: boolean; x: number; y: number; }
+interface PopupState { word: string; data: WordData | null; loading: boolean; }
 interface ResumeInfo { chunkIndex: number; readChunks: number[]; summaries: Summary[]; lastSummary: string; }
 
 interface Props {
@@ -181,21 +181,21 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
     const clean = word.replace(/[^a-zA-Z'-]/g, '').toLowerCase();
     if (clean.length < 2) return;
 
-    // Free limit
+    // Free limit — show panel with upgrade message
     if (!isPro && wordLookupCount >= FREE_WORD_LIMIT && !lookedUpWords[clean]) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      setWordPopup({ word: clean, data: null, loading: false, x: rect.left, y: rect.bottom + 8 });
+      setWordPopup({ word: clean, data: null, loading: false });
       return;
     }
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    setWordPopup({ word: clean, data: lookedUpWords[clean] ?? null, loading: !lookedUpWords[clean], x: rect.left, y: rect.bottom + 8 });
-
+    // If already looked up, show cached result
     if (lookedUpWords[clean]) {
       setLookedUpWords(prev => ({ ...prev, [clean]: { ...prev[clean], count: prev[clean].count + 1 } }));
+      setWordPopup({ word: clean, data: lookedUpWords[clean], loading: false });
       return;
     }
 
+    // Show loading panel immediately
+    setWordPopup({ word: clean, data: null, loading: true });
     if (!isPro) setWordLookupCount(c => c + 1);
 
     try {
@@ -219,12 +219,11 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
           });
         }
       } else {
-        // API returned an error — show fallback in popup
-        const fallback: WordData = { phonetic: '', syllables: [clean], definition: 'Definition unavailable right now. Try again shortly.', example: '', count: 1 };
+        const fallback: WordData = { phonetic: '', syllables: [clean], definition: 'Definition unavailable right now — tap again to retry.', example: '', count: 1 };
         setWordPopup(prev => prev?.word === clean ? { ...prev, data: fallback, loading: false } : prev);
       }
     } catch {
-      const fallback: WordData = { phonetic: '', syllables: [clean], definition: 'Could not look up this word. Check your connection and try again.', example: '', count: 1 };
+      const fallback: WordData = { phonetic: '', syllables: [clean], definition: 'Could not look up this word. Check your connection.', example: '', count: 1 };
       setWordPopup(prev => prev?.word === clean ? { ...prev, data: fallback, loading: false } : prev);
     }
   }
@@ -547,50 +546,72 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
         </div>
       </div>
 
-      {/* ── Word popup ── */}
+      {/* ── Word bottom sheet ── */}
       {wordPopup && (
-        <div
-          style={{ position: 'fixed', zIndex: 2100, left: Math.min(wordPopup.x, typeof window !== 'undefined' ? window.innerWidth - 290 : wordPopup.x), top: Math.min(wordPopup.y, typeof window !== 'undefined' ? window.innerHeight - 200 : wordPopup.y), background: cardBg, border: `1px solid ${border}`, borderRadius: 12, padding: '14px 16px', boxShadow: '0 8px 32px rgba(0,0,0,0.14)', maxWidth: 280, animation: 'popIn 0.2s ease' }}
-          onClick={e => e.stopPropagation()}
-        >
-          <button type="button" onClick={() => setWordPopup(null)}
-            style={{ position: 'absolute', top: 8, right: 10, background: 'none', border: 'none', fontSize: 16, color: muted, cursor: 'pointer' }}
-          >✕</button>
+        <>
+          {/* Backdrop */}
+          <div
+            style={{ position: 'absolute', inset: 0, zIndex: 2050, background: 'rgba(0,0,0,0.35)' }}
+            onClick={() => setWordPopup(null)}
+          />
+          {/* Sheet */}
+          <div
+            style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 2060, background: cardBg, borderTop: `1px solid ${border}`, borderRadius: '16px 16px 0 0', padding: '20px 24px 32px', boxShadow: '0 -4px 32px rgba(0,0,0,0.18)', animation: 'slideUp 0.25s ease' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Drag handle */}
+            <div style={{ width: 40, height: 4, background: border, borderRadius: 2, margin: '0 auto 16px' }} />
 
-          {!isPro && wordLookupCount >= FREE_WORD_LIMIT && !lookedUpWords[wordPopup.word] ? (
-            <p style={{ fontSize: 13, color: textColor, margin: 0 }}>Upgrade to Pro for unlimited word lookups.</p>
-          ) : wordPopup.loading ? (
-            <p style={{ fontSize: 13, color: muted, margin: 0 }}>Looking up <em>{wordPopup.word}</em>…</p>
-          ) : wordPopup.data ? (
-            <>
-              <div style={{ fontSize: 18, fontWeight: 600, color: purple, marginBottom: 2 }}>{wordPopup.word}</div>
-              {wordPopup.data.phonetic && <div style={{ fontSize: 12, color: muted, marginBottom: 6 }}>{wordPopup.data.phonetic}</div>}
-              {wordPopup.data.syllables.length > 0 && (
-                <div style={{ display: 'flex', gap: 3, marginBottom: 8, flexWrap: 'wrap' }}>
-                  {wordPopup.data.syllables.map((s, i) => (
-                    <span key={i} style={{ padding: '3px 8px', borderRadius: 4, background: `${SYLLABLE_COLORS[i % SYLLABLE_COLORS.length]}20`, color: SYLLABLE_COLORS[i % SYLLABLE_COLORS.length], fontSize: 12, fontWeight: 500 }}>{s}</span>
-                  ))}
+            <button type="button" onClick={() => setWordPopup(null)}
+              style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, color: muted, cursor: 'pointer', lineHeight: 1, padding: 4 }}
+            >✕</button>
+
+            {!isPro && wordLookupCount >= FREE_WORD_LIMIT && !lookedUpWords[wordPopup.word] ? (
+              <div>
+                <p style={{ fontSize: 14, color: textColor, marginBottom: 8 }}>
+                  You've used your {FREE_WORD_LIMIT} free word lookups for this document.
+                </p>
+                <p style={{ fontSize: 13, color: muted, margin: 0 }}>
+                  Upgrade to Pro for unlimited word lookups and vocabulary tracking.
+                </p>
+              </div>
+            ) : wordPopup.loading ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0' }}>
+                <div style={{ width: 20, height: 20, border: `2px solid ${purple}`, borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite', flexShrink: 0 }} />
+                <span style={{ fontSize: 14, color: muted }}>Looking up <strong style={{ color: textColor }}>{wordPopup.word}</strong>…</span>
+              </div>
+            ) : wordPopup.data ? (
+              <>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
+                  <span style={{ fontSize: 22, fontWeight: 700, color: purple }}>{wordPopup.word}</span>
+                  {wordPopup.data.phonetic && <span style={{ fontSize: 13, color: muted, fontFamily: 'monospace' }}>{wordPopup.data.phonetic}</span>}
                 </div>
-              )}
-              <div style={{ fontSize: 13, color: textColor, lineHeight: 1.5, marginBottom: 8 }}>{wordPopup.data.definition}</div>
-              {wordPopup.data.example && (
-                <div style={{ fontSize: 12, color: muted, fontStyle: 'italic', marginBottom: 8 }}>"{wordPopup.data.example}"</div>
-              )}
-              <button type="button" onClick={() => speakWord(wordPopup.word)}
-                style={{ padding: '5px 12px', borderRadius: 6, background: tealLight, color: '#085041', border: 'none', fontFamily: 'inherit', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}
-              >
-                <Volume2 size={12} /> Listen
-              </button>
-            </>
-          ) : (
-            <p style={{ fontSize: 13, color: muted, margin: 0 }}>Tap any word to look it up.</p>
-          )}
-        </div>
+                {wordPopup.data.syllables.length > 0 && (
+                  <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
+                    {wordPopup.data.syllables.map((s, i) => (
+                      <span key={i} style={{ padding: '4px 10px', borderRadius: 6, background: `${SYLLABLE_COLORS[i % SYLLABLE_COLORS.length]}22`, color: SYLLABLE_COLORS[i % SYLLABLE_COLORS.length], fontSize: 14, fontWeight: 600 }}>{s}</span>
+                    ))}
+                  </div>
+                )}
+                <div style={{ fontSize: 15, color: textColor, lineHeight: 1.6, marginBottom: 8 }}>{wordPopup.data.definition}</div>
+                {wordPopup.data.example && (
+                  <div style={{ fontSize: 13, color: muted, fontStyle: 'italic', marginBottom: 12 }}>"{wordPopup.data.example}"</div>
+                )}
+                <button type="button" onClick={() => speakWord(wordPopup.word)}
+                  style={{ padding: '8px 18px', borderRadius: 8, background: tealLight, color: '#085041', border: `1px solid #9FE1CB`, fontFamily: 'inherit', fontSize: 13, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                >
+                  <Volume2 size={14} /> Listen
+                </button>
+              </>
+            ) : null}
+          </div>
+        </>
       )}
 
       <style>{`
-        @keyframes fadeUp { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:translateY(0) } }
-        @keyframes popIn  { from { opacity:0; transform:scale(0.95) }       to { opacity:1; transform:scale(1) } }
+        @keyframes fadeUp  { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:translateY(0) } }
+        @keyframes slideUp { from { transform:translateY(100%) } to { transform:translateY(0) } }
+        @keyframes spin    { to { transform:rotate(360deg) } }
       `}</style>
     </div>
   );

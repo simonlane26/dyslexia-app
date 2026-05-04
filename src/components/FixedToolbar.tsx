@@ -60,6 +60,7 @@ interface FixedToolbarProps {
   accessibilityPanelOpen: boolean;
   onAccessibilityPanelToggle: () => void;
   onVocabToggle: () => void;
+  onReadWithSupport: () => void;
 
   // Right side - Document actions
   isSaving: boolean;
@@ -99,6 +100,7 @@ export function FixedToolbar({
   accessibilityPanelOpen,
   onAccessibilityPanelToggle,
   onVocabToggle,
+  onReadWithSupport,
   isSaving,
   onSave,
   lastSaved,
@@ -374,6 +376,15 @@ export function FixedToolbar({
               size="sm"
             >
               {t('toolbar.highlight')}
+            </ModernButton>
+
+            <ModernButton
+              variant="secondary"
+              onClick={onReadWithSupport}
+              title="Open Memory Reading — chunked reading with word help and summaries"
+              size="sm"
+            >
+              📖 Memory Read
             </ModernButton>
 
           </div>

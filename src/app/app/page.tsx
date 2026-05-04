@@ -1289,6 +1289,7 @@ function PageBody() {
         accessibilityPanelOpen={accessibilityPanelOpen}
         onAccessibilityPanelToggle={() => setAccessibilityPanelOpen(!accessibilityPanelOpen)}
         onVocabToggle={() => setVocabOpen(v => !v)}
+        onReadWithSupport={() => setShowMemoryReader(true)}
         isSaving={isSaving}
         onSave={saveDocument}
         lastSaved={lastSaved}
