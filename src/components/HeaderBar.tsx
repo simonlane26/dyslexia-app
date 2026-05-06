@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from 'react';
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useSchoolMode } from '@/hooks/useSchoolMode';
 import { LanguageSelector, useT } from '@/lib/i18n';
 
@@ -19,6 +19,12 @@ export function HeaderBar() {
 
   const isPro = useMemo(() => user?.publicMetadata?.isPro === true, [user?.publicMetadata]);
   const isWorkplaceAdmin = useMemo(() => user?.publicMetadata?.workplaceRole === 'admin', [user?.publicMetadata]);
+  const pathname = usePathname();
+
+  const navLinks = [
+    { label: 'Writing', href: '/app' },
+    { label: 'Meetings', href: '/app/meetings' },
+  ];
 
   return (
     <header className="sticky top-0 z-30 w-full border-b bg-white/70 backdrop-blur border-slate-200 dark:bg-slate-900/70 dark:border-slate-800">
@@ -29,6 +35,30 @@ export function HeaderBar() {
             Dyslexia Write
           </span>
         </div>
+
+        {/* Centre nav — Writing / Meetings */}
+        {isLoaded && isSignedIn && (
+          <nav className="hidden sm:flex items-center gap-1">
+            {navLinks.map(({ label, href }) => {
+              const active = href === '/app' ? pathname === '/app' : pathname?.startsWith(href);
+              return (
+                <button
+                  key={href}
+                  type="button"
+                  onClick={() => router.push(href)}
+                  className={[
+                    'px-4 py-1.5 rounded-lg text-sm font-medium transition',
+                    active
+                      ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800',
+                  ].join(' ')}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </nav>
+        )}
 
         <div className="flex items-center gap-3">
           {/* Language selector */}
