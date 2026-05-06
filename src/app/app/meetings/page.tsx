@@ -265,18 +265,19 @@ export default function MeetingsPage() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
+  const tabStyle = (active: boolean): React.CSSProperties => ({
+    flex: 1, padding: '10px 8px', borderRadius: 9, border: 'none', fontFamily: 'inherit', fontSize: 13,
+    fontWeight: 500, cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center',
+    justifyContent: 'center', gap: 6,
+    background: active ? C.card : 'transparent',
+    color: active ? C.text : C.muted,
+    boxShadow: active ? '0 1px 4px rgba(0,0,0,0.07)' : 'none',
+  });
+
   const st: Record<string, React.CSSProperties> = {
     page: { minHeight: '100vh', background: C.bg, fontFamily: "'Lexend', system-ui, sans-serif", color: C.text },
     container: { maxWidth: 700, margin: '0 auto', padding: '0 16px 80px' },
     tabBar: { display: 'flex', gap: 3, background: C.border, borderRadius: 12, padding: 4, margin: '16px 0 0' },
-    tab: (active: boolean): React.CSSProperties => ({
-      flex: 1, padding: '10px 8px', borderRadius: 9, border: 'none', fontFamily: 'inherit', fontSize: 13,
-      fontWeight: 500, cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center',
-      justifyContent: 'center', gap: 6,
-      background: active ? C.card : 'transparent',
-      color: active ? C.text : C.muted,
-      boxShadow: active ? '0 1px 4px rgba(0,0,0,0.07)' : 'none',
-    }),
     card: { background: C.card, borderRadius: 14, border: `1px solid ${C.border}`, padding: 20, marginBottom: 12 },
     label: { fontSize: 11, fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.8px', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 },
     btnPrimary: { width: '100%', padding: '12px 24px', borderRadius: 10, background: C.teal, color: '#fff', fontFamily: 'inherit', fontSize: 14, fontWeight: 500, border: 'none', cursor: 'pointer', marginTop: 12, transition: 'all 0.2s' },
@@ -300,7 +301,7 @@ export default function MeetingsPage() {
         {/* Tabs */}
         <div style={st.tabBar}>
           {(['prep', 'live', 'summary'] as const).map(t => (
-            <button key={t} type="button" style={st.tab(tab === t)} onClick={() => setTab(t)}>
+            <button key={t} type="button" style={tabStyle(tab === t)} onClick={() => setTab(t)}>
               <span>{t === 'prep' ? '📋' : t === 'live' ? '🎙️' : '📊'}</span>
               {t === 'prep' ? 'Prepare' : t === 'live' ? 'Live' : 'Summary'}
             </button>
