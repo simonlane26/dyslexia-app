@@ -24,6 +24,7 @@ export function HeaderBar() {
   const navLinks = [
     { label: 'Writing', href: '/app' },
     { label: 'Meetings', href: '/app/meetings' },
+    { label: 'Lessons', href: '/app/lessons' },
   ];
 
   return (
