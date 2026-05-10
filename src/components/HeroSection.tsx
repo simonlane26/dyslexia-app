@@ -63,7 +63,7 @@ export function HeroSection({
         {/* Logo */}
         <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
           <img
-            src="/dw-logo.jpg"
+            src="/LogoNew.png"
             alt="Dyslexia Write Logo"
             style={{
               height: '80px',
