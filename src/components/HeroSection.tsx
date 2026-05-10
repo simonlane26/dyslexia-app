@@ -66,9 +66,9 @@ export function HeroSection({
             src="/LogoNew.png"
             alt="Dyslexia Write Logo"
             style={{
-              height: '80px',
+              height: '140px',
               width: 'auto',
-              borderRadius: '12px',
+              borderRadius: '16px',
               boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
             }}
           />
