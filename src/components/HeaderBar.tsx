@@ -25,6 +25,7 @@ export function HeaderBar() {
     { label: 'Writing', href: '/app' },
     { label: 'Meetings', href: '/app/meetings' },
     { label: 'Lessons', href: '/app/lessons' },
+    { label: 'Stories', href: '/app/story' },
   ];
 
   return (
