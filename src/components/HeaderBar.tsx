@@ -4,7 +4,7 @@ import { useEffect, useMemo } from 'react';
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs';
 import { useRouter, usePathname } from 'next/navigation';
 import { useSchoolMode } from '@/hooks/useSchoolMode';
-import { LanguageSelector, useT } from '@/lib/i18n';
+import { useT } from '@/lib/i18n';
 
 export function HeaderBar() {
   const { user, isLoaded, isSignedIn } = useUser();
@@ -63,9 +63,6 @@ export function HeaderBar() {
         )}
 
         <div className="flex items-center gap-3">
-          {/* Language selector */}
-          <LanguageSelector compact />
-
           {/* Fallback UI while Clerk loads */}
           {!isLoaded && (
             <a
