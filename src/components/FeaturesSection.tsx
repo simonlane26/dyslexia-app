@@ -8,11 +8,15 @@ import {
   SpellCheck,
   Edit3,
   Highlighter,
-  MessageSquare,
   Zap,
   Shield,
   Eye,
   Crown,
+  Brain,
+  Calendar,
+  GraduationCap,
+  Volume2,
+  ScanText,
 } from 'lucide-react';
 
 interface FeaturesSectionProps {
@@ -20,310 +24,299 @@ interface FeaturesSectionProps {
   darkMode: boolean;
 }
 
+interface Feature {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  color: string;
+  isPro?: boolean;
+  isNew?: boolean;
+}
+
+function FeatureCard({ feature, theme, darkMode }: { feature: Feature; theme: any; darkMode: boolean }) {
+  return (
+    <div
+      style={{
+        backgroundColor: darkMode ? '#1f2937' : '#ffffff',
+        padding: '28px',
+        borderRadius: '16px',
+        border: `1px solid ${darkMode ? '#374151' : '#e5e7eb'}`,
+        transition: 'all 0.25s ease',
+        cursor: 'default',
+      }}
+      onMouseOver={(e) => {
+        e.currentTarget.style.transform = 'translateY(-4px)';
+        e.currentTarget.style.boxShadow = darkMode
+          ? '0 10px 30px rgba(0,0,0,0.5)'
+          : '0 10px 30px rgba(0,0,0,0.1)';
+        e.currentTarget.style.borderColor = feature.color;
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = 'none';
+        e.currentTarget.style.borderColor = darkMode ? '#374151' : '#e5e7eb';
+      }}
+    >
+      <div
+        style={{
+          width: '56px',
+          height: '56px',
+          borderRadius: '12px',
+          backgroundColor: `${feature.color}18`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '18px',
+          color: feature.color,
+        }}
+      >
+        {feature.icon}
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: 700, color: theme.text, margin: 0 }}>
+          {feature.title}
+        </h3>
+        {feature.isPro && (
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: '3px',
+            padding: '3px 8px', backgroundColor: '#fbbf24', color: '#000',
+            borderRadius: '6px', fontSize: '11px', fontWeight: 700,
+            textTransform: 'uppercase', letterSpacing: '0.5px',
+          }}>
+            <Crown size={11} /> Pro
+          </span>
+        )}
+        {feature.isNew && (
+          <span style={{
+            padding: '3px 8px', backgroundColor: '#10b981', color: '#fff',
+            borderRadius: '6px', fontSize: '11px', fontWeight: 700,
+            textTransform: 'uppercase', letterSpacing: '0.5px',
+          }}>
+            New
+          </span>
+        )}
+      </div>
+
+      <p style={{ fontSize: '14px', color: darkMode ? '#9ca3af' : '#6b7280', lineHeight: 1.65, margin: 0 }}>
+        {feature.description}
+      </p>
+    </div>
+  );
+}
+
+function GroupHeader({ label, color, darkMode }: { label: string; color: string; darkMode: boolean }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px' }}>
+      <span style={{
+        padding: '5px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: 700,
+        letterSpacing: '0.06em', textTransform: 'uppercase',
+        backgroundColor: `${color}18`, color,
+      }}>
+        {label}
+      </span>
+      <div style={{ flex: 1, height: '1px', backgroundColor: darkMode ? '#374151' : '#e5e7eb' }} />
+    </div>
+  );
+}
+
 export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
-  const features = [
+
+  const writingFeatures: Feature[] = [
     {
-      icon: <Eye size={32} />,
-      title: 'Reading Guide',
-      description:
-        'Line Focus, Sentence Spotlight, or Reading Ruler modes reduce visual noise and help you stay focused. Only your current text is bright—everything else fades.',
-      color: '#10b981',
+      icon: <Brain size={28} />,
+      title: 'Writing Mentor',
+      description: 'Intent-first AI mentor that asks who you\'re writing for and why, then gives plain-English suggestions tailored to your audience, purpose, and tone. No jargon — just clear guidance.',
+      color: '#8b5cf6',
+      isPro: true,
       isNew: true,
     },
     {
-      icon: <SpellCheck size={32} />,
+      icon: <SpellCheck size={28} />,
       title: 'Real-Time Grammar Check',
-      description:
-        'Dyslexia-aware grammar checking that catches homophones, letter reversals, and common transpositions. Click underlined text for instant fixes.',
+      description: 'Dyslexia-aware grammar checking that catches homophones, letter reversals, and common transpositions. Click any underlined word for instant fixes.',
       color: '#ef4444',
     },
     {
-      icon: <Edit3 size={32} />,
+      icon: <Edit3 size={28} />,
       title: 'AI Sentence Rewriting',
-      description:
-        'Select any sentence and get 3 alternatives: Simpler, More confident, or Clearer. One-click to apply. No grammar jargon, just plain language.',
+      description: 'Select any sentence and get 3 alternatives: Simpler, More confident, or Clearer. One click to apply — no grammar jargon, just plain language.',
       color: '#3b82f6',
+      isPro: true,
+    },
+    {
+      icon: <Sparkles size={28} />,
+      title: 'Smart Simplification',
+      description: 'AI-powered simplification that makes complex text easier to understand without losing meaning. Paste anything — an email, a letter, a form — and get a plain-English version.',
+      color: '#f59e0b',
+    },
+    {
+      icon: <Mic size={28} />,
+      title: 'Voice Dictation',
+      description: 'Speak naturally and see your words appear in the editor. Great for when typing feels difficult or you want to capture ideas quickly.',
+      color: '#10b981',
+    },
+    {
+      icon: <Zap size={28} />,
+      title: 'Progress Tracking',
+      description: 'See your writing improve over time with metrics like average sentence length and complex word usage. Encouraging, not overwhelming.',
+      color: '#f97316',
+    },
+  ];
+
+  const readingFeatures: Feature[] = [
+    {
+      icon: <Eye size={28} />,
+      title: 'Three Reading Modes',
+      description: 'Clean mode removes all distractions. Guided mode focuses line-by-line with a spotlight. Supported mode adds a reading ruler and colour tint. Choose the mode that works for your brain.',
+      color: '#10b981',
+      isNew: true,
+    },
+    {
+      icon: <ScanText size={28} />,
+      title: 'Memory Reading',
+      description: 'Any document broken into manageable chunks. Tap any word for its definition, pronunciation, and an example sentence. A running summary builds as you read — so nothing slips away.',
+      color: '#7c3aed',
       isPro: true,
       isNew: true,
     },
     {
-      icon: <MessageSquare size={32} />,
-      title: 'Writing Coach',
-      description:
-        'Intent-first coaching that asks who you\'re writing for and why. Get tips tailored to your audience, purpose, and tone—no technical terms.',
-      color: '#8b5cf6',
-      isPro: true,
-    },
-    {
-      icon: <Sparkles size={32} />,
-      title: 'Smart Text Simplification',
-      description:
-        'AI-powered simplification that makes complex text easier to read without losing meaning. Perfect for understanding difficult content.',
-      color: '#f59e0b',
-    },
-    {
-      icon: <Mic size={32} />,
-      title: 'Voice Dictation',
-      description:
-        'Speak naturally and see your words appear in the editor. Great for when typing feels difficult or you want to capture ideas quickly.',
-      color: '#10b981',
-    },
-    {
-      icon: <BookOpen size={32} />,
+      icon: <Volume2 size={28} />,
       title: 'Read Aloud',
-      description:
-        'Listen to your text with high-quality AI voices. Hear how your writing sounds and catch mistakes you might miss while reading.',
+      description: 'Listen to your text with high-quality AI voices. Hear how your writing sounds and catch mistakes you might miss while reading silently.',
       color: '#ec4899',
     },
     {
-      icon: <Highlighter size={32} />,
+      icon: <Highlighter size={28} />,
       title: 'Sentence Highlighting',
-      description:
-        'Follow along as each sentence highlights while reading aloud. Helps you stay focused and improves reading comprehension.',
+      description: 'Each sentence highlights as it\'s read aloud. Helps you stay on the right line, follow along with ease, and improve reading comprehension.',
       color: '#06b6d4',
     },
+  ];
+
+  const workplaceFeatures: Feature[] = [
     {
-      icon: <Zap size={32} />,
-      title: 'Progress Tracking',
-      description:
-        'See your writing improve over time with metrics like average sentence length and complex word usage. Encouraging, not overwhelming.',
-      color: '#f97316',
+      icon: <Calendar size={28} />,
+      title: 'Meeting Survival Kit',
+      description: 'Prepare for meetings with an AI briefing in plain English. Capture live transcripts simplified in real time. Walk away with decisions, action items, and a draft follow-up email — automatically.',
+      color: '#1D9E75',
+      isNew: true,
     },
     {
-      icon: <Shield size={32} />,
+      icon: <GraduationCap size={28} />,
+      title: 'Lesson Capture',
+      description: 'Students: prep before class with vocab previews, capture teacher speech in real time as simplified notes, then get instant revision notes — key facts, a visual memory prompt, and a quick quiz.',
+      color: '#534AB7',
+      isNew: true,
+    },
+    {
+      icon: <BookOpen size={28} />,
+      title: 'Vocabulary Builder',
+      description: 'Every word you look up is saved and scheduled for spaced-repetition review. Build a personal word bank from your reading and lessons, with pronunciation guides and examples.',
+      color: '#0ea5e9',
+      isPro: true,
+    },
+    {
+      icon: <Shield size={28} />,
       title: 'Privacy-Focused',
-      description:
-        'Your writing stays private. We don\'t train AI models on your content. Documents are stored locally in your browser.',
+      description: 'Your writing stays private. We never train AI models on your content. Documents are stored locally in your browser — nothing leaves your device unless you choose.',
       color: '#6366f1',
     },
   ];
 
   return (
-    <div
-      style={{
-        padding: '80px 20px',
-        backgroundColor: darkMode ? '#111827' : '#f9fafb',
-      }}
-    >
+    <div style={{ padding: '80px 20px', backgroundColor: darkMode ? '#111827' : '#f9fafb' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+
         {/* Section header */}
         <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-          <div
-            style={{
-              display: 'inline-block',
-              padding: '8px 20px',
-              backgroundColor: darkMode ? '#374151' : '#e0e7ff',
-              color: darkMode ? '#a5b4fc' : '#6366f1',
-              borderRadius: '50px',
-              fontSize: '14px',
-              fontWeight: '600',
-              marginBottom: '16px',
-            }}
-          >
+          <div style={{
+            display: 'inline-block', padding: '8px 20px',
+            backgroundColor: darkMode ? '#374151' : '#e0e7ff',
+            color: darkMode ? '#a5b4fc' : '#6366f1',
+            borderRadius: '50px', fontSize: '14px', fontWeight: 600, marginBottom: '16px',
+          }}>
             Features
           </div>
-          <h2
-            style={{
-              fontSize: 'clamp(28px, 5vw, 42px)',
-              fontWeight: '800',
-              color: theme.text,
-              marginBottom: '16px',
-              lineHeight: '1.2',
-            }}
-          >
-            Dyslexia-Friendly Writing Tools
-            <br />
-            You'll Actually Use
+          <h2 style={{
+            fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: 800,
+            color: theme.text, marginBottom: '16px', lineHeight: 1.2,
+          }}>
+            Every tool your brain needs
+            <br />to write, read, and learn
           </h2>
-          <p
-            style={{
-              fontSize: '18px',
-              color: darkMode ? '#9ca3af' : '#6b7280',
-              maxWidth: '700px',
-              margin: '0 auto',
-              lineHeight: '1.6',
-            }}
-          >
-            Every feature is designed with dyslexic writers in mind. No jargon, no complexity—just
-            tools that help you write with confidence.
+          <p style={{
+            fontSize: '18px', color: darkMode ? '#9ca3af' : '#6b7280',
+            maxWidth: '700px', margin: '0 auto', lineHeight: 1.6,
+          }}>
+            Built for dyslexic thinkers — from the first word to the final read-through, in the classroom and in the workplace.
           </p>
         </div>
 
-        {/* Features grid */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '32px',
-          }}
-        >
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              style={{
-                backgroundColor: darkMode ? '#1f2937' : '#ffffff',
-                padding: '32px',
-                borderRadius: '16px',
-                border: `1px solid ${darkMode ? '#374151' : '#e5e7eb'}`,
-                transition: 'all 0.3s ease',
-                cursor: 'pointer',
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.boxShadow = darkMode
-                  ? '0 10px 30px rgba(0, 0, 0, 0.5)'
-                  : '0 10px 30px rgba(0, 0, 0, 0.1)';
-                e.currentTarget.style.borderColor = feature.color;
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
-                e.currentTarget.style.borderColor = darkMode ? '#374151' : '#e5e7eb';
-              }}
-            >
-              {/* Icon */}
-              <div
-                style={{
-                  width: '64px',
-                  height: '64px',
-                  borderRadius: '12px',
-                  backgroundColor: `${feature.color}15`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '20px',
-                  color: feature.color,
-                }}
-              >
-                {feature.icon}
-              </div>
+        {/* ── Writing Support ── */}
+        <GroupHeader label="Writing" color="#8b5cf6" darkMode={darkMode} />
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '24px',
+          marginBottom: '56px',
+        }}>
+          {writingFeatures.map((f, i) => (
+            <FeatureCard key={i} feature={f} theme={theme} darkMode={darkMode} />
+          ))}
+        </div>
 
-              {/* Title with badges */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
-                <h3
-                  style={{
-                    fontSize: '20px',
-                    fontWeight: '700',
-                    color: theme.text,
-                    margin: 0,
-                  }}
-                >
-                  {feature.title}
-                </h3>
-                {(feature as any).isPro && (
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      padding: '4px 10px',
-                      backgroundColor: '#fbbf24',
-                      color: '#000000',
-                      borderRadius: '6px',
-                      fontSize: '12px',
-                      fontWeight: '700',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                    }}
-                  >
-                    <Crown size={14} />
-                    Pro
-                  </span>
-                )}
-                {(feature as any).isNew && (
-                  <span
-                    style={{
-                      padding: '4px 10px',
-                      backgroundColor: darkMode ? '#10b981' : '#10b981',
-                      color: '#ffffff',
-                      borderRadius: '6px',
-                      fontSize: '12px',
-                      fontWeight: '700',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                    }}
-                  >
-                    New
-                  </span>
-                )}
-              </div>
+        {/* ── Reading Support ── */}
+        <GroupHeader label="Reading" color="#10b981" darkMode={darkMode} />
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '24px',
+          marginBottom: '56px',
+        }}>
+          {readingFeatures.map((f, i) => (
+            <FeatureCard key={i} feature={f} theme={theme} darkMode={darkMode} />
+          ))}
+        </div>
 
-              {/* Description */}
-              <p
-                style={{
-                  fontSize: '15px',
-                  color: darkMode ? '#9ca3af' : '#6b7280',
-                  lineHeight: '1.6',
-                }}
-              >
-                {feature.description}
-              </p>
-            </div>
+        {/* ── Workplace & Learning ── */}
+        <GroupHeader label="Workplace &amp; Learning" color="#1D9E75" darkMode={darkMode} />
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '24px',
+          marginBottom: '64px',
+        }}>
+          {workplaceFeatures.map((f, i) => (
+            <FeatureCard key={i} feature={f} theme={theme} darkMode={darkMode} />
           ))}
         </div>
 
         {/* Bottom CTA */}
-        <div
-          style={{
-            marginTop: '80px',
-            textAlign: 'center',
-            padding: '48px 32px',
-            background: darkMode
-              ? 'linear-gradient(135deg, #374151 0%, #1f2937 100%)'
-              : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            borderRadius: '24px',
-            color: '#ffffff',
-          }}
-        >
-          <h3
-            style={{
-              fontSize: 'clamp(24px, 4vw, 36px)',
-              fontWeight: '800',
-              marginBottom: '16px',
-            }}
-          >
+        <div style={{
+          textAlign: 'center', padding: '48px 32px',
+          background: darkMode
+            ? 'linear-gradient(135deg, #374151 0%, #1f2937 100%)'
+            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          borderRadius: '24px', color: '#ffffff',
+        }}>
+          <h3 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, marginBottom: '16px' }}>
             Ready to Write with Confidence?
           </h3>
-          <p
-            style={{
-              fontSize: '18px',
-              marginBottom: '32px',
-              opacity: 0.95,
-            }}
-          >
+          <p style={{ fontSize: '18px', marginBottom: '32px', opacity: 0.95 }}>
             Join dyslexic writers who are already using DyslexiaWrite to communicate better.
           </p>
-          <button
-            onClick={() => {
-              const editor = document.getElementById('text');
-              if (editor) {
-                editor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                setTimeout(() => editor.focus(), 500);
-              }
-            }}
+          <a
+            href="/sign-up"
             style={{
-              padding: '16px 40px',
-              fontSize: '18px',
-              fontWeight: '700',
-              backgroundColor: '#ffffff',
-              color: darkMode ? '#1f2937' : '#667eea',
-              border: 'none',
-              borderRadius: '12px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 30px rgba(0, 0, 0, 0.3)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.2)';
+              display: 'inline-block', padding: '16px 40px', fontSize: '18px', fontWeight: 700,
+              backgroundColor: '#ffffff', color: '#667eea',
+              borderRadius: '12px', textDecoration: 'none',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.2)', transition: 'all 0.2s',
             }}
           >
-            Start Writing Now — It's Free
-          </button>
+            Start Writing Free — No card needed
+          </a>
         </div>
       </div>
     </div>
