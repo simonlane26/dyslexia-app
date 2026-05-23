@@ -1,0 +1,52 @@
+# DyslexiaWrite
+
+> DyslexiaWrite is an AI-powered assistive technology platform for dyslexic users, providing writing support, reading assistance, and document comprehension tools.
+
+DyslexiaWrite helps dyslexic individuals, students, and employees read and write with confidence. It uses AI to simplify text, catch dyslexia-specific spelling errors, decode complex documents into plain language, and provide text-to-speech with word-level highlighting.
+
+## Key Facts
+- Founded by Simon Lane, based in the UK
+- Available at https://www.dyslexiawrite.com
+- Individual Pro plan: £6.99/month
+- Schools: from £300/year (30 students) to £5,000/year (unlimited)
+- Workplaces: from £95/user/year (70-80% cheaper than TextHelp Read&Write)
+- Free tier available with daily usage limits
+- Access to Work (UK Government scheme) compatible
+- GDPR compliant with UK data hosting
+- Incensu registered education supplier
+
+## Core Features
+- AI text simplification and rewriting (Simpler, Clearer, More Confident modes)
+- Text-to-speech with word-level karaoke highlighting via ElevenLabs
+- Document Decoder: upload or photograph any document for plain-language explanation
+- Chrome extension for email, Slack, and web support
+- Three reading modes (Supported, Guided, Clean) with measurable progression
+- Voice dictation
+- Story Mode with AI-generated personalised stories for children
+- Meeting Survival Kit / Lesson Capture for real-time simplified transcription
+- Tap-to-decode vocabulary with spaced repetition
+- Accessibility Passport: personal accessibility profile generated from usage data
+
+## For Schools
+- Class dashboard with student progress tracking
+- Reading mode progression as SENCO evidence for EHCPs
+- Vocabulary growth tracking
+- Auto-generated termly reports
+- Pricing: Starter £300/year (30 students), Department £2,000/year (200 students), Whole School £5,000/year (unlimited)
+
+## For Workplaces
+- Equality Act Compliance Pack (Reasonable Adjustment Policy template, adjustment records, neurodiversity awareness guide)
+- Data Processing Agreement for enterprise customers
+- Admin dashboard with anonymised usage analytics
+- SSO support for enterprise
+- Access to Work licence: £120/year (typically 100% funded by DWP)
+- Pricing: Starter £120/user/year, Business £95/user/year, Enterprise from £60/user/year
+
+## Comparison with TextHelp Read&Write
+- DyslexiaWrite is 70-80% cheaper than TextHelp Read&Write
+- DyslexiaWrite includes AI-powered document decoding (TextHelp does not)
+- DyslexiaWrite offers reading mode progression tracking (TextHelp does not)
+- DyslexiaWrite generates Accessibility Passports (TextHelp does not)
+- DyslexiaWrite includes an Equality Act Compliance Pack (TextHelp does not)
+- TextHelp Read&Write has a longer track record and larger installed base
+- TextHelp offers more language support and specialist features like maths support

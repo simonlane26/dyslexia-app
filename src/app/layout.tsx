@@ -83,10 +83,94 @@ export const metadata: Metadata = {
   },
 };
 
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': 'https://www.dyslexiawrite.com/#organization',
+      name: 'DyslexiaWrite',
+      url: 'https://www.dyslexiawrite.com',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://www.dyslexiawrite.com/LogoNew.png',
+      },
+      founder: { '@type': 'Person', name: 'Simon Lane' },
+      foundingLocation: { '@type': 'Place', addressCountry: 'GB' },
+      description:
+        'AI-powered assistive technology platform for dyslexic users, providing writing support, reading assistance, and document comprehension tools.',
+      sameAs: ['https://twitter.com/dyslexiawriter'],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://www.dyslexiawrite.com/#website',
+      url: 'https://www.dyslexiawrite.com',
+      name: 'DyslexiaWrite',
+      publisher: { '@id': 'https://www.dyslexiawrite.com/#organization' },
+    },
+    {
+      '@type': 'SoftwareApplication',
+      '@id': 'https://www.dyslexiawrite.com/#app',
+      name: 'DyslexiaWrite',
+      url: 'https://www.dyslexiawrite.com',
+      applicationCategory: 'EducationApplication',
+      operatingSystem: 'Web, Chrome Extension',
+      offers: [
+        {
+          '@type': 'Offer',
+          name: 'Free',
+          price: '0',
+          priceCurrency: 'GBP',
+          description: 'Free tier with daily usage limits',
+        },
+        {
+          '@type': 'Offer',
+          name: 'Pro',
+          price: '6.99',
+          priceCurrency: 'GBP',
+          billingIncrement: 'P1M',
+          description: 'Unlimited access for individuals',
+        },
+        {
+          '@type': 'Offer',
+          name: 'Access to Work Licence',
+          price: '120',
+          priceCurrency: 'GBP',
+          billingIncrement: 'P1Y',
+          description: 'UK Government Access to Work scheme compatible — typically 100% funded by DWP',
+        },
+      ],
+      featureList: [
+        'AI text simplification and rewriting',
+        'Text-to-speech with word-level highlighting',
+        'Document Decoder for plain-language explanations',
+        'Three reading modes: Supported, Guided, Clean',
+        'Voice dictation',
+        'AI-generated personalised stories for children',
+        'Meeting Survival Kit and Lesson Capture',
+        'Spaced repetition vocabulary builder',
+        'Accessibility Passport',
+        'Chrome extension',
+      ],
+      audience: {
+        '@type': 'Audience',
+        audienceType: 'People with dyslexia, students, employees, schools, workplaces',
+      },
+      provider: { '@id': 'https://www.dyslexiawrite.com/#organization' },
+      description:
+        'DyslexiaWrite helps dyslexic individuals, students, and employees read and write with confidence. 70–80% cheaper than TextHelp Read&Write, with AI document decoding, reading mode progression tracking, and Accessibility Passports.',
+    },
+  ],
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-GB">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=AW-17942125039"
           strategy="afterInteractive"
