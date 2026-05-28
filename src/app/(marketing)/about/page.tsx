@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import React from 'react';
+import { Pen, BookOpen, FileText, GraduationCap, Briefcase, User, School, Building2 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'About DyslexiaWrite',
@@ -168,40 +170,40 @@ export default function AboutPage() {
         </p>
 
         <div style={S.grid3}>
-          {[
+          {([
             {
-              icon: '✍️',
+              icon: <Pen size={28} />,
               title: 'Writing support',
               desc: 'Dyslexia-aware grammar checking, AI sentence rewriting, voice dictation, and a plain-English writing mentor.',
             },
             {
-              icon: '📖',
+              icon: <BookOpen size={28} />,
               title: 'Reading assistance',
               desc: 'Three reading modes with a spotlight, ruler, and tint. Read-aloud with karaoke word highlighting via ElevenLabs.',
             },
             {
-              icon: '📄',
+              icon: <FileText size={28} />,
               title: 'Document decoding',
               desc: 'Upload or photograph any document — letter, form, contract — and get a plain-English summary instantly.',
             },
             {
-              icon: '🎓',
+              icon: <GraduationCap size={28} />,
               title: 'Lesson Capture',
               desc: 'Live simplified transcription in class. Generates revision notes, key facts, and a quick quiz automatically.',
             },
             {
-              icon: '💼',
+              icon: <Briefcase size={28} />,
               title: 'Meeting Survival Kit',
               desc: 'Prep briefing before meetings. Live simplified transcript. Auto-generated action items and follow-up email.',
             },
             {
-              icon: '📚',
+              icon: <BookOpen size={28} />,
               title: 'Story Mode',
               desc: 'AI-generated personalised stories for children with warmup words, karaoke highlighting, and vocab tracking.',
             },
-          ].map((f) => (
+          ] as { icon: React.ReactNode; title: string; desc: string }[]).map((f) => (
             <div key={f.title} style={S.card}>
-              <div style={S.cardIcon}>{f.icon}</div>
+              <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{f.icon}</div>
               <h3 style={S.cardH3}>{f.title}</h3>
               <p style={S.cardP}>{f.desc}</p>
             </div>
@@ -215,25 +217,25 @@ export default function AboutPage() {
           <div style={S.sectionLabel}>Who we serve</div>
           <h2 style={S.h2}>Three audiences, one platform</h2>
           <div style={{ ...S.grid3, marginTop: 32 }}>
-            {[
+            {([
               {
-                icon: '🧑',
+                icon: <User size={28} />,
                 title: 'Individuals',
                 desc: 'From £6.99/month. Free tier available with daily usage limits. Access to Work licence at £120/year — typically 100% funded by DWP.',
               },
               {
-                icon: '🏫',
+                icon: <School size={28} />,
                 title: 'Schools',
                 desc: 'From £300/year for 30 students. Class dashboard, reading mode progression as SENCO evidence, vocabulary growth tracking, and auto-generated termly reports.',
               },
               {
-                icon: '🏢',
+                icon: <Building2 size={28} />,
                 title: 'Workplaces',
                 desc: 'From £95/user/year. Equality Act Compliance Pack, admin dashboard, Data Processing Agreement, and SSO for enterprise.',
               },
-            ].map((a) => (
+            ] as { icon: React.ReactNode; title: string; desc: string }[]).map((a) => (
               <div key={a.title} style={{ ...S.card, background: '#fff' }}>
-                <div style={S.cardIcon}>{a.icon}</div>
+                <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{a.icon}</div>
                 <h3 style={S.cardH3}>{a.title}</h3>
                 <p style={S.cardP}>{a.desc}</p>
               </div>

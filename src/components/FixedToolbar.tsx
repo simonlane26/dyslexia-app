@@ -17,6 +17,8 @@ import {
   Clock,
   MessageSquare,
   Settings,
+  Brain,
+  Star,
 } from 'lucide-react';
 import { ModernButton } from './ModernButton';
 import { ExportPDFButton } from './ExportPDFButton';
@@ -257,7 +259,7 @@ export function FixedToolbar({
                 title="Simplify text"
                 size="sm"
               >
-                ✨ {copy.simplifyLabel}
+                <Sparkles size={14} /> {copy.simplifyLabel}
               </ModernButton>
               {showSimplifyTip && (
                 <FeatureTip
@@ -275,7 +277,7 @@ export function FixedToolbar({
                 title={`Toggle ${copy.aiCoachLabel} panel`}
                 size="sm"
               >
-                💡 {copy.aiCoachButton}
+                <Brain size={14} /> {copy.aiCoachButton}
               </ModernButton>
             ) : (
               <div style={{ position: 'relative' }}>
@@ -285,7 +287,7 @@ export function FixedToolbar({
                   title={`${copy.aiCoachLabel} — Pro feature`}
                   size="sm"
                 >
-                  <span style={{ fontSize: '11px', marginRight: '2px' }}>⭐</span>💡 {copy.aiCoachButton}
+                  <Star size={11} style={{ marginRight: 2 }} /><Brain size={14} /> {copy.aiCoachButton}
                 </ModernButton>
                 {proPopover === 'coach' && (
                   <ProUpgradePopover
@@ -317,7 +319,7 @@ export function FixedToolbar({
                   title="Writing Mentor — Pro feature"
                   size="sm"
                 >
-                  <span style={{ fontSize: '11px', marginRight: '2px' }}>⭐</span>{t('toolbar.mentor')}
+                  <Star size={11} style={{ marginRight: 2 }} /> {t('toolbar.mentor')}
                 </ModernButton>
                 {proPopover === 'agent' && (
                   <ProUpgradePopover
@@ -340,7 +342,7 @@ export function FixedToolbar({
               title="My Vocabulary — words you've decoded"
               size="sm"
             >
-              📖 Vocabulary
+              <BookOpen size={14} /> Vocabulary
             </ModernButton>
 
         {/* Divider */}
@@ -384,7 +386,7 @@ export function FixedToolbar({
               title="Open Memory Reading — chunked reading with word help and summaries"
               size="sm"
             >
-              📖 Memory Read
+              <BookOpen size={14} /> Memory Read
             </ModernButton>
 
           </div>
@@ -508,7 +510,7 @@ export function FixedToolbar({
                 title="⭐ Pro Feature - Compare different versions of your writing"
                 size="sm"
               >
-                <span style={{ fontSize: '12px', marginRight: '2px' }}>⭐</span>
+                <Star size={11} style={{ marginRight: 2 }} />
                 {t('toolbar.compare')}
               </ModernButton>
             )}
@@ -577,7 +579,7 @@ export function FixedToolbar({
         }}>
           <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
             <ModernButton variant="secondary" size="sm" onClick={onSimplify} disabled={loading || !text.trim()}>
-              ✨ {copy.simplifyLabel}
+              <Sparkles size={14} /> {copy.simplifyLabel}
             </ModernButton>
             <ModernButton variant="secondary" size="sm" onClick={onReadAloud}>
               {t('toolbar.readAloud')}

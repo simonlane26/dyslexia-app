@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Send, Bot, Lock, FileText, Mic, MicOff, ChevronRight, Volume2, Square } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { X, Send, Bot, Lock, FileText, Mic, MicOff, ChevronRight, Volume2, Square, Mail, Pen, Briefcase, ClipboardList, Sparkles, BookOpen } from 'lucide-react';
 import { ModernButton } from './ModernButton';
 import { useT, useLanguage } from '@/lib/i18n';
 
@@ -586,8 +586,8 @@ export function AgentChat({
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
-                    <div style={{ fontSize: '13px', lineHeight: 1.5, color: panelText }}>
-                      ✨ {nudge.message}
+                    <div style={{ fontSize: '13px', lineHeight: 1.5, color: panelText, display: 'flex', alignItems: 'flex-start', gap: '4px' }}>
+                      <Sparkles size={15} /> {nudge.message}
                     </div>
                     <button
                       type="button"
@@ -634,16 +634,16 @@ export function AgentChat({
                     {t('mentor.subtitle')}
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    {[
-                      { label: t('writingType.email'),       key: 'email',        icon: '✉️' },
-                      { label: t('writingType.essay'),       key: 'essay',        icon: '📝' },
-                      { label: t('writingType.workMessage'), key: 'work message', icon: '💼' },
+                    {([
+                      { label: t('writingType.email'),       key: 'email',        icon: <Mail size={15} /> },
+                      { label: t('writingType.essay'),       key: 'essay',        icon: <Pen size={15} /> },
+                      { label: t('writingType.workMessage'), key: 'work message', icon: <Briefcase size={15} /> },
                       { label: t('writingType.socialPost'),  key: 'social post',  icon: '📱' },
-                      { label: t('writingType.story'),       key: 'story',        icon: '📖' },
+                      { label: t('writingType.story'),       key: 'story',        icon: <BookOpen size={15} /> },
                       { label: t('writingType.notes'),       key: 'notes',        icon: '🗒️' },
                       { label: t('writingType.homework'),    key: 'homework',     icon: '🎒' },
-                      { label: t('writingType.assignment'),  key: 'assignment',   icon: '📋' },
-                    ].map(({ label, key, icon }) => (
+                      { label: t('writingType.assignment'),  key: 'assignment',   icon: <ClipboardList size={15} /> },
+                    ] as { label: string; key: string; icon: React.ReactNode }[]).map(({ label, key, icon }) => (
                       <button
                         key={key}
                         type="button"

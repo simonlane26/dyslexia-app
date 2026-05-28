@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import React from 'react';
+import { Pen, Volume2, Globe, Mic, BarChart2, ClipboardList, Check } from 'lucide-react';
 
 const S = {
   page: { fontFamily: "'DM Sans', system-ui, sans-serif", color: '#2C2C2A', lineHeight: 1.7, background: '#fff' } as React.CSSProperties,
@@ -65,13 +67,13 @@ const S = {
 export default function EnterprisePage() {
   const [submitted, setSubmitted] = useState(false);
 
-  const features = [
-    { icon: '✍️', bg: '#E1F5EE', h: 'AI writing support', p: 'Simplify, rewrite, and improve any text. Catches dyslexia-specific errors like homophones and phonetic spellings that normal spell-checkers miss.' },
-    { icon: '🔊', bg: '#EEEDFE', h: 'Read any document aloud', p: 'Natural-sounding voices read emails, PDFs, and web pages. Employees hear their writing back to catch errors before sending.' },
-    { icon: '🌐', bg: '#FAEEDA', h: 'Chrome extension', p: 'Works inside Gmail, Outlook, Slack, Teams, and any website. Simplifies web pages and helps with forms — everywhere they work.' },
-    { icon: '🎙️', bg: '#E6F1FB', h: 'Voice dictation', p: 'Speak naturally and see words appear. For employees who think faster than they type, dictation removes the biggest barrier.' },
-    { icon: '📊', bg: '#E1F5EE', h: 'Usage analytics for HR', p: 'See adoption rates, most-used features, and aggregate engagement. Prove the ROI of your accessibility investment.' },
-    { icon: '📋', bg: '#EEEDFE', h: 'Accessibility passport', p: 'Each employee builds a personal accessibility profile that follows them across teams and roles.' },
+  const features: { icon: React.ReactNode; bg: string; h: string; p: string }[] = [
+    { icon: <Pen size={20} />, bg: '#E1F5EE', h: 'AI writing support', p: 'Simplify, rewrite, and improve any text. Catches dyslexia-specific errors like homophones and phonetic spellings that normal spell-checkers miss.' },
+    { icon: <Volume2 size={20} />, bg: '#EEEDFE', h: 'Read any document aloud', p: 'Natural-sounding voices read emails, PDFs, and web pages. Employees hear their writing back to catch errors before sending.' },
+    { icon: <Globe size={20} />, bg: '#FAEEDA', h: 'Chrome extension', p: 'Works inside Gmail, Outlook, Slack, Teams, and any website. Simplifies web pages and helps with forms — everywhere they work.' },
+    { icon: <Mic size={20} />, bg: '#E6F1FB', h: 'Voice dictation', p: 'Speak naturally and see words appear. For employees who think faster than they type, dictation removes the biggest barrier.' },
+    { icon: <BarChart2 size={20} />, bg: '#E1F5EE', h: 'Usage analytics for HR', p: 'See adoption rates, most-used features, and aggregate engagement. Prove the ROI of your accessibility investment.' },
+    { icon: <ClipboardList size={20} />, bg: '#EEEDFE', h: 'Accessibility passport', p: 'Each employee builds a personal accessibility profile that follows them across teams and roles.' },
   ];
 
   const compliance = [
@@ -234,7 +236,7 @@ export default function EnterprisePage() {
         </div>
         {submitted ? (
           <div style={{ maxWidth: 560, margin: '0 auto', textAlign: 'center', padding: 40 }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
+            <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}><Check size={48} /></div>
             <h3 style={{ color: '#fff', fontSize: 20, marginBottom: 8 }}>Thanks — we'll be in touch!</h3>
             <p style={{ color: '#9FE1CB', fontSize: 15 }}>We'll respond within 1 working day.</p>
           </div>

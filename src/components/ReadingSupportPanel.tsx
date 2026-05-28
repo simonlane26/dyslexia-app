@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { Play, Pause } from 'lucide-react';
 
 export type ReadingMode = 'clean' | 'guided' | 'supported';
 
@@ -607,7 +608,7 @@ export function ReadingSupportPanel({
               transition: 'all 0.2s', userSelect: 'none',
             }}
           >
-            {audioState === 'loading' ? '…' : audioState === 'playing' ? '⏸' : '▶'}
+            {audioState === 'loading' ? '…' : audioState === 'playing' ? <Pause size={16} /> : <Play size={16} />}
           </div>
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: darkMode ? '#333' : '#f0f0f0' }}>
             <div style={{ height: '100%', background: '#1D9E75', borderRadius: '0 2px 0 0', width: `${progress}%`, transition: 'width 0.4s' }} />

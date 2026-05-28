@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import React from 'react';
+import { Brain, Mic, Volume2, Smartphone, Pen, BookOpen, GraduationCap, BarChart2, ClipboardList, Calendar, Sparkles, Check } from 'lucide-react';
 
 const S = {
   page: { fontFamily: "'DM Sans', system-ui, sans-serif", color: '#2C2C2A', lineHeight: 1.7, background: '#fff' } as React.CSSProperties,
@@ -205,14 +207,14 @@ export default function SchoolsPage() {
           <p style={S.sectionDesc}>DyslexiaWrite helps students improve, not just cope. Every feature is designed to build skills and confidence over time.</p>
         </div>
         <div style={S.featuresGrid}>
-          {[
-            { icon: '✍️', bg: '#EEEDFE', title: 'Smart writing support', desc: 'AI simplifies and improves text while teaching the student why. Catches dyslexia-specific errors like homophones and phonetic spellings that standard spell-checkers miss.' },
-            { icon: '📚', bg: '#E1F5EE', title: 'Three reading modes', desc: 'Clean, Guided, and Supported modes match the level of help to the student. As they improve, they move between modes — and that progression is tracked.' },
-            { icon: '🔊', bg: '#FAEEDA', title: 'Read aloud with karaoke sync', desc: 'Natural voices read text aloud while each word highlights in sync. Students follow along visually and aurally, building reading fluency without frustration.' },
-            { icon: '📱', bg: '#FAECE7', title: 'Tap-to-decode vocabulary', desc: 'Tap any word to hear it pronounced, see it broken into syllables, and get a simple definition. Every tapped word is saved for spaced repetition vocabulary building.' },
-            { icon: '🎙️', bg: '#E6F1FB', title: 'Voice dictation', desc: 'Students speak their ideas and see words appear. For students who think fluently but freeze when typing, dictation removes the biggest barrier to written expression.' },
-            { icon: '🧠', bg: '#EEEDFE', title: 'Writing coach', desc: 'An AI mentor that asks guiding questions: "Who is this for? What do you want them to do after reading it?" Scaffolds the writing process without writing it for them.' },
-          ].map(f => (
+          {([
+            { icon: <Pen size={20} />, bg: '#EEEDFE', title: 'Smart writing support', desc: 'AI simplifies and improves text while teaching the student why. Catches dyslexia-specific errors like homophones and phonetic spellings that standard spell-checkers miss.' },
+            { icon: <BookOpen size={20} />, bg: '#E1F5EE', title: 'Three reading modes', desc: 'Clean, Guided, and Supported modes match the level of help to the student. As they improve, they move between modes — and that progression is tracked.' },
+            { icon: <Volume2 size={20} />, bg: '#FAEEDA', title: 'Read aloud with karaoke sync', desc: 'Natural voices read text aloud while each word highlights in sync. Students follow along visually and aurally, building reading fluency without frustration.' },
+            { icon: <Smartphone size={20} />, bg: '#FAECE7', title: 'Tap-to-decode vocabulary', desc: 'Tap any word to hear it pronounced, see it broken into syllables, and get a simple definition. Every tapped word is saved for spaced repetition vocabulary building.' },
+            { icon: <Mic size={20} />, bg: '#E6F1FB', title: 'Voice dictation', desc: 'Students speak their ideas and see words appear. For students who think fluently but freeze when typing, dictation removes the biggest barrier to written expression.' },
+            { icon: <Brain size={20} />, bg: '#EEEDFE', title: 'Writing coach', desc: 'An AI mentor that asks guiding questions: "Who is this for? What do you want them to do after reading it?" Scaffolds the writing process without writing it for them.' },
+          ] as { icon: React.ReactNode; bg: string; title: string; desc: string }[]).map(f => (
             <div key={f.title} style={S.featureCard}>
               <div style={S.featureIcon(f.bg)}>{f.icon}</div>
               <h3 style={S.featureH3}>{f.title}</h3>
@@ -243,7 +245,7 @@ export default function SchoolsPage() {
             <p style={S.modeP}>Reading ruler and paragraph focus help track across lines. Hover highlighting shows the current sentence. Student reads independently with visual scaffolding.</p>
           </div>
           <div style={S.modeCard('#E1F5EE', '#9FE1CB')}>
-            <span style={S.modeEmoji}>✨</span>
+            <span style={S.modeEmoji}><Sparkles size={32} /></span>
             <h3 style={S.modeH3}>Clean</h3>
             <div style={S.modeSub('#0F6E56')}>Independent reading</div>
             <p style={S.modeP}>Dyslexia-friendly font, optimised spacing, and preferred colours. No additional visual aids. The student reads on their own. Tap-to-decode still available if needed.</p>
@@ -297,12 +299,12 @@ export default function SchoolsPage() {
           <p style={S.sectionDesc}>DyslexiaWrite automatically generates the evidence SENCOs need, without adding to anyone&apos;s workload.</p>
         </div>
         <div style={S.sencoGrid}>
-          {[
-            { icon: '📊', title: 'Reading mode progression', desc: 'Track which reading mode each student uses over time. Movement from Supported to Guided to Clean is concrete evidence of reading development.' },
-            { icon: '📝', title: 'Writing confidence metrics', desc: 'Words written, rewrites per piece, vocabulary range, and self-correction rate. All tracked automatically, all trended over time.' },
-            { icon: '📖', title: 'Vocabulary growth', desc: "Every word a student taps for help is logged. See which words they've learned (no longer tapping) and which they're still working on." },
-            { icon: '📅', title: 'Termly progress reports', desc: 'Auto-generated reports ready to attach to EHCPs, annual reviews, or parent meetings. Plain-language summaries, not raw data.' },
-          ].map(c => (
+          {([
+            { icon: <BarChart2 size={20} />, title: 'Reading mode progression', desc: 'Track which reading mode each student uses over time. Movement from Supported to Guided to Clean is concrete evidence of reading development.' },
+            { icon: <Pen size={20} />, title: 'Writing confidence metrics', desc: 'Words written, rewrites per piece, vocabulary range, and self-correction rate. All tracked automatically, all trended over time.' },
+            { icon: <BookOpen size={20} />, title: 'Vocabulary growth', desc: "Every word a student taps for help is logged. See which words they've learned (no longer tapping) and which they're still working on." },
+            { icon: <Calendar size={20} />, title: 'Termly progress reports', desc: 'Auto-generated reports ready to attach to EHCPs, annual reviews, or parent meetings. Plain-language summaries, not raw data.' },
+          ] as { icon: React.ReactNode; title: string; desc: string }[]).map(c => (
             <div key={c.title} style={S.sencoCard}>
               <h3 style={S.sencoH3}><span>{c.icon}</span> {c.title}</h3>
               <p style={S.sencoP}>{c.desc}</p>
@@ -387,7 +389,7 @@ export default function SchoolsPage() {
         </div>
         {submitted ? (
           <div style={{ maxWidth: 560, margin: '0 auto', textAlign: 'center', background: 'rgba(255,255,255,0.08)', borderRadius: 16, padding: 40, border: '1px solid rgba(255,255,255,0.15)' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
+            <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}><Check size={48} /></div>
             <h3 style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: 22, color: '#fff', marginBottom: 8 }}>Thanks — we&apos;ll be in touch!</h3>
             <p style={{ fontSize: 14, color: '#9FE1CB' }}>We respond within 1 working day. If your email client didn&apos;t open, email us directly at <a href="mailto:Dyslexiawrite@gmail.com" style={{ color: '#5DCAA5' }}>Dyslexiawrite@gmail.com</a></p>
           </div>

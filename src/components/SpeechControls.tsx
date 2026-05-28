@@ -1,6 +1,7 @@
 'use client';
 
 import { useUser } from '@clerk/nextjs';
+import { Play, StopCircle } from 'lucide-react';
 
 export default SpeechControls;
 
@@ -22,7 +23,7 @@ export function SpeechControls({ text, isReading, setIsReadingAction }: SpeechCo
 
   return (
     <button onClick={speak} disabled={!isPro && text.length > 200}>
-      {isReading ? '⏹️ Stop' : '▶️ Speak'}
+      {isReading ? <><StopCircle size={16} /> Stop</> : <><Play size={16} /> Speak</>}
     </button>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Users, Target, MessageSquare } from 'lucide-react';
+import { X, Users, Target, MessageSquare, Briefcase, Pen } from 'lucide-react';
 import { ModernButton } from './ModernButton';
 
 export interface CoachIntent {
@@ -35,17 +35,17 @@ export function CoachIntentModal({
     onSubmit({ audience, purpose, tone });
   };
 
-  const audiences = [
+  const audiences: { value: CoachIntent['audience']; label: string; icon: React.ReactNode; desc: string }[] = [
     { value: 'friend' as const, label: 'A friend', icon: '👋', desc: 'Casual, relaxed writing' },
     { value: 'teacher' as const, label: 'My teacher', icon: '📚', desc: 'Clear and organized' },
-    { value: 'boss' as const, label: 'My boss', icon: '💼', desc: 'Professional and direct' },
+    { value: 'boss' as const, label: 'My boss', icon: <Briefcase size={18} />, desc: 'Professional and direct' },
     { value: 'general' as const, label: 'Anyone', icon: '🌍', desc: 'Easy for everyone to read' },
   ];
 
-  const purposes = [
+  const purposes: { value: CoachIntent['purpose']; label: string; icon: React.ReactNode; desc: string }[] = [
     { value: 'inform' as const, label: 'Explain something', icon: '💡', desc: 'Help them understand' },
     { value: 'persuade' as const, label: 'Change their mind', icon: '🎯', desc: 'Convince them to agree' },
-    { value: 'explain' as const, label: 'Give instructions', icon: '📝', desc: 'Show them how to do it' },
+    { value: 'explain' as const, label: 'Give instructions', icon: <Pen size={18} />, desc: 'Show them how to do it' },
     { value: 'story' as const, label: 'Tell a story', icon: '📖', desc: 'Entertain or share' },
   ];
 

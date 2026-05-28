@@ -1,8 +1,10 @@
 'use client';
 
+import React from 'react';
 import { useState, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
+import { Home, GraduationCap, Briefcase, Pen, Mail, Volume2, FileText, Mic, BookOpen, Camera, Globe, Sparkles } from 'lucide-react';
 
 type UserType = 'individual' | 'student' | 'employee' | null;
 type Feature = 'writing' | 'emails' | 'readAloud' | 'documents' | 'dictation' | 'reading';
@@ -31,19 +33,19 @@ const BG_COLOURS = [
   { id: '#2C2C2A', label: 'Dark' },
 ];
 
-const USER_TYPES = [
-  { id: 'individual' as UserType, icon: '🏠', title: 'For myself', desc: 'Personal writing, emails, reading letters and documents' },
-  { id: 'student' as UserType, icon: '🎓', title: 'For school or college', desc: 'Homework, essays, reading textbooks, exam prep' },
-  { id: 'employee' as UserType, icon: '💼', title: 'For work', desc: 'Work emails, reports, reading policies and documents' },
+const USER_TYPES: { id: UserType; icon: React.ReactNode; title: string; desc: string }[] = [
+  { id: 'individual' as UserType, icon: <Home size={20} />, title: 'For myself', desc: 'Personal writing, emails, reading letters and documents' },
+  { id: 'student' as UserType, icon: <GraduationCap size={20} />, title: 'For school or college', desc: 'Homework, essays, reading textbooks, exam prep' },
+  { id: 'employee' as UserType, icon: <Briefcase size={20} />, title: 'For work', desc: 'Work emails, reports, reading policies and documents' },
 ];
 
-const FEATURES: { id: Feature; icon: string; name: string; desc: string }[] = [
-  { id: 'writing', icon: '✍️', name: 'Fix my writing', desc: 'Spelling, grammar, clarity' },
-  { id: 'emails', icon: '📧', name: 'Help with emails', desc: 'Write and check messages' },
-  { id: 'readAloud', icon: '🔊', name: 'Read things aloud', desc: 'Hear text spoken to me' },
-  { id: 'documents', icon: '📄', name: 'Understand documents', desc: 'Decode letters and reports' },
-  { id: 'dictation', icon: '🎙️', name: 'Speak instead of type', desc: 'Voice dictation' },
-  { id: 'reading', icon: '📚', name: 'Read more easily', desc: 'Reading guide and support' },
+const FEATURES: { id: Feature; icon: React.ReactNode; name: string; desc: string }[] = [
+  { id: 'writing', icon: <Pen size={20} />, name: 'Fix my writing', desc: 'Spelling, grammar, clarity' },
+  { id: 'emails', icon: <Mail size={20} />, name: 'Help with emails', desc: 'Write and check messages' },
+  { id: 'readAloud', icon: <Volume2 size={20} />, name: 'Read things aloud', desc: 'Hear text spoken to me' },
+  { id: 'documents', icon: <FileText size={20} />, name: 'Understand documents', desc: 'Decode letters and reports' },
+  { id: 'dictation', icon: <Mic size={20} />, name: 'Speak instead of type', desc: 'Voice dictation' },
+  { id: 'reading', icon: <BookOpen size={20} />, name: 'Read more easily', desc: 'Reading guide and support' },
 ];
 
 const TOTAL_STEPS = 6;
@@ -177,7 +179,7 @@ export default function OnboardingWizard() {
         {/* ══ STEP 0: WELCOME ══ */}
         {step === 0 && (
           <div style={card}>
-            <div style={{ textAlign: 'center', fontSize: 40, marginBottom: 20 }}>📝</div>
+            <div style={{ textAlign: 'center', marginBottom: 20, display: 'flex', justifyContent: 'center' }}><Pen size={40} /></div>
             <h1 style={{ ...title, textAlign: 'center' }}>Hi {firstName}! Welcome to DyslexiaWrite</h1>
             <p style={{ ...sub, textAlign: 'center' }}>
               You're in the right place. Let's set things up so the app works the way your brain works. This takes about 2 minutes.
@@ -204,7 +206,7 @@ export default function OnboardingWizard() {
                     background: data.userType === ut.id ? '#E1F5EE' : '#fff',
                     cursor: 'pointer', transition: 'all 0.2s',
                   }}>
-                  <div style={{ fontSize: 24, width: 44, height: 44, borderRadius: 10,
+                  <div style={{ width: 44, height: 44, borderRadius: 10,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     background: data.userType === ut.id ? '#E1F5EE' : '#F1EFE8',
                   }}>{ut.icon}</div>
@@ -328,7 +330,7 @@ export default function OnboardingWizard() {
             />
 
             <button style={{ ...primary, marginTop: 10 }} onClick={handleTrySimplify} disabled={tryLoading}>
-              {tryLoading ? '✨ Working on it...' : 'Simplify this'}
+              {tryLoading ? <><Sparkles size={16} /> Working on it...</> : 'Simplify this'}
             </button>
 
             {tryResult && (
@@ -369,7 +371,7 @@ export default function OnboardingWizard() {
                     background: data.features.includes(feat.id) ? '#E1F5EE' : '#fff',
                     cursor: 'pointer', transition: 'all 0.2s',
                   }}>
-                  <span style={{ fontSize: 22, display: 'block', marginBottom: 6 }}>{feat.icon}</span>
+                  <span style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>{feat.icon}</span>
                   <div style={{ fontSize: 13, fontWeight: 500 }}>{feat.name}</div>
                   <div style={{ fontSize: 11, color: '#888780', marginTop: 2 }}>{feat.desc}</div>
                 </div>
@@ -411,11 +413,11 @@ export default function OnboardingWizard() {
               What would you like to do first?
             </p>
 
-            {[
-              { action: 'write', icon: '✍️', label: 'Start writing something' },
-              { action: 'decode', icon: '📷', label: 'Decode a document' },
-              { action: 'extension', icon: '🌐', label: 'Get the Chrome extension' },
-            ].map(item => (
+            {([
+              { action: 'write', icon: <Pen size={18} />, label: 'Start writing something' },
+              { action: 'decode', icon: <Camera size={18} />, label: 'Decode a document' },
+              { action: 'extension', icon: <Globe size={18} />, label: 'Get the Chrome extension' },
+            ] as { action: string; icon: React.ReactNode; label: string }[]).map(item => (
               <div key={item.action}
                 onClick={() => !saving && completeOnboarding(item.action)}
                 style={{
@@ -424,7 +426,7 @@ export default function OnboardingWizard() {
                   marginBottom: 8, cursor: saving ? 'not-allowed' : 'pointer',
                   opacity: saving ? 0.6 : 1, transition: 'all 0.2s',
                 }}>
-                <span style={{ fontSize: 18 }}>{item.icon}</span>
+                <span style={{ display: 'flex', alignItems: 'center' }}>{item.icon}</span>
                 <span style={{ fontSize: 14, fontWeight: 500 }}>{item.label}</span>
                 <span style={{ marginLeft: 'auto', color: '#B4B2A9', fontSize: 16 }}>→</span>
               </div>

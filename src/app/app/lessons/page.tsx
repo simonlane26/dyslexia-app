@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { useSchoolMode } from '@/hooks/useSchoolMode';
+import { Mic, Pause, Play, StopCircle, ClipboardList, BookOpen, Sparkles, Star, Send, Pen, Brain, Check, School } from 'lucide-react';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -53,10 +54,10 @@ const C = {
 };
 
 const TYPE_CONF = {
-  explain:   { bg: C.tealLight,   border: '#9FE1CB', color: C.teal,   label: '📝 Teacher explaining' },
-  keyword:   { bg: C.purpleLight, border: '#CECBF6', color: C.purple, label: '📚 Key term' },
-  task:      { bg: C.amberLight,  border: '#F0D49C', color: C.amber,  label: '📝 Task set' },
-  important: { bg: C.coralLight,  border: '#F5C4B3', color: C.coral,  label: '⭐ Important' },
+  explain:   { bg: C.tealLight,   border: '#9FE1CB', color: C.teal,   label: <><Pen size={16} /> Teacher explaining</> },
+  keyword:   { bg: C.purpleLight, border: '#CECBF6', color: C.purple, label: <><BookOpen size={16} /> Key term</> },
+  task:      { bg: C.amberLight,  border: '#F0D49C', color: C.amber,  label: <><Pen size={16} /> Task set</> },
+  important: { bg: C.coralLight,  border: '#F5C4B3', color: C.coral,  label: <><Star size={16} /> Important</> },
 };
 
 function fmt(secs: number) {
@@ -368,8 +369,8 @@ export default function LessonsPage() {
 
           {/* Page header */}
           <div style={{ padding: '20px 0 4px', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: C.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
-              📝
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: C.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Pen size={20} />
             </div>
             <div style={{ flex: 1 }}>
               <h1 style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.2 }}>Lesson Capture</h1>
@@ -377,16 +378,16 @@ export default function LessonsPage() {
             </div>
             {schoolMode.isSchoolMode && (
               <div style={{ padding: '5px 12px', borderRadius: 16, background: C.purpleLight, color: C.purpleDark, fontSize: 12, fontWeight: 500 }}>
-                🏫 School Mode
+                <School size={16} /> School Mode
               </div>
             )}
           </div>
 
           {/* Tabs */}
           <div style={st.tabBar}>
-            <button type="button" style={tabStyle(tab === 'prep')} onClick={() => setTab('prep')}>📋 Prep</button>
-            <button type="button" style={tabStyle(tab === 'live')} onClick={() => setTab('live')}>🎙 Capture</button>
-            <button type="button" style={tabStyle(tab === 'revision')} onClick={() => setTab('revision')}>📖 Revision</button>
+            <button type="button" style={tabStyle(tab === 'prep')} onClick={() => setTab('prep')}><ClipboardList size={16} /> Prep</button>
+            <button type="button" style={tabStyle(tab === 'live')} onClick={() => setTab('live')}><Mic size={16} /> Capture</button>
+            <button type="button" style={tabStyle(tab === 'revision')} onClick={() => setTab('revision')}><BookOpen size={16} /> Revision</button>
           </div>
 
           {/* ═══════════════ PREP TAB ═══════════════ */}
@@ -394,7 +395,7 @@ export default function LessonsPage() {
             <div style={{ paddingTop: 14, animation: 'fadeUp 0.3s ease' }}>
               <div style={st.card}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 9, background: C.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17 }}>📋</div>
+                  <div style={{ width: 36, height: 36, borderRadius: 9, background: C.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ClipboardList size={16} /></div>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 600 }}>Prepare for your lesson</div>
                     <div style={{ fontSize: 11, color: C.muted }}>Type what the lesson is about — we&apos;ll explain it before it starts</div>
@@ -416,7 +417,7 @@ export default function LessonsPage() {
                   disabled={prepLoading || !topic.trim()}
                   style={{ ...st.btnPrimary, opacity: prepLoading || !topic.trim() ? 0.6 : 1 }}
                 >
-                  {prepLoading ? 'Preparing…' : 'Explain this lesson ✨'}
+                  {prepLoading ? 'Preparing…' : <>Explain this lesson <Sparkles size={16} /></>}
                 </button>
               </div>
 
@@ -433,7 +434,7 @@ export default function LessonsPage() {
                   {/* Vocab */}
                   <div style={st.card}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                      <div style={{ width: 36, height: 36, borderRadius: 9, background: C.purpleLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17 }}>📚</div>
+                      <div style={{ width: 36, height: 36, borderRadius: 9, background: C.purpleLight, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><BookOpen size={16} /></div>
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 600 }}>Words you&apos;ll hear</div>
                         <div style={{ fontSize: 11, color: C.muted }}>Tap any word to see what it means</div>
@@ -473,7 +474,7 @@ export default function LessonsPage() {
                   {/* Questions */}
                   <div style={st.card}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                      <div style={{ width: 36, height: 36, borderRadius: 9, background: C.amberLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17 }}>💡</div>
+                      <div style={{ width: 36, height: 36, borderRadius: 9, background: C.amberLight, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Brain size={16} /></div>
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 600 }}>Questions you could ask</div>
                         <div style={{ fontSize: 11, color: C.muted }}>Having a question ready makes it easier to participate</div>
@@ -481,13 +482,13 @@ export default function LessonsPage() {
                     </div>
                     {prep.questions.map((q, i) => (
                       <div key={i} style={{ padding: '6px 0', fontSize: 13, color: C.purple, display: 'flex', gap: 6, lineHeight: 1.5 }}>
-                        💡 &ldquo;{q}&rdquo;
+                        <Brain size={16} /> &ldquo;{q}&rdquo;
                       </div>
                     ))}
                   </div>
 
                   <button type="button" onClick={() => setTab('live')} style={{ ...st.btnPrimary, background: C.purple }}>
-                    I&apos;m ready — start the lesson 🎙
+                    I&apos;m ready — start the lesson <Mic size={16} />
                   </button>
                 </>
               )}
@@ -524,26 +525,26 @@ export default function LessonsPage() {
                     disabled={!speechOk}
                     style={{ ...st.liveBtn, background: C.teal, color: '#fff', opacity: speechOk ? 1 : 0.5, cursor: speechOk ? 'pointer' : 'not-allowed' }}
                   >
-                    🎙 Start lesson
+                    <Mic size={16} /> Start lesson
                   </button>
                 )}
                 {captureState === 'recording' && (
                   <>
                     <button type="button" onClick={pauseCapture} style={{ ...st.liveBtn, background: C.amberLight, color: C.amberDark, border: '1px solid #F0D49C' }}>
-                      ⏸ Pause
+                      <Pause size={16} /> Pause
                     </button>
                     <button type="button" onClick={stopCapture} style={{ ...st.liveBtn, background: C.coralLight, color: C.coral, border: '1px solid #F5C4B3' }}>
-                      ⏹ End lesson
+                      <StopCircle size={16} /> End lesson
                     </button>
                   </>
                 )}
                 {captureState === 'paused' && (
                   <>
                     <button type="button" onClick={resumeCapture} style={{ ...st.liveBtn, background: C.tealLight, color: C.tealDark, border: `1px solid ${C.teal}` }}>
-                      ▶ Resume
+                      <Play size={16} /> Resume
                     </button>
                     <button type="button" onClick={stopCapture} style={{ ...st.liveBtn, background: C.coralLight, color: C.coral, border: '1px solid #F5C4B3' }}>
-                      ⏹ End lesson
+                      <StopCircle size={16} /> End lesson
                     </button>
                   </>
                 )}
@@ -559,7 +560,7 @@ export default function LessonsPage() {
               <div style={{ maxHeight: 'calc(100vh - 300px)', overflowY: 'auto' }}>
                 {items.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '32px 16px' }}>
-                    <span style={{ fontSize: 36, display: 'block', marginBottom: 10 }}>🎙</span>
+                    <span style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}><Mic size={36} /></span>
                     <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>Ready when the lesson starts</div>
                     <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.5, maxWidth: 260, margin: '0 auto' }}>
                       Tap &ldquo;Start lesson&rdquo; when the teacher begins. We&apos;ll simplify what&apos;s said and build your notes automatically.
@@ -604,13 +605,13 @@ export default function LessonsPage() {
               {/* Empty state */}
               {!revision && !revLoading && !revError && (
                 <div style={{ textAlign: 'center', padding: '32px 16px' }}>
-                  <span style={{ fontSize: 36, display: 'block', marginBottom: 10 }}>📖</span>
+                  <span style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}><BookOpen size={36} /></span>
                   <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>No lesson captured yet</div>
                   <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.5, maxWidth: 260, margin: '0 auto 16px' }}>
                     After you capture a lesson, your revision notes will appear here automatically.
                   </div>
                   <button type="button" onClick={() => setTab('live')} style={{ padding: '10px 20px', borderRadius: 10, background: C.teal, color: '#fff', fontFamily: 'inherit', fontSize: 13, fontWeight: 500, border: 'none', cursor: 'pointer' }}>
-                    Go to Capture 🎙
+                    Go to Capture <Mic size={16} />
                   </button>
                 </div>
               )}
@@ -621,7 +622,7 @@ export default function LessonsPage() {
                   {/* Overview */}
                   <div style={st.card}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                      <div style={{ width: 36, height: 36, borderRadius: 9, background: C.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17 }}>📖</div>
+                      <div style={{ width: 36, height: 36, borderRadius: 9, background: C.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><BookOpen size={16} /></div>
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 600 }}>{revision.title}</div>
                         <div style={{ fontSize: 11, color: C.muted }}>Captured · {fmt(capturedSeconds.current)}</div>
@@ -651,7 +652,7 @@ export default function LessonsPage() {
                   {/* Vocabulary */}
                   <div style={{ marginBottom: 14 }}>
                     <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6, color: C.purple, display: 'flex', alignItems: 'center', gap: 5 }}>
-                      📚 Vocabulary from this lesson
+                      <BookOpen size={16} /> Vocabulary from this lesson
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                       {revision.vocab.map((v, i) => (
@@ -688,7 +689,7 @@ export default function LessonsPage() {
                   {/* Quiz */}
                   {revision.quiz.map((q, qi) => (
                     <div key={qi} style={{ padding: 14, borderRadius: 10, background: '#E6F1FB', border: '1px solid #B8D8F5', marginBottom: 8 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: '#378ADD', marginBottom: 8 }}>🧠 Quick check</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: '#378ADD', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}><Brain size={16} /> Quick check</div>
                       <div style={{ fontSize: 13, lineHeight: 1.5, color: C.text, marginBottom: 8 }}>{q.question}</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                         {q.options.map((opt, oi) => {
@@ -724,7 +725,7 @@ export default function LessonsPage() {
                           background: quizAnswers[qi].correct ? C.tealLight : C.coralLight,
                           color: quizAnswers[qi].correct ? C.tealDark : C.coral,
                         }}>
-                          {quizAnswers[qi].correct ? '✅ That\'s right! Well remembered.' : 'Not quite — check the key facts above and try again next time.'}
+                          {quizAnswers[qi].correct ? <><Check size={16} /> That&apos;s right! Well remembered.</> : 'Not quite — check the key facts above and try again next time.'}
                         </div>
                       )}
                     </div>
@@ -734,14 +735,14 @@ export default function LessonsPage() {
                   {revision.homework && (
                     <div style={{ padding: 14, borderRadius: 10, background: C.amberLight, border: '1px solid #F0D49C', marginBottom: 10 }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: C.amberDark, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
-                        📝 Homework
+                        <Pen size={16} /> Homework
                       </div>
                       <p style={{ fontSize: 13, color: C.amberDark, lineHeight: 1.6, marginBottom: 6 }}>{revision.homework.task}</p>
                       {revision.homework.deadline && (
                         <div style={{ fontSize: 12, fontWeight: 600, color: C.coral }}>⏰ Due: {revision.homework.deadline}</div>
                       )}
                       <button type="button" onClick={startHomework} style={{ marginTop: 8, padding: '8px 16px', borderRadius: 8, background: C.teal, color: '#fff', fontFamily: 'inherit', fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer' }}>
-                        Start homework in DyslexiaWrite ✍️
+                        Start homework in DyslexiaWrite <Pen size={16} />
                       </button>
                     </div>
                   )}
@@ -749,11 +750,11 @@ export default function LessonsPage() {
                   {/* Export */}
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10 }}>
                     <button type="button" onClick={copyNotes} style={{ padding: '8px 14px', borderRadius: 8, background: C.teal, color: '#fff', fontFamily: 'inherit', fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
-                      📋 Copy notes
+                      <ClipboardList size={16} /> Copy notes
                     </button>
                     {schoolMode.isSchoolMode && (
                       <button type="button" style={{ padding: '8px 14px', borderRadius: 8, background: C.card, color: C.muted, fontFamily: 'inherit', fontSize: 12, fontWeight: 500, border: `1px solid ${C.border}`, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
-                        📤 Share with teacher
+                        <Send size={16} /> Share with teacher
                       </button>
                     )}
                   </div>

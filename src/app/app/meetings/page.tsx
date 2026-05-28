@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
+import { Mic, Pause, Play, StopCircle, ClipboardList, BarChart2, Sparkles, Lightbulb, Mail } from 'lucide-react';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -289,8 +290,8 @@ export default function MeetingsPage() {
 
         {/* Page title */}
         <div style={{ padding: '20px 0 4px', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: C.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
-            🎙️
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: C.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Mic size={20} />
           </div>
           <div>
             <h1 style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.2 }}>Meeting Survival Kit</h1>
@@ -302,7 +303,7 @@ export default function MeetingsPage() {
         <div style={st.tabBar}>
           {(['prep', 'live', 'summary'] as const).map(t => (
             <button key={t} type="button" style={tabStyle(tab === t)} onClick={() => setTab(t)}>
-              <span>{t === 'prep' ? '📋' : t === 'live' ? '🎙️' : '📊'}</span>
+              <span>{t === 'prep' ? <ClipboardList size={16} /> : t === 'live' ? <Mic size={16} /> : <BarChart2 size={16} />}</span>
               {t === 'prep' ? 'Prepare' : t === 'live' ? 'Live' : 'Summary'}
             </button>
           ))}
@@ -313,7 +314,7 @@ export default function MeetingsPage() {
           <div style={{ paddingTop: 16, animation: 'fadeUp 0.3s ease' }}>
             <div style={st.card}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14 }}>
-                <div style={{ width: 38, height: 38, borderRadius: 10, background: C.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>📋</div>
+                <div style={{ width: 38, height: 38, borderRadius: 10, background: C.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><ClipboardList size={20} /></div>
                 <div>
                   <div style={{ fontSize: 15, fontWeight: 600 }}>Prepare for your meeting</div>
                   <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>Paste the agenda — we'll explain everything in plain language</div>
@@ -333,7 +334,7 @@ export default function MeetingsPage() {
                 onClick={runPrep}
                 disabled={prepLoading || !agenda.trim()}
               >
-                {prepLoading ? '⏳ Explaining agenda…' : '✨ Explain this agenda'}
+                {prepLoading ? '⏳ Explaining agenda…' : <><Sparkles size={16} /> Explain this agenda</>}
               </button>
               {prepError && <p style={{ fontSize: 13, color: C.coral, marginTop: 10 }}>{prepError}</p>}
             </div>
@@ -356,7 +357,7 @@ export default function MeetingsPage() {
                   <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 10, marginTop: 4 }}>
                     {item.questions.map((q, qi) => (
                       <div key={qi} style={{ fontSize: 13, color: C.purple, padding: '3px 0', display: 'flex', gap: 6 }}>
-                        <span>💡</span> <span>You could ask: &ldquo;{q}&rdquo;</span>
+                        <span><Lightbulb size={14} /></span> <span>You could ask: &ldquo;{q}&rdquo;</span>
                       </div>
                     ))}
                   </div>
@@ -408,7 +409,7 @@ export default function MeetingsPage() {
                   style={{ flex: 1, padding: 12, borderRadius: 10, background: (isPro && speechSupported) ? C.teal : C.border, color: (isPro && speechSupported) ? '#fff' : C.muted, fontFamily: 'inherit', fontSize: 13, fontWeight: 500, border: 'none', cursor: (isPro && speechSupported) ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                   onClick={isPro && speechSupported ? startMeeting : undefined}
                 >
-                  🎙️ Start meeting
+                  <Mic size={16} /> Start meeting
                 </button>
               )}
               {meetingState === 'recording' && (<>
@@ -416,13 +417,13 @@ export default function MeetingsPage() {
                   style={{ flex: 1, padding: 12, borderRadius: 10, background: C.amberLight, color: C.amberDark, fontFamily: 'inherit', fontSize: 13, fontWeight: 500, border: `1px solid #F0D49C`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                   onClick={pauseMeeting}
                 >
-                  ⏸ Pause
+                  <Pause size={16} /> Pause
                 </button>
                 <button type="button"
                   style={{ flex: 1, padding: 12, borderRadius: 10, background: C.coralLight, color: C.coral, fontFamily: 'inherit', fontSize: 13, fontWeight: 500, border: `1px solid #F5C4B3`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                   onClick={endMeeting}
                 >
-                  ⏹ End meeting
+                  <StopCircle size={16} /> End meeting
                 </button>
               </>)}
               {meetingState === 'paused' && (<>
@@ -430,13 +431,13 @@ export default function MeetingsPage() {
                   style={{ flex: 1, padding: 12, borderRadius: 10, background: C.tealLight, color: C.tealDark, fontFamily: 'inherit', fontSize: 13, fontWeight: 500, border: `1px solid #9FE1CB`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                   onClick={resumeMeeting}
                 >
-                  ▶ Resume
+                  <Play size={16} /> Resume
                 </button>
                 <button type="button"
                   style={{ flex: 1, padding: 12, borderRadius: 10, background: C.coralLight, color: C.coral, fontFamily: 'inherit', fontSize: 13, fontWeight: 500, border: `1px solid #F5C4B3`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                   onClick={endMeeting}
                 >
-                  ⏹ End meeting
+                  <StopCircle size={16} /> End meeting
                 </button>
               </>)}
             </div>
@@ -445,7 +446,7 @@ export default function MeetingsPage() {
             <div style={{ maxHeight: 'calc(100vh - 380px)', overflowY: 'auto' }}>
               {transcriptItems.length === 0 && meetingState === 'idle' && (
                 <div style={{ textAlign: 'center', padding: '48px 20px' }}>
-                  <div style={{ fontSize: 40, marginBottom: 12 }}>🎙️</div>
+                  <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}><Mic size={40} /></div>
                   <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>Ready when you are</div>
                   <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.6, maxWidth: 280, margin: '0 auto' }}>
                     Tap &ldquo;Start meeting&rdquo; when it begins. We&apos;ll listen and create a simplified transcript you can follow along with.
@@ -470,7 +471,7 @@ export default function MeetingsPage() {
           <div style={{ paddingTop: 16 }}>
             {transcriptItems.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>📊</div>
+                <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}><BarChart2 size={40} /></div>
                 <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>No meeting recorded yet</div>
                 <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.6, maxWidth: 300, margin: '0 auto 20px' }}>
                   After you record a meeting in the Live tab, your summary and action items will appear here.
@@ -494,7 +495,7 @@ export default function MeetingsPage() {
                     onClick={generateSummary}
                     disabled={summaryLoading}
                   >
-                    {summaryLoading ? '⏳ Generating summary…' : '📊 Generate meeting summary'}
+                    {summaryLoading ? '⏳ Generating summary…' : <><BarChart2 size={16} /> Generate meeting summary</>}
                   </button>
                 </div>
               </div>
@@ -503,7 +504,7 @@ export default function MeetingsPage() {
                 {/* Overview */}
                 <div style={st.card}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: 10, background: C.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>📊</div>
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: C.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><BarChart2 size={16} /></div>
                     <div style={{ fontSize: 15, fontWeight: 600 }}>Meeting summary</div>
                   </div>
                   <div style={{ fontSize: 14, lineHeight: 1.7, color: C.text }}>{summary.overview}</div>
@@ -550,7 +551,7 @@ export default function MeetingsPage() {
 
                 {/* Email draft */}
                 <div style={{ marginBottom: 16 }}>
-                  <div style={{ ...st.label, color: C.amber }}>📧 Draft follow-up email</div>
+                  <div style={{ ...st.label, color: C.amber }}><Mail size={16} /> Draft follow-up email</div>
                   <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16 }}>
                     <div style={{ fontSize: 12, color: C.muted, marginBottom: 4 }}>Subject</div>
                     <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, paddingBottom: 12, borderBottom: `1px solid ${C.border}` }}>{summary.emailSubject}</div>
@@ -560,13 +561,13 @@ export default function MeetingsPage() {
                         onClick={openEmail}
                         style={{ padding: '8px 16px', borderRadius: 8, background: C.teal, color: '#fff', fontFamily: 'inherit', fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer' }}
                       >
-                        ✉️ Open in email app
+                        <Mail size={16} /> Open in email app
                       </button>
                       <button type="button"
                         onClick={copyEmail}
                         style={{ padding: '8px 16px', borderRadius: 8, background: C.bg, color: C.text, fontFamily: 'inherit', fontSize: 12, fontWeight: 500, border: `1px solid ${C.border}`, cursor: 'pointer' }}
                       >
-                        📋 Copy
+                        <ClipboardList size={16} /> Copy
                       </button>
                     </div>
                   </div>
@@ -593,7 +594,7 @@ function TranscriptCard({ item, C }: { item: TranscriptItem; C: typeof import('.
   const bg = item.type === 'action' ? '#FAEEDA' : item.type === 'decision' ? '#EEEDFE' : '#E1F5EE';
   const borderColor = item.type === 'action' ? '#F0D49C' : item.type === 'decision' ? '#CECBF6' : '#9FE1CB';
   const labelColor = item.type === 'action' ? '#BA7517' : item.type === 'decision' ? '#534AB7' : '#1D9E75';
-  const label = item.type === 'action' ? '📌 Action needed' : item.type === 'decision' ? '⚡ Decision' : '📝 Simplified';
+  const label = item.type === 'action' ? '📌 Action needed' : item.type === 'decision' ? '⚡ Decision' : 'Simplified';
 
   return (
     <div style={{ padding: '12px 14px', borderRadius: 10, marginBottom: 8, background: bg, border: `1px solid ${borderColor}`, animation: 'fadeUp 0.3s ease' }}>
