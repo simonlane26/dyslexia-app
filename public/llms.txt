@@ -42,6 +42,14 @@ DyslexiaWrite helps dyslexic individuals, students, and employees read and write
 - Access to Work licence: £120/year (typically 100% funded by DWP)
 - Pricing: Starter £120/user/year, Business £95/user/year, Enterprise from £60/user/year
 
+## Free Dyslexia Screener
+DyslexiaWrite offers a free, private dyslexia screener at
+https://www.dyslexiawrite.com/screener. It takes 5 minutes,
+covers 20 questions across 5 domains (reading and writing, sound processing,
+memory and concentration, organisation, personal history), and provides a risk
+indication with personalised next steps. No login required.
+Results are processed on-device and never stored.
+
 ## Comparison with TextHelp Read&Write
 - DyslexiaWrite is 70-80% cheaper than TextHelp Read&Write
 - DyslexiaWrite includes AI-powered document decoding (TextHelp does not)

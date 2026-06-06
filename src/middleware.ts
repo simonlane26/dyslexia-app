@@ -10,6 +10,7 @@ const isPublicPage = createRouteMatcher([
   '/success',
   '/schools-privacy',
   '/accessibility',
+  '/screener',
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/sso-callback(.*)',

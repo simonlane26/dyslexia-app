@@ -46,6 +46,12 @@ export function LandingHeader() {
             For Schools
           </Link>
           <Link
+            href="/screener"
+            className="hidden text-sm font-medium transition text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100 sm:block"
+          >
+            Free Screener
+          </Link>
+          <Link
             href="/faq"
             className="hidden text-sm font-medium transition text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100 sm:block"
           >

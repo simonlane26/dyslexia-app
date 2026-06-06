@@ -1,0 +1,101 @@
+.wrap { max-width: 520px; margin: 0 auto; padding: 16px 16px 80px; font-family: 'Lexend', system-ui, sans-serif; }
+
+/* ── INTRO ── */
+.introHeader { text-align: center; padding: 32px 0 20px; }
+.introIcon { font-size: 48px; display: block; margin-bottom: 10px; }
+.introTitle { font-size: 24px; font-weight: 600; margin-bottom: 6px; color: #2C2C2A; }
+.introSub { font-size: 14px; color: #888780; line-height: 1.6; max-width: 400px; margin: 0 auto 24px; }
+
+.infoBox { padding: 16px; border-radius: 12px; margin-bottom: 12px; font-size: 13px; line-height: 1.6; }
+.infoBox strong { display: block; margin-bottom: 3px; font-size: 13px; }
+.infoTeal { background: #E1F5EE; color: #085041; border: 1px solid #9FE1CB; }
+.infoAmber { background: #FAEEDA; color: #633806; border: 1px solid #F0D49C; }
+.infoPurple { background: #EEEDFE; color: #3C3489; border: 1px solid #CECBF6; }
+
+.whoLabel { margin: 16px 0 8px; font-size: 13px; font-weight: 500; color: #2C2C2A; }
+.whoPills { display: flex; gap: 8px; }
+.whoPill { flex: 1; padding: 14px 8px; border-radius: 12px; border: 2px solid #E8E6DE; text-align: center; cursor: pointer; transition: all 0.2s; background: #fff; font-family: inherit; }
+.whoPill:hover { border-color: #534AB7; }
+.whoPillSelected { border-color: #534AB7; background: #EEEDFE; }
+.whoPillIcon { font-size: 22px; display: block; margin-bottom: 4px; }
+.whoPillLabel { font-size: 12px; font-weight: 500; color: #2C2C2A; }
+
+/* ── BUTTONS ── */
+.btn { padding: 14px 28px; border-radius: 12px; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; width: 100%; text-align: center; display: block; }
+.btnPrimary { background: #1D9E75; color: #fff; }
+.btnPrimary:hover { background: #085041; }
+.btnPrimary:disabled { opacity: 0.5; cursor: default; }
+.btnSecondary { background: #fff; color: #2C2C2A; border: 1px solid #E8E6DE; }
+.btnSecondary:hover { border-color: #1D9E75; }
+.btnRow { display: flex; gap: 8px; margin-top: 16px; }
+.btnRow .btn { flex: 1; }
+
+/* ── PROGRESS ── */
+.progressRow { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; color: #888780; }
+.progressDomain { font-weight: 500; color: #534AB7; }
+.progressBar { height: 4px; background: #E8E6DE; border-radius: 2px; margin-bottom: 20px; overflow: hidden; }
+.progressFill { height: 100%; background: #1D9E75; transition: width 0.4s ease; border-radius: 2px; }
+
+/* ── QUESTION CARD ── */
+.qCard { background: #fff; border-radius: 14px; border: 1px solid #E8E6DE; padding: 20px; margin-bottom: 12px; animation: fadeUp 0.3s ease; }
+.qNumber { font-size: 11px; font-weight: 600; color: #1D9E75; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+.qText { font-size: 16px; font-weight: 500; line-height: 1.5; margin-bottom: 14px; color: #2C2C2A; }
+.qHelpToggle { font-size: 12px; color: #534AB7; cursor: pointer; margin-bottom: 10px; display: inline-block; background: none; border: none; font-family: inherit; padding: 0; }
+.qHelpToggle:hover { text-decoration: underline; }
+.qHelp { font-size: 12px; color: #888780; line-height: 1.5; margin-bottom: 12px; padding: 8px 10px; background: #FDF6E3; border-radius: 8px; animation: fadeUp 0.2s ease; }
+
+/* ── ANSWER SCALE ── */
+.qScale { display: flex; gap: 4px; }
+.qOption { flex: 1; padding: 10px 4px; border-radius: 8px; border: 1.5px solid #E8E6DE; text-align: center; cursor: pointer; transition: all 0.2s; background: #fff; font-family: inherit; font-size: 11px; font-weight: 500; color: #888780; line-height: 1.3; }
+.qOption:hover { border-color: #534AB7; color: #2C2C2A; }
+.qOptionSelected { border-color: #534AB7; background: #EEEDFE; color: #3C3489; }
+.qOptNum { display: block; font-size: 16px; font-weight: 600; margin-bottom: 2px; color: inherit; }
+
+/* ── RESULTS ── */
+.resultCard { background: #fff; border-radius: 16px; border: 1px solid #E8E6DE; padding: 24px; text-align: center; margin-bottom: 16px; animation: fadeUp 0.4s ease; }
+.resultIcon { font-size: 48px; display: block; margin-bottom: 10px; }
+.resultLevel { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.resultTitle { font-size: 22px; font-weight: 600; margin-bottom: 8px; color: #2C2C2A; }
+.resultText { font-size: 14px; color: #888780; line-height: 1.7; margin-bottom: 16px; max-width: 400px; margin-left: auto; margin-right: auto; }
+.resultScore { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; background: #FDF6E3; font-size: 13px; color: #888780; }
+.resultScoreNum { font-size: 20px; font-weight: 600; }
+
+/* ── DOMAIN BREAKDOWN ── */
+.domainHead { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: #888780; margin-bottom: 8px; }
+.domainRow { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #E8E6DE; }
+.domainRow:last-child { border: none; }
+.domainName { font-size: 13px; font-weight: 500; flex: 1; color: #2C2C2A; }
+.domainBarTrack { width: 120px; height: 6px; background: #E8E6DE; border-radius: 3px; overflow: hidden; flex-shrink: 0; }
+.domainBarFill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+.barLow { background: #1D9E75; }
+.barMid { background: #BA7517; }
+.barHigh { background: #534AB7; }
+.domainPct { font-size: 12px; font-weight: 500; min-width: 32px; text-align: right; color: #888780; }
+
+/* ── NEXT STEPS ── */
+.nextStepsLabel { font-size: 13px; font-weight: 500; margin: 16px 0 8px; color: #2C2C2A; }
+.nextSteps { }
+.nextStep { display: flex; gap: 10px; padding: 12px; border-radius: 10px; background: #fff; border: 1px solid #E8E6DE; margin-bottom: 8px; cursor: pointer; transition: all 0.15s; text-decoration: none; color: inherit; }
+.nextStep:hover { border-color: #1D9E75; background: #E1F5EE; }
+.nextStepIcon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.nextStepTeal { background: #E1F5EE; }
+.nextStepPurple { background: #EEEDFE; }
+.nextStepAmber { background: #FAEEDA; }
+.nextStepBlue { background: #E6F1FB; }
+.nextStepText { flex: 1; }
+.nextStepTitle { font-size: 13px; font-weight: 500; margin-bottom: 1px; color: #2C2C2A; }
+.nextStepSub { font-size: 11px; color: #888780; }
+.nextStepArrow { color: #B4B2A9; font-size: 14px; display: flex; align-items: center; }
+
+/* ── DISCLAIMER ── */
+.disclaimer { margin-top: 20px; padding: 14px; border-radius: 10px; background: #F8F7F4; border: 1px solid #E8E6DE; font-size: 11px; color: #888780; line-height: 1.6; text-align: center; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 480px) {
+  .qScale { flex-wrap: wrap; }
+  .qOption { min-width: calc(50% - 4px); }
+  .domainBarTrack { width: 80px; }
+}
