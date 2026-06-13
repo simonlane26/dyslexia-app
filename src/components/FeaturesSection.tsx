@@ -59,13 +59,19 @@ function FeatureCard({ feature, theme, darkMode }: { feature: Feature; theme: an
       }}
     >
       {feature.imgSrc ? (
-        <img
-          src={feature.imgSrc}
-          alt={feature.title}
-          width={72}
-          height={72}
-          style={{ borderRadius: '12px', marginBottom: '18px', display: 'block', border: '1px solid #f0f0f0' }}
-        />
+        <div style={{
+          width: '72px', height: '72px', marginBottom: '18px',
+          borderRadius: '12px', border: '1px solid #f0f0f0',
+          overflow: 'hidden', flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: '#fff',
+        }}>
+          <img
+            src={feature.imgSrc}
+            alt={feature.title}
+            style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+          />
+        </div>
       ) : (
         <div
           style={{
@@ -145,12 +151,14 @@ export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
     },
     {
       icon: <SpellCheck size={28} />,
+      imgSrc: '/images/Grammarcheck.png',
       title: 'Real-Time Grammar Check',
       description: 'Dyslexia-aware grammar checking that catches homophones, letter reversals, and common transpositions. Click any underlined word for instant fixes.',
       color: '#ef4444',
     },
     {
       icon: <Edit3 size={28} />,
+      imgSrc: '/images/Rewrite.png',
       title: 'AI Sentence Rewriting',
       description: 'Select any sentence and get 3 alternatives: Simpler, More confident, or Clearer. One click to apply — no grammar jargon, just plain language.',
       color: '#3b82f6',
@@ -158,18 +166,21 @@ export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
     },
     {
       icon: <Sparkles size={28} />,
+      imgSrc: '/images/Simplification.png',
       title: 'Smart Simplification',
       description: 'AI-powered simplification that makes complex text easier to understand without losing meaning. Paste anything — an email, a letter, a form — and get a plain-English version.',
       color: '#f59e0b',
     },
     {
       icon: <Mic size={28} />,
+      imgSrc: '/images/Dictation.png',
       title: 'Voice Dictation',
       description: 'Speak naturally and see your words appear in the editor. Great for when typing feels difficult or you want to capture ideas quickly.',
       color: '#10b981',
     },
     {
       icon: <Zap size={28} />,
+      imgSrc: '/images/Progresstrack.png',
       title: 'Progress Tracking',
       description: 'See your writing improve over time with metrics like average sentence length and complex word usage. Encouraging, not overwhelming.',
       color: '#f97316',
@@ -179,6 +190,7 @@ export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
   const readingFeatures: Feature[] = [
     {
       icon: <Eye size={28} />,
+      imgSrc: '/images/Readingmodes.png',
       title: 'Three Reading Modes',
       description: 'Clean mode removes all distractions. Guided mode focuses line-by-line with a spotlight. Supported mode adds a reading ruler and colour tint. Choose the mode that works for your brain.',
       color: '#10b981',
@@ -195,12 +207,14 @@ export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
     },
     {
       icon: <Volume2 size={28} />,
+      imgSrc: '/images/Readaloud.png',
       title: 'Read Aloud',
       description: 'Listen to your text with high-quality AI voices. Hear how your writing sounds and catch mistakes you might miss while reading silently.',
       color: '#ec4899',
     },
     {
       icon: <Highlighter size={28} />,
+      imgSrc: '/images/Sentencehighlight.png',
       title: 'Sentence Highlighting',
       description: 'Each sentence highlights as it\'s read aloud. Helps you stay on the right line, follow along with ease, and improve reading comprehension.',
       color: '#06b6d4',
@@ -234,6 +248,7 @@ export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
     },
     {
       icon: <Shield size={28} />,
+      imgSrc: '/images/Privacy.png',
       title: 'Privacy-Focused',
       description: 'Your writing stays private. We never train AI models on your content. Documents are stored locally in your browser — nothing leaves your device unless you choose.',
       color: '#6366f1',
