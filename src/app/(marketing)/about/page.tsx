@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import React from 'react';
-import { Pen, BookOpen, FileText, GraduationCap, Briefcase, User, School, Building2 } from 'lucide-react';
+import { FileText, User, School, Building2 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'About DyslexiaWrite',
@@ -172,12 +172,12 @@ export default function AboutPage() {
         <div style={S.grid3}>
           {([
             {
-              icon: <Pen size={28} />,
+              icon: <img src="/images/Notebookpencil.png" alt="" width={52} height={52} style={{ borderRadius: '8px' }} />,
               title: 'Writing support',
               desc: 'Dyslexia-aware grammar checking, AI sentence rewriting, voice dictation, and a plain-English writing mentor.',
             },
             {
-              icon: <BookOpen size={28} />,
+              icon: <img src="/images/Brainbook.png" alt="" width={52} height={52} style={{ borderRadius: '8px' }} />,
               title: 'Reading assistance',
               desc: 'Three reading modes with a spotlight, ruler, and tint. Read-aloud with karaoke word highlighting via ElevenLabs.',
             },
@@ -187,17 +187,17 @@ export default function AboutPage() {
               desc: 'Upload or photograph any document — letter, form, contract — and get a plain-English summary instantly.',
             },
             {
-              icon: <GraduationCap size={28} />,
+              icon: <img src="/images/LessonCapture.png" alt="" width={52} height={52} style={{ borderRadius: '8px' }} />,
               title: 'Lesson Capture',
               desc: 'Live simplified transcription in class. Generates revision notes, key facts, and a quick quiz automatically.',
             },
             {
-              icon: <Briefcase size={28} />,
+              icon: <img src="/images/Brainstorm.png" alt="" width={52} height={52} style={{ borderRadius: '8px' }} />,
               title: 'Meeting Survival Kit',
               desc: 'Prep briefing before meetings. Live simplified transcript. Auto-generated action items and follow-up email.',
             },
             {
-              icon: <BookOpen size={28} />,
+              icon: <img src="/images/Storytime.png" alt="" width={52} height={52} style={{ borderRadius: '8px' }} />,
               title: 'Story Mode',
               desc: 'AI-generated personalised stories for children with warmup words, karaoke highlighting, and vocab tracking.',
             },

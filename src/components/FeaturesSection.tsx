@@ -26,6 +26,7 @@ interface FeaturesSectionProps {
 
 interface Feature {
   icon: React.ReactNode;
+  imgSrc?: string;
   title: string;
   description: string;
   color: string;
@@ -57,21 +58,31 @@ function FeatureCard({ feature, theme, darkMode }: { feature: Feature; theme: an
         e.currentTarget.style.borderColor = darkMode ? '#374151' : '#e5e7eb';
       }}
     >
-      <div
-        style={{
-          width: '56px',
-          height: '56px',
-          borderRadius: '12px',
-          backgroundColor: `${feature.color}18`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: '18px',
-          color: feature.color,
-        }}
-      >
-        {feature.icon}
-      </div>
+      {feature.imgSrc ? (
+        <img
+          src={feature.imgSrc}
+          alt={feature.title}
+          width={72}
+          height={72}
+          style={{ borderRadius: '12px', marginBottom: '18px', display: 'block', border: '1px solid #f0f0f0' }}
+        />
+      ) : (
+        <div
+          style={{
+            width: '56px',
+            height: '56px',
+            borderRadius: '12px',
+            backgroundColor: `${feature.color}18`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '18px',
+            color: feature.color,
+          }}
+        >
+          {feature.icon}
+        </div>
+      )}
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
         <h3 style={{ fontSize: '18px', fontWeight: 700, color: theme.text, margin: 0 }}>
@@ -125,6 +136,7 @@ export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
   const writingFeatures: Feature[] = [
     {
       icon: <Brain size={28} />,
+      imgSrc: '/images/Notebookpencil.png',
       title: 'Writing Mentor',
       description: 'Intent-first AI mentor that asks who you\'re writing for and why, then gives plain-English suggestions tailored to your audience, purpose, and tone. No jargon — just clear guidance.',
       color: '#8b5cf6',
@@ -174,6 +186,7 @@ export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
     },
     {
       icon: <ScanText size={28} />,
+      imgSrc: '/images/Brainbook.png',
       title: 'Memory Reading',
       description: 'Any document broken into manageable chunks. Tap any word for its definition, pronunciation, and an example sentence. A running summary builds as you read — so nothing slips away.',
       color: '#7c3aed',
@@ -197,6 +210,7 @@ export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
   const workplaceFeatures: Feature[] = [
     {
       icon: <Calendar size={28} />,
+      imgSrc: '/images/Brainstorm.png',
       title: 'Meeting Survival Kit',
       description: 'Prepare for meetings with an AI briefing in plain English. Capture live transcripts simplified in real time. Walk away with decisions, action items, and a draft follow-up email — automatically.',
       color: '#1D9E75',
@@ -204,6 +218,7 @@ export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
     },
     {
       icon: <GraduationCap size={28} />,
+      imgSrc: '/images/LessonCapture.png',
       title: 'Lesson Capture',
       description: 'Students: prep before class with vocab previews, capture teacher speech in real time as simplified notes, then get instant revision notes — key facts, a visual memory prompt, and a quick quiz.',
       color: '#534AB7',
@@ -211,6 +226,7 @@ export function FeaturesSection({ theme, darkMode }: FeaturesSectionProps) {
     },
     {
       icon: <BookOpen size={28} />,
+      imgSrc: '/images/Vocabulary.png',
       title: 'Vocabulary Builder',
       description: 'Every word you look up is saved and scheduled for spaced-repetition review. Build a personal word bank from your reading and lessons, with pronunciation guides and examples.',
       color: '#0ea5e9',
