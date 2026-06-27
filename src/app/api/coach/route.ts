@@ -2,6 +2,7 @@
 import 'server-only';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -167,22 +168,19 @@ function jsonError(
 // --- handlers --------------------------------------------------------------
 
 export function GET() {
-  const p = chooseProvider();
   return new Response('WritingCoach OK', {
     status: 200,
-    headers: {
-      'Cache-Control': 'no-store',
-      'x-api-provider': p?.provider || 'none',
-      'x-api-key-present': p ? 'true' : 'false',
-    },
+    headers: { 'Cache-Control': 'no-store' },
   });
 }
 
 export async function POST(req: NextRequest) {
+  const { userId } = await auth();
+  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   const p = chooseProvider();
   const baseHdrs: Record<string, string> = {
     'Cache-Control': 'no-store',
-    'x-api-provider': p?.provider || 'none',
   };
 
   // Fast checks (these often cause 500s if missing)
@@ -276,9 +274,6 @@ export async function POST(req: NextRequest) {
 
     clearTimeout(to);
 
-    baseHdrs['x-provider-status'] = String(rsp.status);
-    baseHdrs['x-provider-model'] = p.model;
-
     if (!rsp.ok) {
       // Try JSON, then text
       let detail: any = null;
@@ -319,15 +314,7 @@ export async function POST(req: NextRequest) {
   } catch (e: any) {
     clearTimeout(to);
     // Surface useful info to the browser for quick debugging
-    return jsonError(500, {
-      error: 'INTERNAL',
-      detail: e?.message || String(e),
-      hints: [
-        'Check that your OPENAI_API_KEY or OPENROUTER_API_KEY is set and valid.',
-        'If you just edited .env.local, stop and restart `next dev`.',
-        'Ensure NEXT_PUBLIC_SITE_URL is set when using OpenRouter (used as Referer).',
-      ],
-    }, baseHdrs);
+    return jsonError(500, { error: 'INTERNAL' }, baseHdrs);
   }
 }
 

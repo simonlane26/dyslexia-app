@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body?.word?.trim()) return NextResponse.json({ error: 'word required' }, { status: 400 });
 
-  const word = body.word.toLowerCase().trim();
+  const word = body.word.toLowerCase().trim().slice(0, 100);
   const schoolId = (sessionClaims?.publicMetadata as any)?.schoolId ?? null;
 
   let db;
@@ -42,11 +42,11 @@ export async function POST(req: NextRequest) {
   const { error } = await db.from('user_vocabulary').insert({
     user_id: userId,
     word,
-    phonetic: body.phonetic ?? null,
-    syllables: body.syllables ?? [],
-    definition: body.definition ?? null,
-    example_sentence: body.example ?? null,
-    source_context: body.context ?? null,
+    phonetic: body.phonetic ? String(body.phonetic).slice(0, 200) : null,
+    syllables: Array.isArray(body.syllables) ? body.syllables.slice(0, 10) : [],
+    definition: body.definition ? String(body.definition).slice(0, 500) : null,
+    example_sentence: body.example ? String(body.example).slice(0, 500) : null,
+    source_context: body.context ? String(body.context).slice(0, 1_000) : null,
     source_type: body.sourceType ?? 'story',
     school_id: schoolId,
   });

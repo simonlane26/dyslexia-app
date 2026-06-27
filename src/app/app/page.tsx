@@ -225,17 +225,6 @@ function PageBody() {
     })();
   }, []);
 
-  // Debug (optional)
-  useEffect(() => { console.log('🔄 usageCount ->', usageCount); }, [usageCount]);
-  useEffect(() => { console.log('🔄 isPro ->', isPro); }, [isPro]);
-  useEffect(() => {
-    console.log('🔍 user meta ->', {
-      public: user?.publicMetadata,
-      unsafe: user?.unsafeMetadata,
-      id: user?.id,
-    });
-  }, [user]);
-
   // Set mounted flag after hydration
   useEffect(() => {
     setMounted(true);
@@ -653,20 +642,6 @@ function PageBody() {
         body: JSON.stringify({ text: text.trim(), isSchoolMode: schoolMode.isSchoolMode }),
       });
 
-      const hdrs = {
-        status: res.status,
-        statusText: res.statusText,
-        'x-api-provider': res.headers.get('x-api-provider'),
-        'x-key-present': res.headers.get('x-key-present'),
-        'x-key-prefix': res.headers.get('x-key-prefix'),
-        'x-key-len': res.headers.get('x-key-len'),
-        'x-upstream-status': res.headers.get('x-upstream-status'),
-        'x-upstream-ok': res.headers.get('x-upstream-ok'),
-        'x-model': res.headers.get('x-model'),
-        'x-pro': res.headers.get('x-pro'),
-      };
-      console.log('🔎 /api/simplify headers →', hdrs);
-
       const ct = res.headers.get('content-type') || '';
       const raw = await res.text();
       const payload = ct.includes('application/json')
@@ -674,7 +649,6 @@ function PageBody() {
         : null;
 
       if (!res.ok) {
-        console.error('❌ Simplify failed', hdrs, payload || raw);
         if (payload?.usage) setUsageCount(payload.usage.count ?? 0);
         setError(payload?.error || `Server error (${res.status}).`);
         setLoading(false);
@@ -930,7 +904,7 @@ function PageBody() {
       toast.warning(t('toast.noTextToRead'));
       return;
     }
-    console.log('TTS path →', { isPro, voiceId, using: isPro && voiceId ? 'elevenlabs' : 'browser' });
+
     setIsPaused(false);
     if (isPro && voiceId) await playWithElevenLabs(ttsText);
     else playWithBrowserVoice(ttsText);
@@ -942,7 +916,7 @@ function PageBody() {
       toast.warning(t('toast.noSimplifiedToRead'));
       return;
     }
-    console.log('TTS path →', { isPro, voiceId, using: isPro && voiceId ? 'elevenlabs' : 'browser' });
+
     setIsPaused(false);
     if (isPro && voiceId) await playWithElevenLabs(ttsText);
     else playWithBrowserVoice(ttsText);

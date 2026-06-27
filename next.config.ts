@@ -28,7 +28,8 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       // Next.js needs unsafe-inline + unsafe-eval; GA and JSON-LD need unsafe-inline
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com",
+      // clerk.dyslexiawrite.com is the Clerk custom domain — must be in script-src
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.dyslexiawrite.com https://www.googletagmanager.com https://www.google-analytics.com",
       // React inline styles are used throughout the app
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' data: https://fonts.gstatic.com",
@@ -37,6 +38,7 @@ const securityHeaders = [
       // API connections: Clerk, OpenAI, OpenRouter, ElevenLabs, Supabase, GA
       [
         "connect-src 'self'",
+        "https://clerk.dyslexiawrite.com",
         "https://*.clerk.com",
         "https://*.clerk.accounts.dev",
         "https://api.clerk.dev",
@@ -47,7 +49,7 @@ const securityHeaders = [
         "https://stats.g.doubleclick.net",
       ].join(" "),
       // Clerk uses Cloudflare Turnstile; block all other frames
-      "frame-src https://challenges.cloudflare.com https://accounts.google.com",
+      "frame-src https://clerk.dyslexiawrite.com https://challenges.cloudflare.com https://accounts.google.com",
       // Prevent this site from being embedded anywhere
       "frame-ancestors 'none'",
       "object-src 'none'",

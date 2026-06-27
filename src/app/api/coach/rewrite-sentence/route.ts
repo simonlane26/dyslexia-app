@@ -173,15 +173,9 @@ function jsonError(
 // --- handlers --------------------------------------------------------------
 
 export function GET() {
-  const p = chooseProvider();
   return new Response('SentenceRewriter OK', {
     status: 200,
-    headers: {
-      'Cache-Control': 'no-store',
-      'x-api-provider': p?.provider || 'none',
-      'x-api-key-present': p ? 'true' : 'false',
-      ...CORS_HEADERS,
-    },
+    headers: { 'Cache-Control': 'no-store', ...CORS_HEADERS },
   });
 }
 
@@ -189,7 +183,6 @@ export async function POST(req: NextRequest) {
   const p = chooseProvider();
   const baseHdrs: Record<string, string> = {
     'Cache-Control': 'no-store',
-    'x-api-provider': p?.provider || 'none',
     ...CORS_HEADERS,
   };
 
@@ -230,7 +223,7 @@ export async function POST(req: NextRequest) {
     return jsonError(400, { error: 'BAD_JSON' }, baseHdrs);
   }
 
-  const sentence = String(body?.sentence || '').trim();
+  const sentence = String(body?.sentence || '').slice(0, 2_000).trim();
   if (!sentence) {
     return jsonError(400, { error: 'MISSING_SENTENCE' }, baseHdrs);
   }
@@ -261,9 +254,6 @@ export async function POST(req: NextRequest) {
     });
 
     clearTimeout(to);
-
-    baseHdrs['x-provider-status'] = String(rsp.status);
-    baseHdrs['x-provider-model'] = p.model;
 
     if (!rsp.ok) {
       let detail: any = null;
@@ -303,13 +293,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (e: any) {
     clearTimeout(to);
-    return jsonError(500, {
-      error: 'INTERNAL',
-      detail: e?.message || String(e),
-      hints: [
-        'Check that your OPENAI_API_KEY or OPENROUTER_API_KEY is set and valid.',
-        'If you just edited .env.local, stop and restart `next dev`.',
-      ],
-    }, baseHdrs);
+    return jsonError(500, { error: 'INTERNAL' }, baseHdrs);
   }
 }

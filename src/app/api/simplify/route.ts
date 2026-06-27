@@ -73,7 +73,7 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: NextRequest) {
-  const H: Record<string, string> = { 'Cache-Control': 'no-store', 'x-runtime': 'node', ...CORS_HEADERS };
+  const H: Record<string, string> = { 'Cache-Control': 'no-store', ...CORS_HEADERS };
 
   try {
     // 1) body
@@ -111,14 +111,12 @@ export async function POST(req: NextRequest) {
 
     // 3) provider + key
     const sel = pickProvider();
-    H['x-api-provider'] = sel.provider;
     if (sel.provider === 'none') {
       return NextResponse.json(
-        { error: 'NO_PROVIDER_KEY', detail: 'Set OPENAI_API_KEY or OPENROUTER_API_KEY' },
+        { error: 'NO_PROVIDER_KEY' },
         { status: 500, headers: H }
       );
     }
-    H['x-model'] = sel.model!;
 
     // 4) Rate limiting (IP-based for free tier)
     const today = todayStr();
@@ -133,7 +131,6 @@ export async function POST(req: NextRequest) {
     }
     const newCount = current + 1;
     dailyUsage.set(rateLimitKey, { count: newCount, date: today });
-    H['x-usage-count'] = String(newCount);
 
     // 6) upstream call (fetch)
     const payload = {
@@ -156,8 +153,6 @@ export async function POST(req: NextRequest) {
     }
 
     const upstream = await fetch(sel.url!, { method: 'POST', headers, body: JSON.stringify(payload) });
-    H['x-upstream-status'] = String(upstream.status);
-    H['x-upstream-ok'] = String(upstream.ok);
 
     const ctype = upstream.headers.get('content-type') || '';
     const raw = await upstream.text();
@@ -194,8 +189,7 @@ export async function POST(req: NextRequest) {
       { headers: H }
     );
   } catch (e: any) {
-    H['x-upstream-ok'] = 'false';
-    return NextResponse.json({ error: 'INTERNAL', detail: e?.message || String(e) }, { status: 500, headers: H });
+    return NextResponse.json({ error: 'INTERNAL' }, { status: 500, headers: H });
   }
 }
 
