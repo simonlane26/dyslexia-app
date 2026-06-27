@@ -17,8 +17,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  const documentText: string = body?.documentText || '';
-  const messages: { role: 'user' | 'assistant'; content: string }[] = body?.messages || [];
+  const documentText: string = String(body?.documentText || '').slice(0, 50_000);
+  const messages: { role: 'user' | 'assistant'; content: string }[] = (body?.messages || [])
+    .slice(-10)
+    .map((m: any) => ({ role: m.role, content: String(m.content ?? '').slice(0, 2_000) }));
 
   if (!documentText) return NextResponse.json({ error: 'No document text provided' }, { status: 400 });
   if (!messages.length) return NextResponse.json({ error: 'No messages provided' }, { status: 400 });

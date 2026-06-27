@@ -37,7 +37,7 @@ const LEVEL_GUIDES: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
+  const { userId, sessionClaims } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await req.json().catch(() => null);
@@ -45,7 +45,8 @@ export async function POST(req: NextRequest) {
   const readingLevel = (['easy', 'medium', 'harder'] as const).includes(body?.readingLevel)
     ? (body.readingLevel as 'easy' | 'medium' | 'harder')
     : 'easy';
-  const isPro = body?.isPro === true;
+  // Read isPro from the signed Clerk session — never trust the client body for access control
+  const isPro = (sessionClaims?.publicMetadata as Record<string, unknown>)?.isPro === true;
 
   // Free tier: 1 generated story per week
   if (!isPro) {

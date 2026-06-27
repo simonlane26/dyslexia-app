@@ -34,6 +34,11 @@ export async function POST(req: Request) {
 
     if (!file) return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
 
+    const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
+    if (file.size > MAX_FILE_BYTES) {
+      return NextResponse.json({ error: 'File too large (max 10 MB)' }, { status: 413 });
+    }
+
     let userId: string | null = null;
     let isPro = false;
     let workplaceId: string | null = null;

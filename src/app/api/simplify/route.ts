@@ -112,9 +112,6 @@ export async function POST(req: NextRequest) {
     // 3) provider + key
     const sel = pickProvider();
     H['x-api-provider'] = sel.provider;
-    H['x-key-present'] = String(Boolean(sel.key));
-    H['x-key-prefix'] = sel.key ? sel.key.slice(0, 5) : '';
-    H['x-key-len'] = sel.key ? String(sel.key.length) : '0';
     if (sel.provider === 'none') {
       return NextResponse.json(
         { error: 'NO_PROVIDER_KEY', detail: 'Set OPENAI_API_KEY or OPENROUTER_API_KEY' },
