@@ -37,15 +37,15 @@ export async function POST(req: NextRequest) {
   // Save looked-up words to vocabulary
   if (Array.isArray(wordsLookedUp) && wordsLookedUp.length > 0) {
     await db
-      .from('vocabulary')
+      .from('user_vocabulary')
       .upsert(
         wordsLookedUp.map((word: string) => ({
-          clerk_user_id: userId,
+          user_id: userId,
           word,
           source_type: 'story',
           next_review_at: new Date().toISOString(),
         })),
-        { onConflict: 'clerk_user_id,word' },
+        { onConflict: 'user_id,word' },
       )
       .then(() => {});
   }
