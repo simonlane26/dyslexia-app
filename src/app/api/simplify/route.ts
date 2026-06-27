@@ -178,7 +178,8 @@ export async function POST(req: NextRequest) {
       data?.choices?.[0]?.text ?? '';
 
     if (!simplified || !String(simplified).trim()) {
-      return NextResponse.json({ error: 'EMPTY_RESPONSE', detail: data }, { status: 502, headers: H });
+      console.error('[simplify] empty provider response', data);
+      return NextResponse.json({ error: 'EMPTY_RESPONSE' }, { status: 502, headers: H });
     }
 
     return NextResponse.json(

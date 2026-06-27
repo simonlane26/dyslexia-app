@@ -110,7 +110,8 @@ export async function POST(req: NextRequest) {
 
     if (!upstream.ok) {
       const detail = await upstream.text().catch(() => '');
-      return NextResponse.json({ error: 'PROVIDER_ERROR', detail }, { status: 502 });
+      console.error('[agent/draft] provider error', upstream.status, detail);
+      return NextResponse.json({ error: 'PROVIDER_ERROR' }, { status: 502 });
     }
 
     const data = await upstream.json();
@@ -123,6 +124,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ draft }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (e: any) {
     clearTimeout(timeout);
-    return NextResponse.json({ error: 'INTERNAL', detail: e?.message }, { status: 500 });
+    console.error('[agent/draft] internal error', e);
+    return NextResponse.json({ error: 'INTERNAL' }, { status: 500 });
   }
 }

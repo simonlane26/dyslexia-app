@@ -37,7 +37,8 @@ export async function GET(req: NextRequest) {
   try {
     db = createSupabaseServerClient();
   } catch (e) {
-    return NextResponse.json({ error: `Supabase init failed: ${e instanceof Error ? e.message : String(e)}` }, { status: 503 });
+    console.error('[school/dashboard] DB init error:', e);
+    return NextResponse.json({ error: 'DB unavailable' }, { status: 503 });
   }
 
   const schoolId: string = meta.schoolId;
@@ -62,12 +63,12 @@ export async function GET(req: NextRequest) {
 
     if (membersRes.error) {
       console.error("[school/dashboard] members query error:", membersRes.error);
-      return NextResponse.json({ error: "Failed to load dashboard", detail: membersRes.error.message }, { status: 500 });
+      return NextResponse.json({ error: "Failed to load dashboard" }, { status: 500 });
     }
     members = membersRes.data;
   } catch (e) {
     console.error("[school/dashboard] unexpected error:", e);
-    return NextResponse.json({ error: "Failed to load dashboard", detail: e instanceof Error ? e.message : String(e) }, { status: 500 });
+    return NextResponse.json({ error: "Failed to load dashboard" }, { status: 500 });
   }
 
   if (!members?.length) {

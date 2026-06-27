@@ -51,6 +51,9 @@ export async function POST(req: NextRequest) {
     school_id: schoolId,
   });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error('[vocabulary/save] insert error:', error);
+    return NextResponse.json({ error: 'Failed to save word' }, { status: 500 });
+  }
   return NextResponse.json({ saved: true, existing: false });
 }

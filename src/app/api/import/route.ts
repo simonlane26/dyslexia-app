@@ -152,8 +152,8 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ text: clean });
   } catch (err: any) {
-    console.error('Import error:', err);
-    return NextResponse.json({ error: err?.message || 'Failed to parse file' }, { status: 500 });
+    console.error('[import] error:', err);
+    return NextResponse.json({ error: 'Failed to parse file' }, { status: 500 });
   }
 }
 

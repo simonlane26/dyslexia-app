@@ -23,7 +23,10 @@ export async function GET() {
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error('[vocabulary/list] query error:', error);
+    return NextResponse.json({ error: 'Failed to load vocabulary' }, { status: 500 });
+  }
 
   const now = new Date().toISOString();
   const words = data ?? [];

@@ -36,7 +36,8 @@ export async function GET() {
   try {
     db = createSupabaseServerClient();
   } catch (e) {
-    return NextResponse.json({ error: `DB init failed: ${e instanceof Error ? e.message : String(e)}` }, { status: 503 });
+    console.error('[workplace/dashboard] DB init error:', e);
+    return NextResponse.json({ error: 'DB unavailable' }, { status: 503 });
   }
 
   const workplaceId: string = meta.workplaceId;

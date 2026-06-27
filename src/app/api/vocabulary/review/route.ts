@@ -86,7 +86,10 @@ export async function POST(req: NextRequest) {
     .eq('id', wordId)
     .eq('user_id', userId);
 
-  if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 });
+  if (updateErr) {
+    console.error('[vocabulary/review] update error:', updateErr);
+    return NextResponse.json({ error: 'Failed to save review' }, { status: 500 });
+  }
 
   return NextResponse.json({
     ok: true,

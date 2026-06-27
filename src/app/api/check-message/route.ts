@@ -128,6 +128,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (e: any) {
     clearTimeout(to);
-    return jsonError(500, { error: 'INTERNAL', detail: e?.message });
+    console.error('[check-message] internal error', e);
+    return jsonError(500, { error: 'INTERNAL' });
   }
 }

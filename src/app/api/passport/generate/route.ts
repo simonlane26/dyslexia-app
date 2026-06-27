@@ -48,7 +48,8 @@ export async function POST(req: Request) {
 
   let db;
   try { db = createSupabaseServerClient(); } catch (e) {
-    return NextResponse.json({ error: `DB unavailable: ${e instanceof Error ? e.message : String(e)}` }, { status: 503 });
+    console.error('[passport/generate] DB init error:', e);
+    return NextResponse.json({ error: 'DB unavailable' }, { status: 503 });
   }
 
   // ── 1. User name from Clerk ──────────────────────────────

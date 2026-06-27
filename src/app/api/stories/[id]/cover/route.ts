@@ -120,7 +120,7 @@ export async function POST(
 
     return NextResponse.json({ coverUrl });
   } catch (e: any) {
-    console.error('cover generation error:', e);
-    return NextResponse.json({ error: e.message || 'Server error' }, { status: 500 });
+    console.error('[stories/cover] generation error:', e);
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
