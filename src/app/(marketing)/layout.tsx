@@ -1,7 +1,23 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Fraunces, Atkinson_Hyperlegible } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { LandingHeader } from "@/components/LandingHeader";
+import { landing } from "@/lib/landingTheme";
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const atkinson = Atkinson_Hyperlegible({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-body",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Dyslexia Write — Dyslexia-friendly Writing App",
@@ -29,7 +45,10 @@ export const metadata: Metadata = {
 export default function MarketingLayout({ children }: { children: ReactNode }) {
   return (
     <ClerkProvider>
-      <div className="min-h-screen">
+      <div
+        className={`min-h-screen ${fraunces.variable} ${atkinson.variable}`}
+        style={{ backgroundColor: landing.bg, fontFamily: landing.fontBody, color: landing.ink }}
+      >
         <LandingHeader />
         {children}
       </div>

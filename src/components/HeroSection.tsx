@@ -1,272 +1,307 @@
 'use client';
 
-import React from 'react';
-import { Sparkles, BookOpen, Mic, ArrowDown } from 'lucide-react';
-import { ModernButton } from './ModernButton';
+import { useState } from 'react';
+import { landing } from '@/lib/landingTheme';
 
 interface HeroSectionProps {
   onGetStarted: () => void;
   onSeeFeatures: () => void;
-  isSignedIn: boolean;
-  theme: any;
-  darkMode: boolean;
 }
 
-export function HeroSection({
-  onGetStarted,
-  onSeeFeatures,
-  isSignedIn,
-  theme,
-  darkMode,
-}: HeroSectionProps) {
+const EXAMPLES = [
+  {
+    label: 'Simplify',
+    before:
+      "I wanted too talk too my friend about are homework becuse i didnt understand it and it was really hard for me to no what to do.",
+    after:
+      "I wanted to talk to my friend about our homework because I didn't understand it and it was really hard for me to know what to do.",
+    highlights: ['Correct words', 'Fixed spelling', 'Clearer flow'],
+  },
+  {
+    label: 'Rewrite sentence',
+    before: 'The thing what happened was me and him went to the shop and we buyed some stuff.',
+    after: 'He and I went to the shop and bought some things.',
+    highlights: ['Shorter', 'Grammatically correct', 'Confident tone'],
+  },
+  {
+    label: 'Read aloud',
+    before:
+      'Paste any text — an email, an essay, a letter — and hear it read back to you in a clear, natural voice. Great for checking your own writing or reading documents others have sent.',
+    after: null,
+    highlights: ['Hear your writing', 'Catch mistakes by ear', 'Natural AI voice'],
+  },
+];
+
+export function HeroSection({ onGetStarted, onSeeFeatures }: HeroSectionProps) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const ex = EXAMPLES[activeIndex];
+
   return (
-    <div
-      style={{
-        background: darkMode
-          ? 'linear-gradient(135deg, #1f2937 0%, #111827 100%)'
-          : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: '#ffffff',
-        padding: '80px 20px',
-        textAlign: 'center',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Background decorative elements */}
+    <section style={{ padding: '56px 20px 64px' }}>
       <div
         style={{
-          position: 'absolute',
-          top: '-50px',
-          right: '-50px',
-          width: '300px',
-          height: '300px',
-          background: 'rgba(255, 255, 255, 0.1)',
-          borderRadius: '50%',
-          filter: 'blur(60px)',
+          maxWidth: '1160px',
+          margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '48px',
+          alignItems: 'center',
         }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '-100px',
-          left: '-100px',
-          width: '400px',
-          height: '400px',
-          background: 'rgba(255, 255, 255, 0.1)',
-          borderRadius: '50%',
-          filter: 'blur(80px)',
-        }}
-      />
-
-      {/* Content */}
-      <div style={{ position: 'relative', zIndex: 1, maxWidth: '900px', margin: '0 auto' }}>
-        {/* Logo */}
-        <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
-          <img
-            src="/LogoNew.png"
-            alt="Dyslexia Write Logo"
+        className="hero-grid"
+      >
+        {/* Left column */}
+        <div>
+          <div
             style={{
-              height: '140px',
-              width: 'auto',
-              borderRadius: '16px',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
-            }}
-          />
-        </div>
-
-        {/* Eyebrow text */}
-        <div
-          style={{
-            display: 'inline-block',
-            padding: '8px 20px',
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-            borderRadius: '50px',
-            fontSize: '14px',
-            fontWeight: '600',
-            marginBottom: '24px',
-            backdropFilter: 'blur(10px)',
-          }}
-        >
-          ✨ Confidence Support for Dyslexic Writers
-        </div>
-
-        {/* Main headline */}
-        <h1
-          style={{
-            fontSize: 'clamp(32px, 6vw, 56px)',
-            fontWeight: '800',
-            lineHeight: '1.2',
-            marginBottom: '16px',
-            textShadow: '0 2px 20px rgba(0, 0, 0, 0.2)',
-          }}
-        >
-          Confidence Support
-          <br />
-          <span
-            style={{
-              background: 'linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              backgroundColor: landing.amberTint,
+              color: landing.amberDark,
+              fontSize: '13px',
+              fontWeight: 700,
+              padding: '7px 14px',
+              borderRadius: '20px',
+              marginBottom: '22px',
             }}
           >
-            for Dyslexic Writers
-          </span>
-        </h1>
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2l2 5 5 .5-3.8 3.5 1 5-4.2-2.6L5.8 16l1-5L3 6.5 8 6z" fill={landing.amberDark} />
+            </svg>
+            Confidence support for dyslexic writers
+          </div>
 
-        {/* Direct subtitle */}
-        <p
-          style={{
-            fontSize: 'clamp(15px, 2.5vw, 18px)',
-            lineHeight: '1.5',
-            marginBottom: '12px',
-            maxWidth: '600px',
-            margin: '0 auto 12px',
-            opacity: 0.9,
-            fontWeight: 500,
-          }}
-        >
-          Designed for people who find writing difficult — especially those with dyslexia.
-        </p>
+          <h1
+            style={{
+              fontFamily: landing.fontDisplay,
+              fontWeight: 600,
+              fontSize: 'clamp(30px, 4vw, 42px)',
+              lineHeight: 1.28,
+              letterSpacing: '-0.01em',
+              marginBottom: '22px',
+              color: landing.ink,
+            }}
+          >
+            Writing that sounds like{' '}
+            <span
+              style={{
+                background: `linear-gradient(120deg, ${landing.amber}52 0%, ${landing.amber}52 100%)`,
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: '100% 0.42em',
+                backgroundPosition: '0 86%',
+                padding: '0 2px',
+              }}
+            >
+              you
+            </span>{' '}
+            — not like you&apos;re struggling.
+          </h1>
 
-        {/* Subheadline */}
-        <p
-          style={{
-            fontSize: 'clamp(14px, 2vw, 17px)',
-            lineHeight: '1.6',
-            marginBottom: '40px',
-            maxWidth: '680px',
-            margin: '0 auto 40px',
-            opacity: 0.8,
-          }}
-        >
-          Grammar checking, AI writing coach, and smart rewriting tools — built around how you think, not how you &apos;should&apos; write.
-        </p>
+          <p
+            style={{
+              fontSize: '16.5px',
+              color: landing.inkMuted,
+              maxWidth: '460px',
+              marginBottom: '30px',
+              lineHeight: 1.65,
+            }}
+          >
+            Designed for people who find writing difficult — especially those with dyslexia. Grammar
+            checking, an AI writing coach, and smart rewriting tools built around how you think, not how
+            you &quot;should&quot; write.
+          </p>
 
-        {/* CTA Buttons */}
+          <div style={{ display: 'flex', gap: '14px', marginBottom: '26px', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={onGetStarted}
+              style={{
+                background: landing.amber,
+                color: '#fff',
+                fontWeight: 700,
+                fontSize: '15px',
+                padding: '13px 26px',
+                borderRadius: '24px',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'background .15s',
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.background = landing.amberDark)}
+              onMouseOut={(e) => (e.currentTarget.style.background = landing.amber)}
+            >
+              Start Writing Free
+            </button>
+            <button
+              type="button"
+              onClick={onSeeFeatures}
+              style={{
+                border: `1.5px solid ${landing.line}`,
+                color: landing.ink,
+                background: 'transparent',
+                fontSize: '15px',
+                fontWeight: 700,
+                padding: '12px 26px',
+                borderRadius: '24px',
+                cursor: 'pointer',
+                transition: 'border-color .15s',
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.borderColor = landing.inkFaint)}
+              onMouseOut={(e) => (e.currentTarget.style.borderColor = landing.line)}
+            >
+              See Features
+            </button>
+          </div>
+
+          <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px', listStyle: 'none', margin: 0, padding: 0 }}>
+            {['No credit card required', '5 free uses every day', "Privacy-focused — nothing leaves your device unless you choose"].map(
+              (item) => (
+                <li key={item} style={{ display: 'flex', alignItems: 'center', gap: '9px', fontSize: '14px', color: landing.inkMuted }}>
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke={landing.teal} strokeWidth="2" style={{ flexShrink: 0 }}>
+                    <path d="M4 10l4 4 8-8" />
+                  </svg>
+                  {item}
+                </li>
+              )
+            )}
+          </ul>
+        </div>
+
+        {/* Right column — demo card */}
         <div
           style={{
-            display: 'flex',
-            gap: '16px',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            marginBottom: '48px',
+            background: landing.panel,
+            border: `1px solid ${landing.line}`,
+            borderRadius: '14px',
+            padding: '26px',
+            boxShadow: '0 24px 60px -30px rgba(43,42,40,0.2)',
           }}
         >
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
+            {EXAMPLES.map((e, i) => (
+              <button
+                key={e.label}
+                type="button"
+                onClick={() => setActiveIndex(i)}
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  padding: '8px 14px',
+                  borderRadius: '18px',
+                  border: `1.5px solid ${activeIndex === i ? landing.amber : landing.line}`,
+                  color: activeIndex === i ? landing.amberDark : landing.inkMuted,
+                  backgroundColor: activeIndex === i ? landing.amberTint : 'transparent',
+                  cursor: 'pointer',
+                  transition: 'all .15s',
+                }}
+              >
+                {e.label}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ display: 'grid', gap: '14px' }}>
+            <div style={{ borderRadius: '10px', padding: '18px 18px 16px', backgroundColor: landing.roseTint }}>
+              <div style={{ fontSize: '11.5px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '8px', color: landing.rose }}>
+                Before
+              </div>
+              <p style={{ fontFamily: landing.fontDisplay, fontSize: '16.5px', fontStyle: 'italic', lineHeight: 1.55, margin: 0, color: landing.ink }}>
+                &quot;{ex.before}&quot;
+              </p>
+            </div>
+
+            <div style={{ borderRadius: '10px', padding: '18px 18px 16px', backgroundColor: landing.tealTint }}>
+              <div style={{ fontSize: '11.5px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '8px', color: landing.teal }}>
+                {ex.after !== null ? 'After — with DyslexiaWrite' : 'Read Aloud'}
+              </div>
+              <p style={{ fontFamily: landing.fontDisplay, fontSize: '16.5px', fontStyle: 'italic', lineHeight: 1.55, margin: 0, color: landing.ink }}>
+                {ex.after !== null ? (
+                  <span key={activeIndex} className="sweep-underline">
+                    &quot;{ex.after}&quot;
+                  </span>
+                ) : (
+                  `"${ex.before}"`
+                )}
+              </p>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '14px', flexWrap: 'wrap' }}>
+                {ex.highlights.map((h) => (
+                  <span
+                    key={h}
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      color: landing.teal,
+                      background: '#fff',
+                      border: `1px solid ${landing.teal}`,
+                      padding: '4px 10px',
+                      borderRadius: '14px',
+                    }}
+                  >
+                    ✓ {h}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <button
+            type="button"
             onClick={onGetStarted}
             style={{
-              padding: '16px 40px',
-              fontSize: '18px',
-              fontWeight: '700',
-              backgroundColor: '#ffffff',
-              color: darkMode ? '#1f2937' : '#667eea',
+              display: 'block',
+              width: '100%',
+              textAlign: 'center',
+              marginTop: '18px',
+              background: landing.amber,
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: '15px',
+              padding: '13px 26px',
+              borderRadius: '24px',
               border: 'none',
-              borderRadius: '12px',
               cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
             }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 30px rgba(0, 0, 0, 0.3)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.2)';
-            }}
+            onMouseOver={(e) => (e.currentTarget.style.background = landing.amberDark)}
+            onMouseOut={(e) => (e.currentTarget.style.background = landing.amber)}
           >
-            <Sparkles size={20} />
-            {isSignedIn ? 'Start Writing' : 'Start Writing Free'}
+            Start Writing Free — no card needed
           </button>
-
-          <button
-            onClick={onSeeFeatures}
-            style={{
-              padding: '16px 40px',
-              fontSize: '18px',
-              fontWeight: '700',
-              backgroundColor: 'rgba(255, 255, 255, 0.2)',
-              color: '#ffffff',
-              border: '2px solid rgba(255, 255, 255, 0.4)',
-              borderRadius: '12px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              backdropFilter: 'blur(10px)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.6)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
-            }}
-          >
-            <BookOpen size={20} />
-            See Features
-          </button>
-        </div>
-
-        {/* Trust badges */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '32px',
-            flexWrap: 'wrap',
-            fontSize: '14px',
-            opacity: 0.9,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '20px' }}>✓</span>
-            <span>No credit card required</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '20px' }}>✓</span>
-            <span>5 free uses per day</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '20px' }}>✓</span>
-            <span>Privacy-focused</span>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div
-          style={{
-            marginTop: '60px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '8px',
-            animation: 'bounce 2s infinite',
-          }}
-        >
-          <span style={{ fontSize: '14px', opacity: 0.8 }}>Scroll to explore</span>
-          <ArrowDown size={24} style={{ opacity: 0.8 }} />
         </div>
       </div>
 
       <style jsx>{`
-        @keyframes bounce {
-          0%,
-          100% {
-            transform: translateY(0);
+        .sweep-underline {
+          position: relative;
+          display: inline;
+        }
+        .sweep-underline::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          bottom: 2px;
+          height: 0.4em;
+          width: 0;
+          background: rgba(47, 122, 107, 0.25);
+          z-index: -1;
+          animation: sweep 1.1s ease forwards;
+          animation-delay: 0.3s;
+        }
+        @keyframes sweep {
+          to {
+            width: 100%;
           }
-          50% {
-            transform: translateY(10px);
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .sweep-underline::after {
+            animation: none;
+            width: 100%;
+          }
+        }
+        @media (max-width: 900px) {
+          .hero-grid {
+            grid-template-columns: 1fr !important;
           }
         }
       `}</style>
-    </div>
+    </section>
   );
 }
