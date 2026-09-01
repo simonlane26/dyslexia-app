@@ -46,22 +46,22 @@ const ModernButton = ({
 
   const variantStyles: Record<ButtonVariant, CSSProperties> = {
     primary: {
-      background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+      background: 'linear-gradient(135deg, #D98C2B 0%, #B06F1D 100%)',
       color: 'white',
       border: 'none',
-      boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)',
+      boxShadow: '0 4px 15px rgba(217, 140, 43, 0.4)',
     },
     secondary: {
-      background: '#f1f5f9',
-      color: '#334155',
-      border: '1px solid #cbd5e1',
+      background: '#F4EEDE',
+      color: '#2B2A28',
+      border: '1px solid #E6DECB',
       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
     },
     success: {
-      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+      background: 'linear-gradient(135deg, #2F7A6B 0%, #22594F 100%)',
       color: 'white',
       border: 'none',
-      boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)',
+      boxShadow: '0 4px 15px rgba(47, 122, 107, 0.4)',
     },
     danger: {
       background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
@@ -71,8 +71,8 @@ const ModernButton = ({
     },
     ghost: {
       background: 'transparent',
-      color: '#64748b',
-      border: '1px solid #e2e8f0',
+      color: '#6B6558',
+      border: '1px solid #F4EEDE',
       boxShadow: 'none',
     },
   };
@@ -102,9 +102,9 @@ const ModernButton = ({
     if (!disabled) {
       e.currentTarget.style.transform = 'scale(1.02) translateY(-2px)';
       if (variant === 'primary') {
-        e.currentTarget.style.boxShadow = '0 8px 25px rgba(59, 130, 246, 0.6)';
+        e.currentTarget.style.boxShadow = '0 8px 25px rgba(217, 140, 43, 0.6)';
       } else if (variant === 'success') {
-        e.currentTarget.style.boxShadow = '0 8px 25px rgba(16, 185, 129, 0.6)';
+        e.currentTarget.style.boxShadow = '0 8px 25px rgba(47, 122, 107, 0.6)';
       }
     }
   };
@@ -146,18 +146,18 @@ const PricingCard = ({
   [key: string]: any;
 }) => {
   const defaultShadow = featured
-    ? '0 20px 60px rgba(59, 130, 246, 0.15)'
+    ? '0 20px 60px rgba(217, 140, 43, 0.15)'
     : '0 8px 32px rgba(0, 0, 0, 0.1)';
 
   const base: React.CSSProperties = {
     background: featured
-      ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)'
+      ? 'linear-gradient(135deg, rgba(217, 140, 43, 0.05) 0%, rgba(176, 111, 29, 0.05) 100%)'
       : 'rgba(255, 255, 255, 0.9)',
     backdropFilter: 'blur(10px)',
     borderRadius: 24,
     boxShadow: defaultShadow,
     border: featured
-      ? '2px solid rgba(59, 130, 246, 0.2)'
+      ? '2px solid rgba(217, 140, 43, 0.2)'
       : '1px solid rgba(255, 255, 255, 0.2)',
     transition: 'all 0.3s ease',
     position: 'relative' as React.CSSProperties['position'], // <- narrowed
@@ -173,7 +173,7 @@ const PricingCard = ({
   const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     e.currentTarget.style.transform = 'translateY(-8px)';
     e.currentTarget.style.boxShadow = featured
-      ? '0 25px 80px rgba(59, 130, 246, 0.25)'
+      ? '0 25px 80px rgba(217, 140, 43, 0.25)'
       : '0 20px 60px rgba(0, 0, 0, 0.15)';
   };
 
@@ -197,7 +197,7 @@ const PricingCard = ({
             left: 0,
             right: 0,
             height: 4,
-            background: 'linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%)',
+            background: 'linear-gradient(90deg, #D98C2B 0%, #B06F1D 100%)',
           }}
         />
       )}
@@ -230,7 +230,7 @@ const FeatureItem = ({
     {icon ? (
       icon
     ) : (
-      <Check size={18} style={{ color: highlighted ? '#10b981' : '#6b7280' }} />
+      <Check size={18} style={{ color: highlighted ? '#2F7A6B' : '#6B6558' }} />
     )}
     <span>{children}</span>
   </div>
@@ -275,8 +275,8 @@ export default function ModernPricingPage() {
       style={{
         minHeight: '100vh',
         background:
-          'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)',
-        fontFamily: "'Lexend', sans-serif",
+          'linear-gradient(135deg, #FBF7EF 0%, #F4EEDE 50%, #F4EEDE 100%)',
+        fontFamily: "var(--font-body), 'Atkinson Hyperlegible', system-ui, sans-serif",
       }}
     >
       <div
@@ -302,7 +302,7 @@ export default function ModernPricingPage() {
                 height: '40px',
                 borderRadius: '12px',
                 background:
-                  'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                  'linear-gradient(135deg, #D98C2B 0%, #B06F1D 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -313,12 +313,9 @@ export default function ModernPricingPage() {
             <h1
               style={{
                 fontSize: '3rem',
-                fontWeight: 'bold',
-                background:
-                  'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                // backgroundClip: 'text', // (removed to avoid TS type mismatch)
+                fontWeight: 700,
+                fontFamily: "var(--font-display), 'Fraunces', Georgia, serif",
+                color: '#2B2A28',
                 margin: 0,
               }}
             >
@@ -328,7 +325,7 @@ export default function ModernPricingPage() {
           <p
             style={{
               fontSize: '1.25rem',
-              color: '#64748b',
+              color: '#6B6558',
               maxWidth: '600px',
               margin: '0 auto',
               lineHeight: 1.6,
@@ -350,12 +347,13 @@ export default function ModernPricingPage() {
               justifyContent: 'center',
             }}
           >
-            <Users size={24} style={{ color: '#3b82f6' }} />
+            <Users size={24} style={{ color: '#D98C2B' }} />
             <h2
               style={{
                 fontSize: '2rem',
                 fontWeight: 700,
-                color: '#1e293b',
+                fontFamily: "var(--font-display), 'Fraunces', Georgia, serif",
+                color: '#2B2A28',
                 margin: 0,
               }}
             >
@@ -380,7 +378,8 @@ export default function ModernPricingPage() {
                     style={{
                       fontSize: '1.5rem',
                       fontWeight: 700,
-                      color: '#1e293b',
+                      fontFamily: "var(--font-display), 'Fraunces', Georgia, serif",
+                      color: '#2B2A28',
                       marginBottom: '8px',
                     }}
                   >
@@ -390,13 +389,13 @@ export default function ModernPricingPage() {
                     style={{
                       fontSize: '3rem',
                       fontWeight: 800,
-                      color: '#3b82f6',
+                      color: '#D98C2B',
                       marginBottom: '4px',
                     }}
                   >
                     £0
                   </div>
-                  <div style={{ color: '#64748b', fontSize: '14px' }}>
+                  <div style={{ color: '#6B6558', fontSize: '14px' }}>
                     per month
                   </div>
                 </div>
@@ -407,7 +406,7 @@ export default function ModernPricingPage() {
                   <FeatureItem>3 saved documents</FeatureItem>
                   <FeatureItem
                     icon={
-                      <Volume2 size={18} style={{ color: '#6b7280' }} />
+                      <Volume2 size={18} style={{ color: '#6B6558' }} />
                     }
                   >
                     Read Aloud — Rachelle voice
@@ -438,7 +437,7 @@ export default function ModernPricingPage() {
                     top: '20px',
                     right: '20px',
                     background:
-                      'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      'linear-gradient(135deg, #2F7A6B 0%, #22594F 100%)',
                     color: 'white',
                     padding: '6px 12px',
                     borderRadius: '20px',
@@ -458,7 +457,8 @@ export default function ModernPricingPage() {
                     style={{
                       fontSize: '1.5rem',
                       fontWeight: 700,
-                      color: '#1e293b',
+                      fontFamily: "var(--font-display), 'Fraunces', Georgia, serif",
+                      color: '#2B2A28',
                       marginBottom: '8px',
                     }}
                   >
@@ -469,7 +469,7 @@ export default function ModernPricingPage() {
                       fontSize: '3rem',
                       fontWeight: 800,
                       background:
-                        'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                        'linear-gradient(135deg, #D98C2B 0%, #B06F1D 100%)',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
                       marginBottom: '4px',
@@ -477,7 +477,7 @@ export default function ModernPricingPage() {
                   >
                     £6.99
                   </div>
-                  <div style={{ color: '#64748b', fontSize: '14px' }}>
+                  <div style={{ color: '#6B6558', fontSize: '14px' }}>
                     per month
                   </div>
                 </div>
@@ -485,37 +485,37 @@ export default function ModernPricingPage() {
                 <div style={{ marginBottom: '32px' }}>
                   <FeatureItem
                     highlighted
-                    icon={<Sparkles size={18} style={{ color: '#10b981' }} />}
+                    icon={<Sparkles size={18} style={{ color: '#2F7A6B' }} />}
                   >
                     Unlimited simplifications &amp; rewrites
                   </FeatureItem>
                   <FeatureItem
                     highlighted
-                    icon={<Sparkles size={18} style={{ color: '#10b981' }} />}
+                    icon={<Sparkles size={18} style={{ color: '#2F7A6B' }} />}
                   >
                     All rewrite modes (Simpler, Clearer, More confident)
                   </FeatureItem>
                   <FeatureItem
                     highlighted
-                    icon={<Sparkles size={18} style={{ color: '#10b981' }} />}
+                    icon={<Sparkles size={18} style={{ color: '#2F7A6B' }} />}
                   >
                     AI Writing Coach &amp; Mentor
                   </FeatureItem>
                   <FeatureItem
                     highlighted
-                    icon={<Volume2 size={18} style={{ color: '#10b981' }} />}
+                    icon={<Volume2 size={18} style={{ color: '#2F7A6B' }} />}
                   >
                     All voices (Molly, Liam, Elli &amp; more)
                   </FeatureItem>
                   <FeatureItem
                     highlighted
-                    icon={<Palette size={18} style={{ color: '#10b981' }} />}
+                    icon={<Palette size={18} style={{ color: '#2F7A6B' }} />}
                   >
                     Guided &amp; Supported reading modes
                   </FeatureItem>
                   <FeatureItem
                     highlighted
-                    icon={<Download size={18} style={{ color: '#10b981' }} />}
+                    icon={<Download size={18} style={{ color: '#2F7A6B' }} />}
                   >
                     Export as MP3, PDF, DOC
                   </FeatureItem>
@@ -557,7 +557,7 @@ export default function ModernPricingPage() {
                     top: '20px',
                     right: '20px',
                     background:
-                      'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                      'linear-gradient(135deg, #D98C2B 0%, #B06F1D 100%)',
                     color: 'white',
                     padding: '6px 12px',
                     borderRadius: '20px',
@@ -573,7 +573,8 @@ export default function ModernPricingPage() {
                     style={{
                       fontSize: '1.5rem',
                       fontWeight: 700,
-                      color: '#1e293b',
+                      fontFamily: "var(--font-display), 'Fraunces', Georgia, serif",
+                      color: '#2B2A28',
                       marginBottom: '8px',
                     }}
                   >
@@ -583,18 +584,18 @@ export default function ModernPricingPage() {
                     style={{
                       fontSize: '3rem',
                       fontWeight: 800,
-                      color: '#3b82f6',
+                      color: '#D98C2B',
                       marginBottom: '4px',
                     }}
                   >
                     £50
                   </div>
-                  <div style={{ color: '#64748b', fontSize: '14px' }}>
+                  <div style={{ color: '#6B6558', fontSize: '14px' }}>
                     per year
                   </div>
                   <div
                     style={{
-                      color: '#10b981',
+                      color: '#2F7A6B',
                       fontSize: '12px',
                       fontWeight: 600,
                       marginTop: '4px',
@@ -607,37 +608,37 @@ export default function ModernPricingPage() {
                 <div style={{ marginBottom: '32px' }}>
                   <FeatureItem
                     highlighted
-                    icon={<Sparkles size={18} style={{ color: '#10b981' }} />}
+                    icon={<Sparkles size={18} style={{ color: '#2F7A6B' }} />}
                   >
                     Unlimited simplifications &amp; rewrites
                   </FeatureItem>
                   <FeatureItem
                     highlighted
-                    icon={<Sparkles size={18} style={{ color: '#10b981' }} />}
+                    icon={<Sparkles size={18} style={{ color: '#2F7A6B' }} />}
                   >
                     All rewrite modes (Simpler, Clearer, More confident)
                   </FeatureItem>
                   <FeatureItem
                     highlighted
-                    icon={<Sparkles size={18} style={{ color: '#10b981' }} />}
+                    icon={<Sparkles size={18} style={{ color: '#2F7A6B' }} />}
                   >
                     AI Writing Coach &amp; Mentor
                   </FeatureItem>
                   <FeatureItem
                     highlighted
-                    icon={<Volume2 size={18} style={{ color: '#10b981' }} />}
+                    icon={<Volume2 size={18} style={{ color: '#2F7A6B' }} />}
                   >
                     All voices (Molly, Liam, Elli &amp; more)
                   </FeatureItem>
                   <FeatureItem
                     highlighted
-                    icon={<Palette size={18} style={{ color: '#10b981' }} />}
+                    icon={<Palette size={18} style={{ color: '#2F7A6B' }} />}
                   >
                     Guided &amp; Supported reading modes
                   </FeatureItem>
                   <FeatureItem
                     highlighted
-                    icon={<Download size={18} style={{ color: '#10b981' }} />}
+                    icon={<Download size={18} style={{ color: '#2F7A6B' }} />}
                   >
                     Export as MP3, PDF, DOC
                   </FeatureItem>
@@ -671,12 +672,12 @@ export default function ModernPricingPage() {
         {/* Workplace Plans */}
         <div style={{ marginBottom: '80px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', justifyContent: 'center' }}>
-            <Briefcase size={24} style={{ color: '#185FA5' }} />
-            <h2 style={{ fontSize: '2rem', fontWeight: 700, color: '#1e293b', margin: 0 }}>
+            <Briefcase size={24} style={{ color: '#B06F1D' }} />
+            <h2 style={{ fontSize: '2rem', fontWeight: 700, fontFamily: "var(--font-display), 'Fraunces', Georgia, serif", color: '#2B2A28', margin: 0 }}>
               For Workplaces
             </h2>
           </div>
-          <p style={{ textAlign: 'center', color: '#64748b', fontSize: '14px', marginBottom: '40px' }}>
+          <p style={{ textAlign: 'center', color: '#6B6558', fontSize: '14px', marginBottom: '40px' }}>
             Access to Work eligible — employees can claim the full cost through DWP
           </p>
 
@@ -684,15 +685,15 @@ export default function ModernPricingPage() {
             {/* Starter */}
             <PricingCard>
               <div style={{ padding: '32px', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: '16px', left: '50%', transform: 'translateX(-50%)', background: '#FEF3C7', color: '#92400E', fontSize: '11px', fontWeight: 600, padding: '3px 12px', borderRadius: '20px', whiteSpace: 'nowrap', zIndex: 1 }}>
+                <div style={{ position: 'absolute', top: '16px', left: '50%', transform: 'translateX(-50%)', background: '#FBEEDA', color: '#B06F1D', fontSize: '11px', fontWeight: 600, padding: '3px 12px', borderRadius: '20px', whiteSpace: 'nowrap', zIndex: 1 }}>
                   Coming Soon
                 </div>
                 <div style={{ textAlign: 'center', marginBottom: '32px', marginTop: '24px' }}>
-                  <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>Starter</h3>
-                  <div style={{ color: '#64748b', fontSize: '13px', marginBottom: '12px' }}>Individual employees</div>
-                  <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0F6E56', marginBottom: '2px' }}>£120</div>
-                  <div style={{ color: '#64748b', fontSize: '13px' }}>per user / year</div>
-                  <div style={{ color: '#9ca3af', fontSize: '11px', fontStyle: 'italic', marginTop: '2px' }}>£10/month per user · 1–5 users</div>
+                  <h3 style={{ fontSize: '1.5rem', fontWeight: 700, fontFamily: "var(--font-display), 'Fraunces', Georgia, serif", color: '#2B2A28', marginBottom: '4px' }}>Starter</h3>
+                  <div style={{ color: '#6B6558', fontSize: '13px', marginBottom: '12px' }}>Individual employees</div>
+                  <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#2F7A6B', marginBottom: '2px' }}>£120</div>
+                  <div style={{ color: '#6B6558', fontSize: '13px' }}>per user / year</div>
+                  <div style={{ color: '#9C9686', fontSize: '11px', fontStyle: 'italic', marginTop: '2px' }}>£10/month per user · 1–5 users</div>
                 </div>
                 <div style={{ marginBottom: '32px' }}>
                   <FeatureItem highlighted>Full Pro features per user</FeatureItem>
@@ -711,18 +712,18 @@ export default function ModernPricingPage() {
             {/* Business */}
             <PricingCard featured>
               <div style={{ padding: '32px', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: '16px', left: '50%', transform: 'translateX(-50%)', background: '#FEF3C7', color: '#92400E', fontSize: '11px', fontWeight: 600, padding: '3px 12px', borderRadius: '20px', whiteSpace: 'nowrap', zIndex: 1 }}>
+                <div style={{ position: 'absolute', top: '16px', left: '50%', transform: 'translateX(-50%)', background: '#FBEEDA', color: '#B06F1D', fontSize: '11px', fontWeight: 600, padding: '3px 12px', borderRadius: '20px', whiteSpace: 'nowrap', zIndex: 1 }}>
                   Coming Soon
                 </div>
-                <div style={{ position: 'absolute', top: '20px', right: '20px', background: 'linear-gradient(135deg, #534AB7 0%, #7C3AED 100%)', color: 'white', padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 600 }}>
+                <div style={{ position: 'absolute', top: '20px', right: '20px', background: 'linear-gradient(135deg, #B65C4A 0%, #94493A 100%)', color: 'white', padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 600 }}>
                   Most Popular
                 </div>
                 <div style={{ textAlign: 'center', marginBottom: '32px', marginTop: '24px' }}>
-                  <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>Business</h3>
-                  <div style={{ color: '#64748b', fontSize: '13px', marginBottom: '12px' }}>Teams and departments</div>
-                  <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#534AB7', marginBottom: '2px' }}>£95</div>
-                  <div style={{ color: '#64748b', fontSize: '13px' }}>per user / year</div>
-                  <div style={{ color: '#9ca3af', fontSize: '11px', fontStyle: 'italic', marginTop: '2px' }}>£7.92/month per user · 6–50 users</div>
+                  <h3 style={{ fontSize: '1.5rem', fontWeight: 700, fontFamily: "var(--font-display), 'Fraunces', Georgia, serif", color: '#2B2A28', marginBottom: '4px' }}>Business</h3>
+                  <div style={{ color: '#6B6558', fontSize: '13px', marginBottom: '12px' }}>Teams and departments</div>
+                  <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#B65C4A', marginBottom: '2px' }}>£95</div>
+                  <div style={{ color: '#6B6558', fontSize: '13px' }}>per user / year</div>
+                  <div style={{ color: '#9C9686', fontSize: '11px', fontStyle: 'italic', marginTop: '2px' }}>£7.92/month per user · 6–50 users</div>
                 </div>
                 <div style={{ marginBottom: '32px' }}>
                   <FeatureItem highlighted>Everything in Starter</FeatureItem>
@@ -742,15 +743,15 @@ export default function ModernPricingPage() {
             {/* Enterprise */}
             <PricingCard>
               <div style={{ padding: '32px', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: '16px', left: '50%', transform: 'translateX(-50%)', background: '#FEF3C7', color: '#92400E', fontSize: '11px', fontWeight: 600, padding: '3px 12px', borderRadius: '20px', whiteSpace: 'nowrap', zIndex: 1 }}>
+                <div style={{ position: 'absolute', top: '16px', left: '50%', transform: 'translateX(-50%)', background: '#FBEEDA', color: '#B06F1D', fontSize: '11px', fontWeight: 600, padding: '3px 12px', borderRadius: '20px', whiteSpace: 'nowrap', zIndex: 1 }}>
                   Coming Soon
                 </div>
                 <div style={{ textAlign: 'center', marginBottom: '32px', marginTop: '24px' }}>
-                  <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>Enterprise</h3>
-                  <div style={{ color: '#64748b', fontSize: '13px', marginBottom: '12px' }}>Organisation-wide</div>
-                  <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#185FA5', marginBottom: '2px' }}>Custom</div>
-                  <div style={{ color: '#64748b', fontSize: '13px' }}>volume pricing</div>
-                  <div style={{ color: '#9ca3af', fontSize: '11px', fontStyle: 'italic', marginTop: '2px' }}>From £60/user/year at scale · 50+ users</div>
+                  <h3 style={{ fontSize: '1.5rem', fontWeight: 700, fontFamily: "var(--font-display), 'Fraunces', Georgia, serif", color: '#2B2A28', marginBottom: '4px' }}>Enterprise</h3>
+                  <div style={{ color: '#6B6558', fontSize: '13px', marginBottom: '12px' }}>Organisation-wide</div>
+                  <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#B06F1D', marginBottom: '2px' }}>Custom</div>
+                  <div style={{ color: '#6B6558', fontSize: '13px' }}>volume pricing</div>
+                  <div style={{ color: '#9C9686', fontSize: '11px', fontStyle: 'italic', marginTop: '2px' }}>From £60/user/year at scale · 50+ users</div>
                 </div>
                 <div style={{ marginBottom: '32px' }}>
                   <FeatureItem highlighted>Everything in Business</FeatureItem>
@@ -771,24 +772,24 @@ export default function ModernPricingPage() {
 
           {/* Comparison + Access to Work note */}
           <div style={{ maxWidth: '1000px', margin: '32px auto 0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-            <div style={{ background: '#f8f8f5', borderRadius: '12px', padding: '20px' }}>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#1e293b', marginBottom: '12px' }}>How we compare to TextHelp Read&amp;Write</div>
+            <div style={{ background: '#F4EEDE', borderRadius: '12px', padding: '20px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#2B2A28', marginBottom: '12px' }}>How we compare to TextHelp Read&amp;Write</div>
               {[
                 { label: 'TextHelp single licence (3yr)', value: '£378–500/user/year', highlight: false },
                 { label: 'DyslexiaWrite Starter', value: '£120/user/year', highlight: false },
                 { label: 'DyslexiaWrite Business', value: '£95/user/year', highlight: false },
                 { label: 'Your saving vs TextHelp', value: '68–81% cheaper', highlight: true },
               ].map((row) => (
-                <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', padding: '6px 0', borderBottom: '1px solid #e8e8e8' }}>
-                  <span style={{ color: '#64748b' }}>{row.label}</span>
-                  <span style={{ fontWeight: 600, color: row.highlight ? '#1D9E75' : '#1e293b' }}>{row.value}</span>
+                <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', padding: '6px 0', borderBottom: '1px solid #E6DECB' }}>
+                  <span style={{ color: '#6B6558' }}>{row.label}</span>
+                  <span style={{ fontWeight: 600, color: row.highlight ? '#2F7A6B' : '#2B2A28' }}>{row.value}</span>
                 </div>
               ))}
             </div>
 
-            <div style={{ background: '#E1F5EE', borderRadius: '12px', padding: '20px' }}>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#085041', marginBottom: '8px' }}>Access to Work funding</div>
-              <div style={{ fontSize: '12px', color: '#0F6E56', lineHeight: 1.6 }}>
+            <div style={{ background: '#E4F0EC', borderRadius: '12px', padding: '20px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#22594F', marginBottom: '8px' }}>Access to Work funding</div>
+              <div style={{ fontSize: '12px', color: '#2F7A6B', lineHeight: 1.6 }}>
                 DyslexiaWrite is eligible for Access to Work funding. Employees can claim the full licence cost through the DWP scheme — meaning the employer pays nothing. We provide all documentation needed for the application.
               </div>
             </div>
@@ -806,12 +807,13 @@ export default function ModernPricingPage() {
               justifyContent: 'center',
             }}
           >
-            <School size={24} style={{ color: '#10b981' }} />
+            <School size={24} style={{ color: '#2F7A6B' }} />
             <h2
               style={{
                 fontSize: '2rem',
                 fontWeight: 700,
-                color: '#1e293b',
+                fontFamily: "var(--font-display), 'Fraunces', Georgia, serif",
+                color: '#2B2A28',
                 margin: 0,
               }}
             >
@@ -858,7 +860,8 @@ export default function ModernPricingPage() {
                       style={{
                         fontSize: '1.5rem',
                         fontWeight: 700,
-                        color: '#1e293b',
+                        fontFamily: "var(--font-display), 'Fraunces', Georgia, serif",
+                        color: '#2B2A28',
                         marginBottom: '4px',
                       }}
                     >
@@ -866,7 +869,7 @@ export default function ModernPricingPage() {
                     </h3>
                     <div
                       style={{
-                        color: '#64748b',
+                        color: '#6B6558',
                         fontSize: '14px',
                         marginBottom: '12px',
                       }}
@@ -877,13 +880,13 @@ export default function ModernPricingPage() {
                       style={{
                         fontSize: '2.5rem',
                         fontWeight: 800,
-                        color: '#10b981',
+                        color: '#2F7A6B',
                         marginBottom: '4px',
                       }}
                     >
                       {plan.price}
                     </div>
-                    <div style={{ color: '#64748b', fontSize: '14px' }}>
+                    <div style={{ color: '#6B6558', fontSize: '14px' }}>
                       per year
                     </div>
                   </div>
@@ -916,8 +919,8 @@ export default function ModernPricingPage() {
                     </SignInButton>
                   </SignedOut>
 
-                  <p style={{ textAlign: 'center', fontSize: '12px', color: '#94a3b8', marginTop: '12px' }}>
-                    <Link href="/schools-privacy" style={{ color: '#7c3aed', textDecoration: 'underline' }}>
+                  <p style={{ textAlign: 'center', fontSize: '12px', color: '#9C9686', marginTop: '12px' }}>
+                    <Link href="/schools-privacy" style={{ color: '#2F7A6B', textDecoration: 'underline' }}>
                       Schools privacy policy
                     </Link>
                     {' · '}GDPR compliant
@@ -935,16 +938,17 @@ export default function ModernPricingPage() {
             marginTop: '80px',
             padding: '40px',
             background:
-              'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
+              'linear-gradient(135deg, rgba(217, 140, 43, 0.05) 0%, rgba(176, 111, 29, 0.05) 100%)',
             borderRadius: '24px',
-            border: '1px solid rgba(59, 130, 246, 0.1)',
+            border: '1px solid rgba(217, 140, 43, 0.1)',
           }}
         >
           <h3
             style={{
               fontSize: '1.5rem',
               fontWeight: 700,
-              color: '#1e293b',
+              fontFamily: "var(--font-display), 'Fraunces', Georgia, serif",
+              color: '#2B2A28',
               marginBottom: '12px',
             }}
           >
@@ -952,7 +956,7 @@ export default function ModernPricingPage() {
           </h3>
           <p
             style={{
-              color: '#64748b',
+              color: '#6B6558',
               marginBottom: '24px',
             }}
           >
@@ -973,7 +977,7 @@ export default function ModernPricingPage() {
           style={{
             textAlign: 'center',
             marginTop: '16px',
-            color: '#64748b',
+            color: '#6B6558',
             fontSize: '12px',
           }}
         >
