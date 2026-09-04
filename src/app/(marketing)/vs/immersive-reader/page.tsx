@@ -4,7 +4,7 @@ import { organizationSchema } from '@/app/schema';
 import { OtherComparisons } from '@/components/OtherComparisons';
 
 export const metadata: Metadata = {
-  title: 'Dyslexia Write vs Microsoft Immersive Reader — Do You Still Need It If It’s Free?',
+  title: 'Dyslexia Write vs Immersive Reader — Honest Comparison',
   description:
     'An honest comparison of Dyslexia Write and Microsoft Immersive Reader: what the free built-in reading tool does well, and where you still need writing support.',
   alternates: { canonical: 'https://www.dyslexiawrite.com/vs/immersive-reader' },

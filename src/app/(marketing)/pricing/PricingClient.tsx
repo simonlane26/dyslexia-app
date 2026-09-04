@@ -4,7 +4,6 @@ import {
   SignedIn,
   SignedOut,
   SignInButton,
-  useUser,
 } from '@clerk/nextjs';
 
 import Link from 'next/link';
@@ -236,12 +235,6 @@ const FeatureItem = ({
 /* ---------- Page ---------- */
 
 export default function PricingClient() {
-  const { isLoaded } = useUser();
-
-  if (!isLoaded) {
-    return <div>Loading...</div>;
-  }
-
   const handleGetPro = async (planType: string) => {
     try {
       const response = await fetch('/api/checkout', {

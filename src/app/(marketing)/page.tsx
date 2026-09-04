@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { HeroSection } from '@/components/HeroSection';
 import { DualPathSection } from '@/components/DualPathSection';
 import { FeaturesSection } from '@/components/FeaturesSection';
+import { FundingCompatibilityFAQ } from '@/components/FundingCompatibilityFAQ';
 import { HomeInfoSections } from '@/components/HomeInfoSections';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
 import { StatsStrip } from '@/components/StatsStrip';
@@ -111,6 +112,9 @@ export default function LandingPage() {
       <div id="features-section">
         <FeaturesSection />
       </div>
+
+      {/* Funding and compatibility FAQ */}
+      <FundingCompatibilityFAQ />
 
       {/* Who it's for / Access to Work / Schools */}
       <HomeInfoSections />

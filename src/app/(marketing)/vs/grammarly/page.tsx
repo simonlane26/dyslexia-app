@@ -4,7 +4,7 @@ import { organizationSchema } from '@/app/schema';
 import { OtherComparisons } from '@/components/OtherComparisons';
 
 export const metadata: Metadata = {
-  title: 'Dyslexia Write vs Grammarly — Which One Actually Helps You Write with Dyslexia?',
+  title: 'Dyslexia Write vs Grammarly — Honest Comparison',
   description:
     'An honest comparison of Dyslexia Write and Grammarly for dyslexic writers: phonetic spelling correction, homophones, read-aloud, dictation, pricing, and Access to Work funding.',
   alternates: { canonical: 'https://www.dyslexiawrite.com/vs/grammarly' },

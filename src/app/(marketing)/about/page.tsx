@@ -172,12 +172,12 @@ export default function AboutPage() {
         <div style={S.grid3}>
           {([
             {
-              icon: <img src="/images/Notebookpencil.png" alt="" width={52} height={52} style={{ borderRadius: '8px' }} />,
+              icon: <img src="/images/Notebookpencil.png" alt="Writing support" width={52} height={52} style={{ borderRadius: '8px' }} />,
               title: 'Writing support',
               desc: 'Dyslexia-aware grammar checking, AI sentence rewriting, voice dictation, and a plain-English writing mentor.',
             },
             {
-              icon: <img src="/images/Brainbook.png" alt="" width={52} height={52} style={{ borderRadius: '8px' }} />,
+              icon: <img src="/images/Brainbook.png" alt="Reading assistance" width={52} height={52} style={{ borderRadius: '8px' }} />,
               title: 'Reading assistance',
               desc: 'Three reading modes with a spotlight, ruler, and tint. Read-aloud with karaoke word highlighting via ElevenLabs.',
             },
@@ -187,17 +187,17 @@ export default function AboutPage() {
               desc: 'Upload or photograph any document — letter, form, contract — and get a plain-English summary instantly.',
             },
             {
-              icon: <img src="/images/LessonCapture.png" alt="" width={52} height={52} style={{ borderRadius: '8px' }} />,
+              icon: <img src="/images/LessonCapture.png" alt="Lesson Capture" width={52} height={52} style={{ borderRadius: '8px' }} />,
               title: 'Lesson Capture',
               desc: 'Live simplified transcription in class. Generates revision notes, key facts, and a quick quiz automatically.',
             },
             {
-              icon: <img src="/images/Brainstorm.png" alt="" width={52} height={52} style={{ borderRadius: '8px' }} />,
+              icon: <img src="/images/Brainstorm.png" alt="Meeting Survival Kit" width={52} height={52} style={{ borderRadius: '8px' }} />,
               title: 'Meeting Survival Kit',
               desc: 'Prep briefing before meetings. Live simplified transcript. Auto-generated action items and follow-up email.',
             },
             {
-              icon: <img src="/images/Storytime.png" alt="" width={52} height={52} style={{ borderRadius: '8px' }} />,
+              icon: <img src="/images/Storytime.png" alt="Story Mode" width={52} height={52} style={{ borderRadius: '8px' }} />,
               title: 'Story Mode',
               desc: 'AI-generated personalised stories for children with warmup words, karaoke highlighting, and vocab tracking.',
             },

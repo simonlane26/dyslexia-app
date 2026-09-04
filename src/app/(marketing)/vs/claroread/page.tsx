@@ -4,7 +4,7 @@ import { organizationSchema } from '@/app/schema';
 import { OtherComparisons } from '@/components/OtherComparisons';
 
 export const metadata: Metadata = {
-  title: 'Dyslexia Write vs ClaroRead — Which One Actually Helps You Write with Dyslexia?',
+  title: 'Dyslexia Write vs ClaroRead — Honest Comparison',
   description:
     'An honest comparison of Dyslexia Write and ClaroRead: phonetic spelling correction, word prediction, OCR scanning, pricing, and Access to Work funding.',
   alternates: { canonical: 'https://www.dyslexiawrite.com/vs/claroread' },
