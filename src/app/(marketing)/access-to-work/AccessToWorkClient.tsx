@@ -249,7 +249,7 @@ export default function AccessToWorkClient() {
       <footer style={S.footer}>
         <div style={{ fontSize: 13, color: '#888780' }}>© 2026 DyslexiaWrite. Confidence support for neurodiverse minds.</div>
         <div style={{ display: 'flex', gap: 24 }}>
-          {[['Privacy','/privacy'],['Terms','/terms'],['For Employers','/enterprise'],['For Schools','/schools'],['Pricing','/pricing']].map(([l,h]) => (
+          {[['Privacy','/privacy'],['Terms','/terms'],['For Employers','/enterprise'],['For Schools','/schools'],['Pricing','/pricing'],['vs Grammarly','/vs/grammarly']].map(([l,h]) => (
             <Link key={h} href={h} style={{ fontSize: 13, color: '#888780', textDecoration: 'none' }}>{l}</Link>
           ))}
         </div>

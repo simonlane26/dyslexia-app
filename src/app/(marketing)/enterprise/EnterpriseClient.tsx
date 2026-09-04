@@ -64,8 +64,44 @@ const S = {
   footerLinks: { display: 'flex', gap: 24 },
 };
 
+interface InquiryForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+  companyName: string;
+  role: string;
+  employeeCount: string;
+  interest: string;
+  message: string;
+}
+
 export default function EnterpriseClient() {
   const [submitted, setSubmitted] = useState(false);
+  const [form, setForm] = useState<InquiryForm>({
+    firstName: '', lastName: '', email: '', companyName: '',
+    role: '', employeeCount: '', interest: '', message: '',
+  });
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }
+
+  function handleSubmit() {
+    const body = [
+      `Enterprise inquiry from ${form.firstName} ${form.lastName}`.trim(),
+      `Email: ${form.email}`,
+      `Company: ${form.companyName}`,
+      `Role: ${form.role}`,
+      `Employees: ${form.employeeCount}`,
+      `Interested in: ${form.interest}`,
+      '',
+      form.message,
+    ].join('\n');
+    window.location.href = `mailto:Dyslexiawrite@gmail.com?subject=${encodeURIComponent(
+      `Enterprise inquiry — ${form.companyName || 'unnamed company'}`
+    )}&body=${encodeURIComponent(body)}`;
+    setSubmitted(true);
+  }
 
   const features: { icon: React.ReactNode; bg: string; h: string; p: string }[] = [
     { icon: <Pen size={20} />, bg: '#E1F5EE', h: 'AI writing support', p: 'Simplify, rewrite, and improve any text. Catches dyslexia-specific errors like homophones and phonetic spellings that normal spell-checkers miss.' },
@@ -243,15 +279,15 @@ export default function EnterpriseClient() {
         ) : (
           <div style={S.formWrap}>
             <div style={S.formRow}>
-              <div><label style={S.formLabel}>First name *</label><input style={S.formInput} placeholder="Jane" /></div>
-              <div><label style={S.formLabel}>Last name *</label><input style={S.formInput} placeholder="Smith" /></div>
+              <div><label style={S.formLabel}>First name *</label><input name="firstName" value={form.firstName} onChange={handleChange} style={S.formInput} placeholder="Jane" /></div>
+              <div><label style={S.formLabel}>Last name *</label><input name="lastName" value={form.lastName} onChange={handleChange} style={S.formInput} placeholder="Smith" /></div>
             </div>
-            <div style={S.formGroup}><label style={S.formLabel}>Work email *</label><input type="email" style={S.formInput} placeholder="jane@company.co.uk" /></div>
+            <div style={S.formGroup}><label style={S.formLabel}>Work email *</label><input name="email" value={form.email} onChange={handleChange} type="email" style={S.formInput} placeholder="jane@company.co.uk" /></div>
             <div style={S.formRow}>
-              <div><label style={S.formLabel}>Company name *</label><input style={S.formInput} placeholder="Acme Ltd" /></div>
+              <div><label style={S.formLabel}>Company name *</label><input name="companyName" value={form.companyName} onChange={handleChange} style={S.formInput} placeholder="Acme Ltd" /></div>
               <div>
                 <label style={S.formLabel}>Your role</label>
-                <select style={S.formSelect}>
+                <select name="role" value={form.role} onChange={handleChange} style={S.formSelect}>
                   {['Select...','HR / People','Diversity & Inclusion','Wellbeing / Health','IT / Procurement','Manager supporting an employee','Employee (self-referral)','Other'].map(o => <option key={o}>{o}</option>)}
                 </select>
               </div>
@@ -259,22 +295,22 @@ export default function EnterpriseClient() {
             <div style={S.formRow}>
               <div>
                 <label style={S.formLabel}>Number of employees</label>
-                <select style={S.formSelect}>
+                <select name="employeeCount" value={form.employeeCount} onChange={handleChange} style={S.formSelect}>
                   {['Select...','1–5','6–20','21–50','51–200','201–1000','1000+'].map(o => <option key={o}>{o}</option>)}
                 </select>
               </div>
               <div>
                 <label style={S.formLabel}>Interested in</label>
-                <select style={S.formSelect}>
+                <select name="interest" value={form.interest} onChange={handleChange} style={S.formSelect}>
                   {['Select...','Starter (1–5 users)','Business (6–50 users)','Enterprise (50+ users)','Access to Work claim','Not sure yet'].map(o => <option key={o}>{o}</option>)}
                 </select>
               </div>
             </div>
             <div style={S.formGroup}>
               <label style={S.formLabel}>Anything else?</label>
-              <textarea style={{ ...S.formInput, resize: 'vertical', minHeight: 80 }} placeholder="Tell us about your accessibility needs, timelines, or any questions..." />
+              <textarea name="message" value={form.message} onChange={handleChange} style={{ ...S.formInput, resize: 'vertical', minHeight: 80 }} placeholder="Tell us about your accessibility needs, timelines, or any questions..." />
             </div>
-            <button style={S.formSubmit} onClick={() => setSubmitted(true)}>Send inquiry</button>
+            <button style={S.formSubmit} onClick={handleSubmit}>Send inquiry</button>
             <p style={S.formNote}>We'll respond within 1 working day. No sales spam, ever.</p>
           </div>
         )}
@@ -284,7 +320,7 @@ export default function EnterpriseClient() {
       <footer style={S.footer}>
         <div style={S.footerLeft}>© 2026 DyslexiaWrite. Confidence support for neurodiverse minds.</div>
         <div style={S.footerLinks}>
-          {[['Privacy','/privacy'],['Terms','/terms'],['Access to Work','/access-to-work'],['For Schools','/schools'],['Pricing','/pricing']].map(([l,h]) => (
+          {[['Privacy','/privacy'],['Terms','/terms'],['Access to Work','/access-to-work'],['For Schools','/schools'],['Pricing','/pricing'],['vs Grammarly','/vs/grammarly']].map(([l,h]) => (
             <Link key={h} href={h} style={{ fontSize: 13, color: '#888780', textDecoration: 'none' }}>{l}</Link>
           ))}
         </div>

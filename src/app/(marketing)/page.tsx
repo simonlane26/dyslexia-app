@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { HeroSection } from '@/components/HeroSection';
+import { DualPathSection } from '@/components/DualPathSection';
 import { FeaturesSection } from '@/components/FeaturesSection';
 import { HomeInfoSections } from '@/components/HomeInfoSections';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
@@ -51,13 +52,16 @@ export default function LandingPage() {
       {/* Hero Section */}
       <HeroSection
         onGetStarted={() => router.push('/sign-up')}
-        onSeeFeatures={() => {
-          const features = document.getElementById('features-section');
-          if (features) {
-            features.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        onSeeFunding={() => {
+          const target = document.getElementById('path-funders');
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         }}
       />
+
+      {/* Dual-path: individuals vs. employers/schools */}
+      <DualPathSection />
 
       {/* Trust Signals Strip */}
       <div
@@ -183,6 +187,20 @@ export default function LandingPage() {
               <path d="M15 11 L19 15" stroke={landing.amber} strokeWidth="1.6" />
             </svg>
             <span style={{ fontFamily: landing.fontDisplay, fontWeight: 700, fontSize: '19px', color: landing.ink }}>DyslexiaWrite</span>
+          </div>
+          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+            {[
+              ['Pricing', '/pricing'],
+              ['Access to Work', '/access-to-work'],
+              ['For Schools', '/schools'],
+              ['vs TextHelp', '/compare'],
+              ['vs Grammarly', '/vs/grammarly'],
+              ['Privacy', '/privacy'],
+            ].map(([label, href]) => (
+              <a key={href} href={href} style={{ fontSize: '13px', color: landing.inkFaint, textDecoration: 'none' }}>
+                {label}
+              </a>
+            ))}
           </div>
           <span style={{ fontSize: '13px', color: landing.inkFaint }}>© 2026 DyslexiaWrite. Write, simplify, and listen.</span>
         </div>

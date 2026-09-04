@@ -16,6 +16,7 @@ const isPublicPage = createRouteMatcher([
   '/schools',
   '/enterprise',
   '/compare',
+  '/vs/grammarly',
   '/about',
   '/assist',
   '/sign-in(.*)',

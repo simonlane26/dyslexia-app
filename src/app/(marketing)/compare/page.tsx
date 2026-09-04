@@ -490,6 +490,16 @@ export default function ComparePage() {
               </Link>
             </div>
           </div>
+
+          {/* Other comparisons */}
+          <div style={{ textAlign: 'center', paddingTop: 24 }}>
+            <p style={{ fontSize: 13, color: '#9ca3af' }}>
+              Also see:{' '}
+              <Link href="/vs/grammarly" style={{ color: '#6366f1', fontWeight: 600 }}>
+                Dyslexia Write vs Grammarly
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </>

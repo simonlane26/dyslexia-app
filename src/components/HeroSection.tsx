@@ -5,7 +5,7 @@ import { landing } from '@/lib/landingTheme';
 
 interface HeroSectionProps {
   onGetStarted: () => void;
-  onSeeFeatures: () => void;
+  onSeeFunding: () => void;
 }
 
 const EXAMPLES = [
@@ -32,7 +32,7 @@ const EXAMPLES = [
   },
 ];
 
-export function HeroSection({ onGetStarted, onSeeFeatures }: HeroSectionProps) {
+export function HeroSection({ onGetStarted, onSeeFunding }: HeroSectionProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const ex = EXAMPLES[activeIndex];
 
@@ -68,21 +68,21 @@ export function HeroSection({ onGetStarted, onSeeFeatures }: HeroSectionProps) {
             <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
               <path d="M10 2l2 5 5 .5-3.8 3.5 1 5-4.2-2.6L5.8 16l1-5L3 6.5 8 6z" fill={landing.amberDark} />
             </svg>
-            Confidence support for dyslexic writers
+            Writing software built for dyslexic brains — not spellcheck with a new coat of paint
           </div>
 
           <h1
             style={{
               fontFamily: landing.fontDisplay,
               fontWeight: 600,
-              fontSize: 'clamp(28px, 3.6vw, 40px)',
-              lineHeight: 1.28,
+              fontSize: 'clamp(30px, 4vw, 44px)',
+              lineHeight: 1.22,
               letterSpacing: '-0.01em',
               marginBottom: '18px',
               color: landing.ink,
             }}
           >
-            Dyslexia Write — writing software for adults and students with{' '}
+            Write it once.{' '}
             <span
               style={{
                 background: `linear-gradient(120deg, ${landing.amber}52 0%, ${landing.amber}52 100%)`,
@@ -92,7 +92,7 @@ export function HeroSection({ onGetStarted, onSeeFeatures }: HeroSectionProps) {
                 padding: '0 2px',
               }}
             >
-              dyslexia
+              Get it right.
             </span>
           </h1>
 
@@ -101,18 +101,16 @@ export function HeroSection({ onGetStarted, onSeeFeatures }: HeroSectionProps) {
               fontSize: '16.5px',
               color: landing.inkMuted,
               maxWidth: '480px',
-              marginBottom: '30px',
+              marginBottom: '26px',
               lineHeight: 1.65,
             }}
           >
-            Dyslexia Write is a writing tool for adults and students with dyslexia that helps you draft,
-            correct and finish written work at school or in the workplace. It reads your writing back to
-            you, fixes dyslexia-specific spelling errors that standard spellcheckers miss, and works
-            inside the documents and emails you already use. It&apos;s funded for employees through UK
-            Access to Work grants and available to schools as a site licence.
+            Dyslexia Write helps you get the words out of your head and onto the page — then fixes the
+            spelling, grammar and phrasing that regular tools miss, including the errors that are
+            actually correct words. Built for work emails, essays, reports and applications.
           </p>
 
-          <div style={{ display: 'flex', gap: '14px', marginBottom: '26px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '18px', flexWrap: 'wrap' }}>
             <button
               type="button"
               onClick={onGetStarted}
@@ -130,41 +128,31 @@ export function HeroSection({ onGetStarted, onSeeFeatures }: HeroSectionProps) {
               onMouseOver={(e) => (e.currentTarget.style.background = landing.amberDark)}
               onMouseOut={(e) => (e.currentTarget.style.background = landing.amber)}
             >
-              Start Writing Free
+              Start free — no card needed
             </button>
             <button
               type="button"
-              onClick={onSeeFeatures}
+              onClick={onSeeFunding}
               style={{
-                border: `1.5px solid ${landing.line}`,
-                color: landing.ink,
+                border: 'none',
                 background: 'transparent',
+                color: landing.teal,
                 fontSize: '15px',
                 fontWeight: 700,
-                padding: '12px 26px',
-                borderRadius: '24px',
+                padding: 0,
                 cursor: 'pointer',
-                transition: 'border-color .15s',
+                textDecoration: 'underline',
+                textUnderlineOffset: '3px',
               }}
-              onMouseOver={(e) => (e.currentTarget.style.borderColor = landing.inkFaint)}
-              onMouseOut={(e) => (e.currentTarget.style.borderColor = landing.line)}
             >
-              See Features
+              Funded by your employer or school? See how →
             </button>
           </div>
 
-          <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px', listStyle: 'none', margin: 0, padding: 0 }}>
-            {['No credit card required', '5 free uses every day', "Privacy-focused — nothing leaves your device unless you choose"].map(
-              (item) => (
-                <li key={item} style={{ display: 'flex', alignItems: 'center', gap: '9px', fontSize: '14px', color: landing.inkMuted }}>
-                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke={landing.teal} strokeWidth="2" style={{ flexShrink: 0 }}>
-                    <path d="M4 10l4 4 8-8" />
-                  </svg>
-                  {item}
-                </li>
-              )
-            )}
-          </ul>
+          <p style={{ fontSize: '13.5px', color: landing.inkFaint, margin: 0 }}>
+            Chrome extension for Gmail, Outlook, Slack and Teams — plus the web editor built in.
+            Eligible for Access to Work funding.
+          </p>
         </div>
 
         {/* Right column — demo card */}
@@ -264,7 +252,7 @@ export function HeroSection({ onGetStarted, onSeeFeatures }: HeroSectionProps) {
             onMouseOver={(e) => (e.currentTarget.style.background = landing.amberDark)}
             onMouseOut={(e) => (e.currentTarget.style.background = landing.amber)}
           >
-            Start Writing Free — no card needed
+            Start free — no card needed
           </button>
         </div>
       </div>

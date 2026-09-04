@@ -473,6 +473,7 @@ export default function SchoolsClient() {
           <Link href="/schools-privacy" style={S.footerLink}>Schools GDPR</Link>
           <Link href="/enterprise" style={S.footerLink}>For Employers</Link>
           <Link href="/access-to-work" style={S.footerLink}>Access to Work</Link>
+          <Link href="/vs/grammarly" style={S.footerLink}>vs Grammarly</Link>
         </div>
       </footer>
     </div>
