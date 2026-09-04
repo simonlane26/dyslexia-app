@@ -13,8 +13,6 @@ import {
   Eye,
   Crown,
   Brain,
-  Calendar,
-  GraduationCap,
   Volume2,
   ScanText,
 } from 'lucide-react';
@@ -236,22 +234,6 @@ export function FeaturesSection() {
 
   const workplaceFeatures: Feature[] = [
     {
-      icon: <Calendar size={28} />,
-      imgSrc: '/images/Brainstorm.png',
-      title: 'Meeting Survival Kit',
-      description:
-        'Prepare for meetings with an AI briefing in plain English. Capture live transcripts simplified in real time. Walk away with decisions, action items, and a draft follow-up email — automatically.',
-      isNew: true,
-    },
-    {
-      icon: <GraduationCap size={28} />,
-      imgSrc: '/images/LessonCapture.png',
-      title: 'Lesson Capture',
-      description:
-        'Students: prep before class with vocab previews, capture teacher speech in real time as simplified notes, then get instant revision notes — key facts, a visual memory prompt, and a quick quiz.',
-      isNew: true,
-    },
-    {
       icon: <BookOpen size={28} />,
       imgSrc: '/images/Vocabulary.png',
       title: 'Vocabulary Builder',
@@ -317,7 +299,7 @@ export function FeaturesSection() {
           ))}
         </div>
 
-        <CatDivider label="Workplace & Learning" />
+        <CatDivider label="Also included" />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '18px' }}>
           {workplaceFeatures.map((f, i) => (
             <Reveal key={i}>

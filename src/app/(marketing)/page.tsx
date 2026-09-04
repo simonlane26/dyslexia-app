@@ -9,7 +9,6 @@ import { FeaturesSection } from '@/components/FeaturesSection';
 import { FundingCompatibilityFAQ } from '@/components/FundingCompatibilityFAQ';
 import { HomeInfoSections } from '@/components/HomeInfoSections';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
-import { StatsStrip } from '@/components/StatsStrip';
 import { Reveal } from '@/components/Reveal';
 import { landing } from '@/lib/landingTheme';
 import {
@@ -121,9 +120,6 @@ export default function LandingPage() {
 
       {/* Testimonials Section */}
       <TestimonialsSection />
-
-      {/* Stats Strip */}
-      <StatsStrip />
 
       {/* Final CTA Section */}
       <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 20px' }}>
