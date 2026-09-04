@@ -195,6 +195,8 @@ export default function LandingPage() {
               ['For Schools', '/schools'],
               ['vs TextHelp', '/compare'],
               ['vs Grammarly', '/vs/grammarly'],
+              ['vs ClaroRead', '/vs/claroread'],
+              ['vs Immersive Reader', '/vs/immersive-reader'],
               ['Privacy', '/privacy'],
             ].map(([label, href]) => (
               <a key={href} href={href} style={{ fontSize: '13px', color: landing.inkFaint, textDecoration: 'none' }}>

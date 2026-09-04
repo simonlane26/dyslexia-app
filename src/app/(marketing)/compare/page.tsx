@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { organizationSchema } from '@/app/schema';
+import { OtherComparisons } from '@/components/OtherComparisons';
 
 export const metadata: Metadata = {
   title: 'DyslexiaWrite vs TextHelp Read&Write — Honest Comparison',
@@ -492,13 +493,8 @@ export default function ComparePage() {
           </div>
 
           {/* Other comparisons */}
-          <div style={{ textAlign: 'center', paddingTop: 24 }}>
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>
-              Also see:{' '}
-              <Link href="/vs/grammarly" style={{ color: '#6366f1', fontWeight: 600 }}>
-                Dyslexia Write vs Grammarly
-              </Link>
-            </p>
+          <div style={{ paddingTop: 24 }}>
+            <OtherComparisons current="texthelp" />
           </div>
         </div>
       </div>

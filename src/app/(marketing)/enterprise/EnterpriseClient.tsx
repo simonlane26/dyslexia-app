@@ -320,7 +320,7 @@ export default function EnterpriseClient() {
       <footer style={S.footer}>
         <div style={S.footerLeft}>© 2026 DyslexiaWrite. Confidence support for neurodiverse minds.</div>
         <div style={S.footerLinks}>
-          {[['Privacy','/privacy'],['Terms','/terms'],['Access to Work','/access-to-work'],['For Schools','/schools'],['Pricing','/pricing'],['vs Grammarly','/vs/grammarly']].map(([l,h]) => (
+          {[['Privacy','/privacy'],['Terms','/terms'],['Access to Work','/access-to-work'],['For Schools','/schools'],['Pricing','/pricing'],['vs Grammarly','/vs/grammarly'],['vs ClaroRead','/vs/claroread'],['vs Immersive Reader','/vs/immersive-reader']].map(([l,h]) => (
             <Link key={h} href={h} style={{ fontSize: 13, color: '#888780', textDecoration: 'none' }}>{l}</Link>
           ))}
         </div>

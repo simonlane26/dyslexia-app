@@ -17,6 +17,8 @@ const isPublicPage = createRouteMatcher([
   '/enterprise',
   '/compare',
   '/vs/grammarly',
+  '/vs/claroread',
+  '/vs/immersive-reader',
   '/about',
   '/assist',
   '/robots.txt',

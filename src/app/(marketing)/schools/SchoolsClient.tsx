@@ -474,6 +474,8 @@ export default function SchoolsClient() {
           <Link href="/enterprise" style={S.footerLink}>For Employers</Link>
           <Link href="/access-to-work" style={S.footerLink}>Access to Work</Link>
           <Link href="/vs/grammarly" style={S.footerLink}>vs Grammarly</Link>
+          <Link href="/vs/claroread" style={S.footerLink}>vs ClaroRead</Link>
+          <Link href="/vs/immersive-reader" style={S.footerLink}>vs Immersive Reader</Link>
         </div>
       </footer>
     </div>
