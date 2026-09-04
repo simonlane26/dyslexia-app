@@ -4,7 +4,7 @@ import DyslexiaScreener from '@/components/screener/DyslexiaScreener';
 export const metadata: Metadata = {
   title: 'Free Dyslexia Screener | DyslexiaWrite',
   description:
-    'Take a free, private 5-minute screener to understand whether your reading and writing experiences might be linked to dyslexia. No login required. Results are not stored.',
+    'Take a free, private 5-minute screener to understand whether your reading and writing experiences might be linked to dyslexia. No login required. Your answers stay on your device.',
   alternates: { canonical: 'https://www.dyslexiawrite.com/screener' },
   openGraph: {
     title: 'Could it be dyslexia? Free screener from DyslexiaWrite',

@@ -6,6 +6,7 @@ import {
   type UserType, type RiskLevel, type ScreenerResult,
 } from '@/lib/screener/data';
 import styles from './Screener.module.css';
+import { EmailCaptureBlock } from './EmailCaptureBlock';
 
 type Screen = 'intro' | 'questions' | 'results';
 
@@ -150,7 +151,8 @@ export default function DyslexiaScreener() {
         <div className={`${styles.infoBox} ${styles.infoPurple}`} style={{ marginTop: 12 }}>
           <strong>Your privacy</strong>
           Your answers are processed on your device and are not stored or
-          shared. You can save or share your results at the end if you choose to.
+          shared. At the end, you can save or share your results, or choose
+          to email yourself a copy — nothing is stored unless you ask for that.
         </div>
       </div>
     );
@@ -248,6 +250,11 @@ export default function DyslexiaScreener() {
     };
 
     const content = RESULT_CONTENT[result.level];
+    const SCREENER_RESULT_CODE: Record<RiskLevel, 'unlikely' | 'possible' | 'likely'> = {
+      low: 'unlikely',
+      moderate: 'possible',
+      high: 'likely',
+    };
 
     return (
       <div className={styles.wrap}>
@@ -292,6 +299,11 @@ export default function DyslexiaScreener() {
             transform your experience with reading and writing.
           </div>
         )}
+
+        <EmailCaptureBlock
+          screenerResult={SCREENER_RESULT_CODE[result.level]}
+          resultTitle={content.title}
+        />
 
         <div className={styles.nextStepsLabel}>What to do next</div>
         <div className={styles.nextSteps}>
@@ -384,8 +396,10 @@ export default function DyslexiaScreener() {
           and is designed as an informational tool, not a diagnostic instrument.
           It should not be used as a substitute for a professional assessment by a
           qualified educational psychologist or specialist teacher assessor.
-          Results are indicative only and are processed entirely on your device —
-          your answers are not stored or transmitted.
+          Results are indicative only and are processed entirely on your device.
+          Your answers are not stored or transmitted unless you choose to email
+          yourself a copy of your results above — in that case, only your result
+          and email address are stored, never your individual answers.
           <br /><br />
           DyslexiaWrite Ltd · dyslexiawrite.com
         </div>

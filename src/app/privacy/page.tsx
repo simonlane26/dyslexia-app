@@ -42,6 +42,12 @@ export default function PrivacyPage() {
           <strong>Content</strong>: Text you submit for simplification and audio creation,
           processed by OpenAI and ElevenLabs.
         </li>
+        <li>
+          <strong>Free Screener (optional)</strong>: The screener itself runs on your device and
+          isn&apos;t stored. If you choose to email yourself a copy of your result, we store the
+          email address and result category (not your individual answers) so we can send it, and
+          occasional related tips you can unsubscribe from at any time.
+        </li>
       </ul>
 
       <h2>2. How We Use Information</h2>
@@ -60,6 +66,7 @@ export default function PrivacyPage() {
         <li>Stripe (payments &amp; subscriptions)</li>
         <li>OpenAI (text processing)</li>
         <li>ElevenLabs (text-to-speech)</li>
+        <li>Resend (transactional email delivery)</li>
         <li>Vercel (hosting) and Supabase — EU region (database)</li>
       </ul>
       <p>We do not sell or rent your personal data.</p>

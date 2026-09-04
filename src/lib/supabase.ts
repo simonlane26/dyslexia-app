@@ -69,6 +69,16 @@ export interface StoryEpisode {
   created_at: string;
 }
 
+export interface ScreenerLead {
+  id: string;
+  email: string;
+  audience: 'self' | 'parent-sen' | 'employer' | null;
+  screener_result: 'likely' | 'possible' | 'unlikely';
+  source: string;
+  email_sent: boolean;
+  created_at: string;
+}
+
 export interface WordTiming {
   word: string;
   startMs: number;
