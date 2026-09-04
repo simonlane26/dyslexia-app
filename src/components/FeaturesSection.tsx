@@ -120,9 +120,9 @@ function FeatureCard({ feature }: { feature: Feature }) {
         )}
       </div>
 
-      <h4 style={{ fontFamily: landing.fontDisplay, fontSize: '16.5px', fontWeight: 600, margin: '0 0 8px', color: landing.ink }}>
+      <h3 style={{ fontFamily: landing.fontDisplay, fontSize: '16.5px', fontWeight: 600, margin: '0 0 8px', color: landing.ink }}>
         {feature.title}
-      </h4>
+      </h3>
       <p style={{ fontSize: '13.5px', color: landing.inkMuted, lineHeight: 1.55, margin: 0 }}>{feature.description}</p>
     </div>
   );
@@ -286,10 +286,15 @@ export function FeaturesSection() {
               Features
             </div>
             <h2 style={{ fontFamily: landing.fontDisplay, fontSize: 'clamp(26px, 4vw, 32px)', fontWeight: 600, marginBottom: '14px', color: landing.ink }}>
-              Every tool your <span style={{ background: `linear-gradient(120deg, ${landing.amber}52 0%, ${landing.amber}52 100%)`, backgroundRepeat: 'no-repeat', backgroundSize: '100% 0.42em', backgroundPosition: '0 86%', padding: '0 2px' }}>brain</span> needs to write, read, and learn
+              How Dyslexia Write works
             </h2>
-            <p style={{ color: landing.inkMuted, fontSize: '15.5px', maxWidth: '520px', margin: '0 auto' }}>
-              Built for dyslexic thinkers — from the first word to the final read-through, in the classroom and in the workplace.
+            <p style={{ color: landing.inkMuted, fontSize: '15.5px', maxWidth: '640px', margin: '0 auto', lineHeight: 1.65, textAlign: 'left' }}>
+              You write or paste text into the editor, and Dyslexia Write checks it in real time for the
+              spelling and grammar mistakes dyslexic writers make most often — reversed letters,
+              homophones, and missed words. Select any sentence to get a simpler, clearer, or more
+              confident rewrite in one click. When you&apos;d rather speak than type, dictate instead;
+              when you&apos;d rather listen than read, have any document read back to you with each word
+              highlighted as it&apos;s spoken.
             </p>
           </div>
         </Reveal>

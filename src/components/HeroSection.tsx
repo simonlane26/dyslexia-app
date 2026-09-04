@@ -75,14 +75,14 @@ export function HeroSection({ onGetStarted, onSeeFeatures }: HeroSectionProps) {
             style={{
               fontFamily: landing.fontDisplay,
               fontWeight: 600,
-              fontSize: 'clamp(30px, 4vw, 42px)',
+              fontSize: 'clamp(28px, 3.6vw, 40px)',
               lineHeight: 1.28,
               letterSpacing: '-0.01em',
-              marginBottom: '22px',
+              marginBottom: '18px',
               color: landing.ink,
             }}
           >
-            Writing that sounds like{' '}
+            Dyslexia Write — writing software for adults and students with{' '}
             <span
               style={{
                 background: `linear-gradient(120deg, ${landing.amber}52 0%, ${landing.amber}52 100%)`,
@@ -92,23 +92,24 @@ export function HeroSection({ onGetStarted, onSeeFeatures }: HeroSectionProps) {
                 padding: '0 2px',
               }}
             >
-              you
-            </span>{' '}
-            — not like you&apos;re struggling.
+              dyslexia
+            </span>
           </h1>
 
           <p
             style={{
               fontSize: '16.5px',
               color: landing.inkMuted,
-              maxWidth: '460px',
+              maxWidth: '480px',
               marginBottom: '30px',
               lineHeight: 1.65,
             }}
           >
-            Designed for people who find writing difficult — especially those with dyslexia. Grammar
-            checking, an AI writing coach, and smart rewriting tools built around how you think, not how
-            you &quot;should&quot; write.
+            Dyslexia Write is a writing tool for adults and students with dyslexia that helps you draft,
+            correct and finish written work at school or in the workplace. It reads your writing back to
+            you, fixes dyslexia-specific spelling errors that standard spellcheckers miss, and works
+            inside the documents and emails you already use. It&apos;s funded for employees through UK
+            Access to Work grants and available to schools as a site licence.
           </p>
 
           <div style={{ display: 'flex', gap: '14px', marginBottom: '26px', flexWrap: 'wrap' }}>

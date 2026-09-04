@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { HeroSection } from '@/components/HeroSection';
 import { FeaturesSection } from '@/components/FeaturesSection';
+import { HomeInfoSections } from '@/components/HomeInfoSections';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
 import { StatsStrip } from '@/components/StatsStrip';
 import { Reveal } from '@/components/Reveal';
@@ -22,36 +23,15 @@ export const dynamic = 'force-dynamic';
 export default function LandingPage() {
   const { isSignedIn, isLoaded } = useUser();
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
 
+  // Redirect authenticated users to the app. This never hides the marketing
+  // content below — search engines and AI crawlers that don't execute
+  // client JS still need to see the full page in the initial HTML.
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Redirect authenticated users to the app
-  useEffect(() => {
-    if (mounted && isLoaded && isSignedIn) {
+    if (isLoaded && isSignedIn) {
       router.push('/app');
     }
-  }, [mounted, isLoaded, isSignedIn, router]);
-
-  if (!mounted) {
-    return null; // Prevent hydration mismatch
-  }
-
-  // Show loading state while checking auth
-  if (!isLoaded) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: landing.ink }}>Loading...</div>
-      </div>
-    );
-  }
-
-  // If user is signed in, they'll be redirected (show nothing)
-  if (isSignedIn) {
-    return null;
-  }
+  }, [isLoaded, isSignedIn, router]);
 
   return (
     <div style={{ minHeight: '100vh' }}>
@@ -127,6 +107,9 @@ export default function LandingPage() {
       <div id="features-section">
         <FeaturesSection />
       </div>
+
+      {/* Who it's for / Access to Work / Schools */}
+      <HomeInfoSections />
 
       {/* Testimonials Section */}
       <TestimonialsSection />
