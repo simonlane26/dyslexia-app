@@ -19,6 +19,8 @@ const isPublicPage = createRouteMatcher([
   '/vs/grammarly',
   '/about',
   '/assist',
+  '/robots.txt',
+  '/sitemap.xml',
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/sso-callback(.*)',
