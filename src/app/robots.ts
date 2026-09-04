@@ -21,6 +21,15 @@ export default function robots(): MetadataRoute.Robots {
           "/success",
         ],
       },
+      // Explicit allow rules for AI crawlers/answer engines. Functionally
+      // redundant with the wildcard rule above (nothing blocks them), but
+      // explicit beats implicit for tools that check for named allowances.
+      { userAgent: "GPTBot", allow: "/" },
+      { userAgent: "OAI-SearchBot", allow: "/" },
+      { userAgent: "ClaudeBot", allow: "/" },
+      { userAgent: "PerplexityBot", allow: "/" },
+      { userAgent: "CCBot", allow: "/" },
+      { userAgent: "Google-Extended", allow: "/" },
     ],
     // Point crawlers to your sitemap
     sitemap: "https://www.dyslexiawrite.com/sitemap.xml",
