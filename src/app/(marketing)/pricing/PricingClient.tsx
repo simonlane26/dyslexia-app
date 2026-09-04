@@ -675,10 +675,7 @@ export default function PricingClient() {
             {/* Starter */}
             <PricingCard>
               <div style={{ padding: '32px', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: '16px', left: '50%', transform: 'translateX(-50%)', background: '#FBEEDA', color: '#B06F1D', fontSize: '11px', fontWeight: 600, padding: '3px 12px', borderRadius: '20px', whiteSpace: 'nowrap', zIndex: 1 }}>
-                  Coming Soon
-                </div>
-                <div style={{ textAlign: 'center', marginBottom: '32px', marginTop: '24px' }}>
+                <div style={{ textAlign: 'center', marginBottom: '32px' }}>
                   <h3 style={{ fontSize: '1.5rem', fontWeight: 700, fontFamily: "var(--font-display), 'Fraunces', Georgia, serif", color: '#2B2A28', marginBottom: '4px' }}>Starter</h3>
                   <div style={{ color: '#6B6558', fontSize: '13px', marginBottom: '12px' }}>Individual employees</div>
                   <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#2F7A6B', marginBottom: '2px' }}>£120</div>
@@ -693,8 +690,13 @@ export default function PricingClient() {
                   <FeatureItem>Email &amp; chat support</FeatureItem>
                   <FeatureItem highlighted>Access to Work eligible</FeatureItem>
                 </div>
-                <ModernButton variant="ghost" size="lg" style={{ width: '100%', opacity: 0.6, cursor: 'default' }} disabled>
-                  Coming Soon
+                <ModernButton
+                  variant="secondary"
+                  size="lg"
+                  style={{ width: '100%' }}
+                  onClick={() => (window.location.href = '/enterprise#inquiry')}
+                >
+                  Get a quote
                 </ModernButton>
               </div>
             </PricingCard>
@@ -702,13 +704,10 @@ export default function PricingClient() {
             {/* Business */}
             <PricingCard featured>
               <div style={{ padding: '32px', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: '16px', left: '50%', transform: 'translateX(-50%)', background: '#FBEEDA', color: '#B06F1D', fontSize: '11px', fontWeight: 600, padding: '3px 12px', borderRadius: '20px', whiteSpace: 'nowrap', zIndex: 1 }}>
-                  Coming Soon
-                </div>
                 <div style={{ position: 'absolute', top: '20px', right: '20px', background: 'linear-gradient(135deg, #B65C4A 0%, #94493A 100%)', color: 'white', padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 600 }}>
                   Most Popular
                 </div>
-                <div style={{ textAlign: 'center', marginBottom: '32px', marginTop: '24px' }}>
+                <div style={{ textAlign: 'center', marginBottom: '32px' }}>
                   <h3 style={{ fontSize: '1.5rem', fontWeight: 700, fontFamily: "var(--font-display), 'Fraunces', Georgia, serif", color: '#2B2A28', marginBottom: '4px' }}>Business</h3>
                   <div style={{ color: '#6B6558', fontSize: '13px', marginBottom: '12px' }}>Teams and departments</div>
                   <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#B65C4A', marginBottom: '2px' }}>£95</div>
@@ -724,8 +723,13 @@ export default function PricingClient() {
                   <FeatureItem>Onboarding session included</FeatureItem>
                   <FeatureItem>Priority support</FeatureItem>
                 </div>
-                <ModernButton variant="ghost" size="lg" style={{ width: '100%', opacity: 0.6, cursor: 'default' }} disabled>
-                  Coming Soon
+                <ModernButton
+                  variant="primary"
+                  size="lg"
+                  style={{ width: '100%' }}
+                  onClick={() => (window.location.href = '/enterprise#inquiry')}
+                >
+                  Talk to sales
                 </ModernButton>
               </div>
             </PricingCard>
@@ -733,10 +737,7 @@ export default function PricingClient() {
             {/* Enterprise */}
             <PricingCard>
               <div style={{ padding: '32px', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: '16px', left: '50%', transform: 'translateX(-50%)', background: '#FBEEDA', color: '#B06F1D', fontSize: '11px', fontWeight: 600, padding: '3px 12px', borderRadius: '20px', whiteSpace: 'nowrap', zIndex: 1 }}>
-                  Coming Soon
-                </div>
-                <div style={{ textAlign: 'center', marginBottom: '32px', marginTop: '24px' }}>
+                <div style={{ textAlign: 'center', marginBottom: '32px' }}>
                   <h3 style={{ fontSize: '1.5rem', fontWeight: 700, fontFamily: "var(--font-display), 'Fraunces', Georgia, serif", color: '#2B2A28', marginBottom: '4px' }}>Enterprise</h3>
                   <div style={{ color: '#6B6558', fontSize: '13px', marginBottom: '12px' }}>Organisation-wide</div>
                   <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#B06F1D', marginBottom: '2px' }}>Custom</div>
@@ -753,8 +754,13 @@ export default function PricingClient() {
                   <FeatureItem>Equality Act compliance pack</FeatureItem>
                   <FeatureItem>Quarterly impact reports</FeatureItem>
                 </div>
-                <ModernButton variant="ghost" size="lg" style={{ width: '100%', opacity: 0.6, cursor: 'default' }} disabled>
-                  Coming Soon
+                <ModernButton
+                  variant="secondary"
+                  size="lg"
+                  style={{ width: '100%' }}
+                  onClick={() => (window.location.href = '/enterprise#inquiry')}
+                >
+                  Contact us
                 </ModernButton>
               </div>
             </PricingCard>
