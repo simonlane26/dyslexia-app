@@ -5,6 +5,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/n
 import { useRouter, usePathname } from 'next/navigation';
 import { useSchoolMode } from '@/hooks/useSchoolMode';
 import { useT } from '@/lib/i18n';
+import { IconPencil } from '@tabler/icons-react';
 
 export function HeaderBar() {
   const { user, isLoaded, isSignedIn } = useUser();
@@ -32,7 +33,7 @@ export function HeaderBar() {
     <header className="sticky top-0 z-30 w-full border-b bg-white/70 backdrop-blur border-slate-200 dark:bg-slate-900/70 dark:border-slate-800">
       <div className="flex items-center justify-between max-w-6xl px-4 py-3 mx-auto">
         <div className="flex items-center gap-2">
-          <span className="text-2xl" aria-hidden>✍️</span>
+          <IconPencil size={22} stroke={1.75} className="text-amber-600" aria-hidden />
           <span className="text-lg font-semibold text-slate-900 dark:text-slate-100">
             Dyslexia Write
           </span>

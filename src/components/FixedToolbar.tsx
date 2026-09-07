@@ -507,7 +507,7 @@ export function FixedToolbar({
               <ModernButton
                 variant="secondary"
                 onClick={onUpgradeClick}
-                title="⭐ Pro Feature - Compare different versions of your writing"
+                title="Pro Feature - Compare different versions of your writing"
                 size="sm"
               >
                 <Star size={11} style={{ marginRight: 2 }} />

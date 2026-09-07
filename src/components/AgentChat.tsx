@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Send, Bot, Lock, FileText, Mic, MicOff, ChevronRight, Volume2, Square, Mail, Pen, Briefcase, ClipboardList, Sparkles, BookOpen } from 'lucide-react';
+import { IconDeviceMobile, IconNotes, IconBackpack, IconCheck } from '@tabler/icons-react';
 import { ModernButton } from './ModernButton';
 import { useT, useLanguage } from '@/lib/i18n';
 
@@ -638,10 +639,10 @@ export function AgentChat({
                       { label: t('writingType.email'),       key: 'email',        icon: <Mail size={15} /> },
                       { label: t('writingType.essay'),       key: 'essay',        icon: <Pen size={15} /> },
                       { label: t('writingType.workMessage'), key: 'work message', icon: <Briefcase size={15} /> },
-                      { label: t('writingType.socialPost'),  key: 'social post',  icon: '📱' },
+                      { label: t('writingType.socialPost'),  key: 'social post',  icon: <IconDeviceMobile size={15} /> },
                       { label: t('writingType.story'),       key: 'story',        icon: <BookOpen size={15} /> },
-                      { label: t('writingType.notes'),       key: 'notes',        icon: '🗒️' },
-                      { label: t('writingType.homework'),    key: 'homework',     icon: '🎒' },
+                      { label: t('writingType.notes'),       key: 'notes',        icon: <IconNotes size={15} /> },
+                      { label: t('writingType.homework'),    key: 'homework',     icon: <IconBackpack size={15} /> },
                       { label: t('writingType.assignment'),  key: 'assignment',   icon: <ClipboardList size={15} /> },
                     ] as { label: string; key: string; icon: React.ReactNode }[]).map(({ label, key, icon }) => (
                       <button
@@ -796,7 +797,7 @@ export function AgentChat({
                             border: i >= currentSectionIndex ? `1px solid ${borderColor}` : 'none',
                           }}
                         >
-                          {i < currentSectionIndex ? '✓' : s}
+                          {i < currentSectionIndex ? <IconCheck size={12} stroke={3} /> : s}
                         </div>
                       ))}
                     </div>

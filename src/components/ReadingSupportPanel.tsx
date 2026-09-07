@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Play, Pause } from 'lucide-react';
+import { IconX } from '@tabler/icons-react';
 
 export type ReadingMode = 'clean' | 'guided' | 'supported';
 
@@ -557,7 +558,7 @@ export function ReadingSupportPanel({
               type="button"
               onClick={() => { setDecodeWord(null); setWordInfo(null); }}
               style={{ position: 'absolute', top: 10, right: 12, border: 'none', background: 'none', color: darkMode ? '#666' : '#999', cursor: 'pointer', fontSize: 14 }}
-            >✕</button>
+            ><IconX size={14} stroke={1.75} /></button>
             <div style={{ fontSize: 18, fontWeight: 500, color: darkMode ? '#e0e0e0' : '#1a1a1a', marginBottom: 2 }}>
               {decodeWord}
             </div>

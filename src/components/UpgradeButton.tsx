@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { ModernButton } from '@/components/ModernButton';
+import { IconDiamond } from '@tabler/icons-react';
 
 export function UpgradeButton() {
   const router = useRouter();
@@ -40,7 +41,7 @@ export function UpgradeButton() {
       onClick={() => { setBusy(true); router.push('/pricing'); }}
       variant="primary" size="lg" disabled={busy} className="mb-6"
     >
-      {busy ? 'Redirecting…' : '💎 Upgrade to Pro'}
+      {busy ? 'Redirecting…' : <><IconDiamond size={15} stroke={1.75} /> Upgrade to Pro</>}
     </ModernButton>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
+import { IconSearch, IconDownload, IconFileText, IconUpload, IconCamera } from '@tabler/icons-react';
 import type { DecoderAnalysis } from '@/lib/document-decoder';
 
 export type OCRProps = { onTextAction: (text: string) => void };
@@ -211,7 +212,10 @@ export default function OCRImport({ onTextAction }: OCRProps) {
               borderBottom: mode === m ? '2px solid #0369a1' : '2px solid transparent',
             }}
           >
-            {m === 'decode' ? '🔍 Decode a document' : '📥 Import to editor'}
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              {m === 'decode' ? <IconSearch size={15} stroke={1.75} /> : <IconDownload size={15} stroke={1.75} />}
+              {m === 'decode' ? 'Decode a document' : 'Import to editor'}
+            </span>
           </button>
         ))}
       </div>
@@ -233,10 +237,12 @@ export default function OCRImport({ onTextAction }: OCRProps) {
               onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) { setSelectedFile(f); handleUpload(f); } }}
             >
               {selectedFile ? (
-                <p style={{ fontSize: 14, color: '#334155' }}>📄 {selectedFile.name}</p>
+                <p style={{ fontSize: 14, color: '#334155', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  <IconFileText size={16} stroke={1.75} /> {selectedFile.name}
+                </p>
               ) : (
                 <>
-                  <p style={{ fontSize: 24, marginBottom: 8 }}>📤</p>
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8, color: '#64748b' }}><IconUpload size={24} stroke={1.5} /></div>
                   <p style={{ fontSize: 14, color: '#64748b' }}>
                     Click to upload or drag &amp; drop<br />
                     <span style={{ fontSize: 12, color: '#94a3b8' }}>{mode === 'decode' ? 'PDF, DOCX, JPG, PNG' : 'PDF only'}</span>
@@ -254,9 +260,9 @@ export default function OCRImport({ onTextAction }: OCRProps) {
                 <button
                   type="button"
                   onClick={() => cameraRef.current?.click()}
-                  style={{ width: '100%', padding: '10px', borderRadius: 8, border: '1px solid #e2e8f0', background: '#f8fafc', color: '#334155', fontSize: 14, cursor: 'pointer', marginBottom: 12 }}
+                  style={{ width: '100%', padding: '10px', borderRadius: 8, border: '1px solid #e2e8f0', background: '#f8fafc', color: '#334155', fontSize: 14, cursor: 'pointer', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                 >
-                  📷 Scan with camera
+                  <IconCamera size={16} stroke={1.75} /> Scan with camera
                 </button>
                 <input ref={cameraRef} type="file" accept="image/*" capture="environment" style={{ display: 'none' }}
                   onChange={e => { const f = e.target.files?.[0]; if (f) { setSelectedFile(f); handleUpload(f); } }} />
@@ -318,9 +324,9 @@ export default function OCRImport({ onTextAction }: OCRProps) {
             <button
               type="button"
               onClick={() => { onTextAction(docText); reset(); }}
-              style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #e2e8f0', background: '#f8fafc', color: '#334155', fontSize: 13, cursor: 'pointer', marginBottom: 16 }}
+              style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #e2e8f0', background: '#f8fafc', color: '#334155', fontSize: 13, cursor: 'pointer', marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
             >
-              📥 Import full text to editor
+              <IconDownload size={14} stroke={1.75} /> Import full text to editor
             </button>
 
             {/* Chat */}

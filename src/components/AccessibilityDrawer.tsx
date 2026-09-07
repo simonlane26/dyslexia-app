@@ -1,6 +1,7 @@
 'use client';
 
 import { X } from 'lucide-react';
+import { IconLock } from '@tabler/icons-react';
 import { ModernButton } from './ModernButton';
 import { AccessibilityPresets } from './AccessibilityPresets';
 import { WritingTemplates } from './WritingTemplates';
@@ -299,7 +300,7 @@ export function AccessibilityDrawer({
                       opacity: isLocked ? 0.5 : 1,
                     }}
                   >
-                    {isLocked && <span style={{ fontSize: '16px' }}>🔒</span>}
+                    {isLocked && <IconLock size={15} stroke={1.75} />}
                   </button>
                 );
               })}

@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { FileText, Plus, Trash2, Download, Upload, Search, X, Clock } from 'lucide-react';
+import { IconStar } from '@tabler/icons-react';
 import { ModernButton } from './ModernButton';
 import {
   getLocalDocuments,
@@ -213,7 +214,7 @@ export function DocumentManager({
           {!isPro && documents.length >= FREE_DOC_LIMIT ? (
             <ModernButton variant="secondary" size="sm" onClick={onUpgradeClick} title={`Free plan: ${FREE_DOC_LIMIT} documents max`}>
               <Plus size={16} />
-              New Document ⭐
+              New Document <IconStar size={13} stroke={2} style={{ marginLeft: 2 }} />
             </ModernButton>
           ) : (
             <ModernButton variant="primary" size="sm" onClick={onNewDocument}>

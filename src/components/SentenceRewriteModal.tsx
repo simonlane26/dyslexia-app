@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, Loader2, AlertCircle, Check } from 'lucide-react';
+import { IconBulb } from '@tabler/icons-react';
 import { ModernButton } from './ModernButton';
 import { CoachIntent } from './CoachIntentModal';
 
@@ -467,7 +468,7 @@ export function SentenceRewriteModal({
                             gap: '4px',
                           }}
                         >
-                          💡 {expandedExplain === index ? 'Hide explanation' : 'Why this changed'}
+                          <IconBulb size={14} stroke={1.75} /> {expandedExplain === index ? 'Hide explanation' : 'Why this changed'}
                         </button>
                         {expandedExplain === index && (
                           <div

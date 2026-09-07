@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, Users, Target, MessageSquare, Briefcase, Pen } from 'lucide-react';
+import { IconMoodSmile, IconBooks, IconWorld, IconBulb, IconTarget, IconBook } from '@tabler/icons-react';
 import { ModernButton } from './ModernButton';
 
 export interface CoachIntent {
@@ -36,17 +37,17 @@ export function CoachIntentModal({
   };
 
   const audiences: { value: CoachIntent['audience']; label: string; icon: React.ReactNode; desc: string }[] = [
-    { value: 'friend' as const, label: 'A friend', icon: '👋', desc: 'Casual, relaxed writing' },
-    { value: 'teacher' as const, label: 'My teacher', icon: '📚', desc: 'Clear and organized' },
+    { value: 'friend' as const, label: 'A friend', icon: <IconMoodSmile size={18} />, desc: 'Casual, relaxed writing' },
+    { value: 'teacher' as const, label: 'My teacher', icon: <IconBooks size={18} />, desc: 'Clear and organized' },
     { value: 'boss' as const, label: 'My boss', icon: <Briefcase size={18} />, desc: 'Professional and direct' },
-    { value: 'general' as const, label: 'Anyone', icon: '🌍', desc: 'Easy for everyone to read' },
+    { value: 'general' as const, label: 'Anyone', icon: <IconWorld size={18} />, desc: 'Easy for everyone to read' },
   ];
 
   const purposes: { value: CoachIntent['purpose']; label: string; icon: React.ReactNode; desc: string }[] = [
-    { value: 'inform' as const, label: 'Explain something', icon: '💡', desc: 'Help them understand' },
-    { value: 'persuade' as const, label: 'Change their mind', icon: '🎯', desc: 'Convince them to agree' },
+    { value: 'inform' as const, label: 'Explain something', icon: <IconBulb size={18} />, desc: 'Help them understand' },
+    { value: 'persuade' as const, label: 'Change their mind', icon: <IconTarget size={18} />, desc: 'Convince them to agree' },
     { value: 'explain' as const, label: 'Give instructions', icon: <Pen size={18} />, desc: 'Show them how to do it' },
-    { value: 'story' as const, label: 'Tell a story', icon: '📖', desc: 'Entertain or share' },
+    { value: 'story' as const, label: 'Tell a story', icon: <IconBook size={18} />, desc: 'Entertain or share' },
   ];
 
   const tones = [

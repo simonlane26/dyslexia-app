@@ -1,6 +1,7 @@
 'use client';
 
 import { X } from 'lucide-react';
+import { IconSparkles } from '@tabler/icons-react';
 import { ModernButton } from './ModernButton';
 import CoachPanel from './CoachPanel';
 import { useEffect } from 'react';
@@ -124,9 +125,12 @@ export function CoachDrawer({
               fontSize: '18px',
               fontWeight: '600',
               color: theme.text,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
             }}
           >
-            ✨ {copy.aiCoachLabel}
+            <IconSparkles size={18} stroke={1.75} /> {copy.aiCoachLabel}
           </h2>
           <ModernButton
             variant="secondary"

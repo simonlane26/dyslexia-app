@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { ModernButton } from './ModernButton';
 import { addExportRecord } from '@/lib/exportHistory';
+import { IconMusic } from '@tabler/icons-react';
 
 interface ExportMP3ButtonProps {
   text: string;
@@ -85,7 +86,7 @@ export function ExportMP3Button({
       variant="secondary"
       size="sm"
     >
-      {loading ? 'Generating…' : '🎵 MP3'}
+      {loading ? 'Generating…' : <><IconMusic size={15} stroke={1.75} /> MP3</>}
     </ModernButton>
   ) : (
     <ModernButton
@@ -94,7 +95,7 @@ export function ExportMP3Button({
       size="sm"
       disabled
     >
-      🎵 MP3 (Pro)
+      <IconMusic size={15} stroke={1.75} /> MP3 (Pro)
     </ModernButton>
   );
 }

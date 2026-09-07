@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { X, BookOpen, Flame, Trophy, Clock, ChevronRight } from 'lucide-react';
+import { IconBook2 } from '@tabler/icons-react';
 import { VocabularyReview } from './VocabularyReview';
 
 interface VocabWord {
@@ -155,7 +156,7 @@ export function VocabularyPanel({ isOpen, onClose, theme, darkMode }: Vocabulary
           )}
           {!loading && words.length === 0 && (
             <div style={{ padding: 40, textAlign: 'center' }}>
-              <div style={{ fontSize: 40, marginBottom: 12 }}>📖</div>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12, color: muted }}><IconBook2 size={40} stroke={1.5} /></div>
               <p style={{ fontSize: 14, color: text, fontWeight: 600, marginBottom: 6 }}>No words yet</p>
               <p style={{ fontSize: 13, color: muted, lineHeight: 1.6 }}>
                 Double-click any word in the editor, or tap a word while reading a story, to decode it and add it here.

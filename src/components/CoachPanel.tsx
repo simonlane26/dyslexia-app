@@ -3,6 +3,7 @@
 
 import React, { useState } from 'react';
 import { Sparkles, Volume2, RotateCcw, Loader2, AlertTriangle, Lightbulb, Edit3, List, CheckCircle, Star, ChevronDown, ChevronUp } from 'lucide-react';
+import { IconTrendingUp, IconBulb, IconHelpCircle, IconChartBar, IconCheck, IconBolt, IconStar } from '@tabler/icons-react';
 import { CoachIntentModal, CoachIntent } from './CoachIntentModal';
 import type { CopyMap } from '@/lib/schoolCopy';
 import { DEFAULT_COPY } from '@/lib/schoolCopy';
@@ -106,14 +107,14 @@ export default function CoachPanel({
 
         if (sentenceImprovement > 2) {
           setProgressMessage(
-            `📈 Your sentences are ${Math.round(sentenceImprovement)} words shorter than last time! Keep it up!`
+            `Your sentences are ${Math.round(sentenceImprovement)} words shorter than last time! Keep it up!`
           );
         } else if (complexWordsImprovement > 2) {
           setProgressMessage(
-            `📈 You're using ${complexWordsImprovement} fewer complex words! Your writing is getting clearer!`
+            `You're using ${complexWordsImprovement} fewer complex words! Your writing is getting clearer!`
           );
         } else if (sentenceImprovement > 0 || complexWordsImprovement > 0) {
-          setProgressMessage(`📈 You're making progress! Your writing is getting clearer.`);
+          setProgressMessage(`You're making progress! Your writing is getting clearer.`);
         }
       }
     } catch (e) {
@@ -246,9 +247,9 @@ export default function CoachPanel({
 
   function getSeverityBadge(severity: TipSeverity) {
     const badges = {
-      high: { icon: '⭐', label: copy.coachBadgeHigh, bg: 'rgba(34, 197, 94, 0.1)', border: 'rgba(34, 197, 94, 0.3)', text: '#22c55e' },
-      medium: { icon: '💡', label: copy.coachBadgeMedium, bg: 'rgba(59, 130, 246, 0.1)', border: 'rgba(59, 130, 246, 0.3)', text: '#3b82f6' },
-      low: { icon: '🤔', label: 'Optional', bg: 'rgba(148, 163, 184, 0.1)', border: 'rgba(148, 163, 184, 0.3)', text: '#64748b' },
+      high: { icon: IconStar, label: copy.coachBadgeHigh, bg: 'rgba(34, 197, 94, 0.1)', border: 'rgba(34, 197, 94, 0.3)', text: '#22c55e' },
+      medium: { icon: IconBulb, label: copy.coachBadgeMedium, bg: 'rgba(59, 130, 246, 0.1)', border: 'rgba(59, 130, 246, 0.3)', text: '#3b82f6' },
+      low: { icon: IconHelpCircle, label: 'Optional', bg: 'rgba(148, 163, 184, 0.1)', border: 'rgba(148, 163, 184, 0.3)', text: '#64748b' },
     };
     const b = badges[severity];
     return (
@@ -266,7 +267,7 @@ export default function CoachPanel({
           gap: '4px',
         }}
       >
-        <span>{b.icon}</span>
+        <b.icon size={12} stroke={2} />
         <span>{b.label}</span>
       </span>
     );
@@ -373,7 +374,9 @@ export default function CoachPanel({
             className="p-3 border rounded-xl"
             style={{ borderColor: coachBorder, backgroundColor: withAlpha(coachText, 0.03) }}
           >
-            <h3 className="text-sm font-semibold mb-2">📊 Text Analysis</h3>
+            <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+              <IconChartBar size={16} stroke={1.75} /> Text Analysis
+            </h3>
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div>
                 <div className="opacity-70">Avg Sentence Length</div>
@@ -409,7 +412,7 @@ export default function CoachPanel({
               </h3>
               <ul className="text-xs space-y-1">
                 {state.data.strengths.map((s, i) => (
-                  <li key={i} className="opacity-90">✓ {s}</li>
+                  <li key={i} className="opacity-90 flex items-center gap-1.5"><IconCheck size={13} stroke={2.5} /> {s}</li>
                 ))}
               </ul>
             </div>
@@ -417,7 +420,9 @@ export default function CoachPanel({
 
           {/* Tips */}
           <div className="space-y-2">
-            <h3 className="text-sm font-semibold">💡 Suggestions</h3>
+            <h3 className="text-sm font-semibold flex items-center gap-2">
+              <IconBulb size={16} stroke={1.75} /> Suggestions
+            </h3>
             {state.data.tips.map((tip, i) => {
               const isExpanded = expandedTips.has(i);
               const categoryColor = getCategoryColor(tip.category);
@@ -538,13 +543,14 @@ export default function CoachPanel({
           {/* Progress Message */}
           {progressMessage && (
             <div
-              className="p-3 border rounded-xl text-sm font-medium"
+              className="p-3 border rounded-xl text-sm font-medium flex items-center gap-2"
               style={{
                 borderColor: 'rgba(34, 197, 94, 0.3)',
                 backgroundColor: 'rgba(34, 197, 94, 0.05)',
                 color: '#22c55e',
               }}
             >
+              <IconTrendingUp size={16} stroke={2} style={{ flexShrink: 0 }} />
               {progressMessage}
             </div>
           )}
@@ -552,13 +558,13 @@ export default function CoachPanel({
           {/* Motivation */}
           {state.data.motivation && (
             <div
-              className="p-3 border rounded-xl text-sm italic"
+              className="p-3 border rounded-xl text-sm italic flex items-center gap-2"
               style={{
                 borderColor: 'rgba(139, 92, 246, 0.3)',
                 backgroundColor: 'rgba(139, 92, 246, 0.05)',
               }}
             >
-              💪 {state.data.motivation}
+              <IconBolt size={16} stroke={1.75} style={{ flexShrink: 0 }} /> {state.data.motivation}
             </div>
           )}
         </div>

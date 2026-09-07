@@ -3,59 +3,63 @@
 
 import { useState, useEffect } from 'react';
 import { X, ChevronRight, ChevronLeft, Check } from 'lucide-react';
+import {
+  IconMoodSmile, IconMicrophone, IconSparkles, IconVolume, IconPalette,
+  IconDeviceFloppy, IconTemplate, IconKeyboard, IconConfetti,
+} from '@tabler/icons-react';
 import { ModernButton } from './ModernButton';
 
 interface OnboardingStep {
   title: string;
   description: string;
-  icon: string;
+  icon: typeof IconMoodSmile;
 }
 
 const ONBOARDING_STEPS: OnboardingStep[] = [
   {
     title: 'Welcome to Dyslexia Write!',
     description: 'A dyslexia-friendly writing app with powerful tools to help you write, simplify, and listen to your text. Let\'s take a quick tour!',
-    icon: '👋',
+    icon: IconMoodSmile,
   },
   {
     title: 'Write with Your Voice',
     description: 'Click the "Dictate" button to start voice typing. Your words will appear as you speak. Perfect for when typing is difficult!',
-    icon: '🎤',
+    icon: IconMicrophone,
   },
   {
     title: 'Simplify Complex Text',
     description: 'Click "Simplify" to make your text easier to read. Our AI rewrites complex sentences into simpler language.',
-    icon: '✨',
+    icon: IconSparkles,
   },
   {
     title: 'Listen to Your Writing',
     description: 'Click "Read Aloud" to hear your text spoken back to you. Great for catching mistakes and improving flow!',
-    icon: '🔊',
+    icon: IconVolume,
   },
   {
     title: 'Customize Your Experience',
-    description: 'Click the Settings button (⚙️) to change fonts, colors, and text size. Find what works best for you!',
-    icon: '🎨',
+    description: 'Click the Settings button to change fonts, colors, and text size. Find what works best for you!',
+    icon: IconPalette,
   },
   {
     title: 'Save Your Work',
     description: 'Your work auto-saves every 10 seconds! You can also manually save and access all your documents from the Document Manager.',
-    icon: '💾',
+    icon: IconDeviceFloppy,
   },
   {
     title: 'Quick Templates',
     description: 'Use "Quick Templates" to start with pre-formatted structures for essays, letters, and stories.',
-    icon: '📝',
+    icon: IconTemplate,
   },
   {
     title: 'Keyboard Shortcuts',
     description: 'Press "?" to see all keyboard shortcuts. Power users can work faster with Ctrl+S to save, Ctrl+Shift+S to simplify, and more!',
-    icon: '⌨️',
+    icon: IconKeyboard,
   },
   {
     title: 'You\'re All Set!',
     description: 'You\'re ready to start writing! Remember, you can always revisit this tutorial from the help menu. Happy writing!',
-    icon: '🎉',
+    icon: IconConfetti,
   },
 ];
 
@@ -158,7 +162,7 @@ export function OnboardingTutorial({ theme, onComplete }: OnboardingTutorialProp
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '32px', lineHeight: 1 }}>{step.icon}</span>
+            <step.icon size={32} stroke={1.5} />
             <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: theme.text, margin: 0 }}>
               {step.title}
             </h2>

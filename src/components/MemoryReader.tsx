@@ -2,11 +2,27 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, BookOpen, Volume2, ChevronRight, RotateCcw } from 'lucide-react';
+import {
+  IconBook2, IconBookmark, IconBrain, IconClipboardText, IconBooks,
+  IconCheck, IconConfetti, IconX, IconCalendar, IconClock,
+  IconCurrencyPound, IconUser, IconMapPin, IconMail, IconPin,
+} from '@tabler/icons-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
+type KeyFactIcon = 'date' | 'deadline' | 'money' | 'person' | 'location' | 'email';
+
+const KEY_FACT_ICONS: Record<KeyFactIcon, typeof IconCalendar> = {
+  date: IconCalendar,
+  deadline: IconClock,
+  money: IconCurrencyPound,
+  person: IconUser,
+  location: IconMapPin,
+  email: IconMail,
+};
+
 interface Chunk { id: number; text: string; }
-interface KeyFact { icon: string; text: string; }
+interface KeyFact { icon: KeyFactIcon; text: string; }
 interface Summary { num: number; text: string; chunkIndex: number; }
 interface WordData { phonetic: string; syllables: string[]; definition: string; example: string; count: number; }
 interface PopupState { word: string; data: WordData | null; loading: boolean; }
@@ -56,28 +72,28 @@ function chunkText(text: string): Chunk[] {
 function extractKeyFacts(text: string): KeyFact[] {
   const facts: KeyFact[] = [];
   const seen = new Set<string>();
-  function add(icon: string, t: string) {
+  function add(icon: KeyFactIcon, t: string) {
     const key = t.toLowerCase().slice(0, 30);
     if (!seen.has(key)) { seen.add(key); facts.push({ icon, text: t }); }
   }
   // Dates
   const dates = text.match(/\b\d{1,2}(?:st|nd|rd|th)?\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}/gi) ?? [];
-  dates.slice(0, 2).forEach(d => add('📅', d));
+  dates.slice(0, 2).forEach(d => add('date', d));
   // Deadlines
   const deadlines = text.match(/deadline[:\s]+([^\n.]{3,40})/gi) ?? [];
-  deadlines.slice(0, 1).forEach(d => add('⏰', d.replace(/^deadline[:\s]+/i, 'Deadline: ')));
+  deadlines.slice(0, 1).forEach(d => add('deadline', d.replace(/^deadline[:\s]+/i, 'Deadline: ')));
   // Money
   const money = text.match(/[£$€]\d[\d,]*(?:\.\d{2})?(?:\s*(?:million|thousand|k))?\b/gi) ?? [];
-  money.slice(0, 2).forEach(m => add('💷', m));
+  money.slice(0, 2).forEach(m => add('money', m));
   // Names (Mrs/Mr/Dr/Ms)
   const names = text.match(/\b(?:Mrs|Mr|Dr|Ms|Miss|Prof)\.?\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?/g) ?? [];
-  names.slice(0, 2).forEach(n => add('👤', n));
+  names.slice(0, 2).forEach(n => add('person', n));
   // Room numbers
   const rooms = text.match(/\bRoom\s+\d+[^.,\n]{0,20}/gi) ?? [];
-  rooms.slice(0, 1).forEach(r => add('📍', r.trim()));
+  rooms.slice(0, 1).forEach(r => add('location', r.trim()));
   // Email addresses
   const emails = text.match(/\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/g) ?? [];
-  emails.slice(0, 1).forEach(e => add('📧', e));
+  emails.slice(0, 1).forEach(e => add('email', e));
   return facts.slice(0, 6);
 }
 
@@ -301,7 +317,7 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
       {/* ── Toolbar ── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 20px', background: cardBg, borderBottom: `1px solid ${border}`, flexShrink: 0, zIndex: 110 }}>
         <span style={{ fontSize: 14, fontWeight: 600, color: '#085041', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 18 }}>📖</span> Memory Reading
+          <IconBook2 size={18} stroke={1.75} /> Memory Reading
         </span>
         <div style={{ flex: 1 }} />
         {/* Mode switcher */}
@@ -324,7 +340,7 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
           <button type="button" onClick={() => setShowSidebar(s => !s)}
             style={{ padding: '6px 12px', borderRadius: 7, border: `1px solid ${showSidebar ? teal : border}`, fontSize: 12, cursor: 'pointer', background: showSidebar ? tealLight : cardBg, color: showSidebar ? '#085041' : muted, display: 'flex', alignItems: 'center', gap: 5 }}
           >
-            📋 Summary
+            <IconClipboardText size={14} stroke={1.75} /> Summary
           </button>
         )}
         {/* Read aloud */}
@@ -358,19 +374,24 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
       {/* ── Key facts strip (free + pro) ── */}
       {keyFacts.length > 0 && mode !== 'clean' && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: '8px 16px', background: amberLight, borderBottom: `2px solid #F0D49C`, flexShrink: 0, zIndex: 100 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px', color: amber, padding: '4px 0', alignSelf: 'center' }}>📌 Key facts</span>
-          {keyFacts.map((f, i) => (
-            <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 6, background: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: 500, color: '#633806' }}>
-              {f.icon} {f.text}
-            </span>
-          ))}
+          <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px', color: amber, padding: '4px 0', alignSelf: 'center', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <IconPin size={12} stroke={2} /> Key facts
+          </span>
+          {keyFacts.map((f, i) => {
+            const FactIcon = KEY_FACT_ICONS[f.icon];
+            return (
+              <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 6, background: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: 500, color: '#633806' }}>
+                <FactIcon size={13} stroke={1.75} /> {f.text}
+              </span>
+            );
+          })}
         </div>
       )}
 
       {/* ── Resume banner (free + pro) ── */}
       {resumeInfo && !dismissedResume && (
         <div style={{ padding: '12px 20px', background: purpleLight, borderBottom: `1px solid #CECBF6`, display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, animation: 'fadeUp 0.4s ease' }}>
-          <span style={{ fontSize: 20 }}>📖</span>
+          <IconBookmark size={20} stroke={1.75} />
           <div style={{ flex: 1, fontSize: 13, color: purple, lineHeight: 1.5 }}>
             <strong style={{ color: textColor }}>Welcome back.</strong>
             {resumeInfo.lastSummary
@@ -384,7 +405,7 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
           </button>
           <button type="button" onClick={() => setDismissedResume(true)}
             style={{ background: 'none', border: 'none', cursor: 'pointer', color: muted, fontSize: 16, padding: 4 }}
-          >✕</button>
+          ><IconX size={16} stroke={1.75} /></button>
         </div>
       )}
 
@@ -398,7 +419,7 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
             {/* Running summary */}
             <div style={{ marginBottom: 20 }}>
               <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, color: teal, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span>📋</span> Running summary
+                <IconClipboardText size={14} stroke={1.75} /> Running summary
               </div>
               {summaries.length === 0 ? (
                 <p style={{ fontSize: 12, color: muted, fontStyle: 'italic', padding: 8, textAlign: 'center' }}>Summaries will appear here as you read each section</p>
@@ -425,7 +446,7 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
             {/* Looked-up words */}
             <div>
               <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, color: purple, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span>📚</span> Words looked up
+                <IconBooks size={14} stroke={1.75} /> Words looked up
               </div>
               {Object.keys(lookedUpWords).length === 0 ? (
                 <p style={{ fontSize: 12, color: muted, fontStyle: 'italic', padding: 8, textAlign: 'center' }}>Tap any word to look it up</p>
@@ -502,12 +523,12 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
                 {mode === 'supported' && isPro && shouldShowCheckpoint(i) && (
                   <div style={{ margin: '12px 0', padding: '16px 20px', borderRadius: 12, background: darkMode ? '#1a2744' : '#E6F1FB', border: '1px solid #B8D8F5', animation: 'fadeUp 0.4s ease' }}>
                     <div style={{ fontSize: 12, fontWeight: 600, color: '#378ADD', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span>🧠</span> Let&apos;s check in — here&apos;s what you&apos;ve covered so far
+                      <IconBrain size={16} stroke={1.75} /> Let&apos;s check in — here&apos;s what you&apos;ve covered so far
                     </div>
                     <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 12px' }}>
                       {summaries.filter(s => s.chunkIndex <= i).map((s, si) => (
                         <li key={si} style={{ fontSize: 13, color: '#1A5C94', padding: '3px 0', display: 'flex', gap: 6, lineHeight: 1.5 }}>
-                          <span>✓</span> {s.text}
+                          <IconCheck size={14} stroke={2.5} /> {s.text}
                         </li>
                       ))}
                     </ul>
@@ -526,7 +547,7 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
           {/* Finished */}
           {mode === 'supported' && readChunks.length === chunks.length && chunks.length > 0 && (
             <div style={{ margin: '16px 0', padding: '20px 24px', borderRadius: 12, background: tealLight, border: '1px solid #9FE1CB', textAlign: 'center' }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>🎉</div>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}><IconConfetti size={32} stroke={1.5} color="#085041" /></div>
               <p style={{ fontSize: 15, fontWeight: 600, color: '#085041', marginBottom: 4 }}>You&apos;ve finished reading!</p>
               <p style={{ fontSize: 13, color: '#0F6E56' }}>Your full summary is in the sidebar. You can review it anytime.</p>
             </div>
@@ -564,7 +585,7 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
 
             <button type="button" onClick={() => setWordPopup(null)}
               style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, color: muted, cursor: 'pointer', lineHeight: 1, padding: 4 }}
-            >✕</button>
+            ><IconX size={16} stroke={1.75} /></button>
 
             {!isPro && wordLookupCount >= FREE_WORD_LIMIT && !lookedUpWords[wordPopup.word] ? (
               <div>

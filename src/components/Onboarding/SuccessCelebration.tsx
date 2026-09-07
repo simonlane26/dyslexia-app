@@ -35,7 +35,7 @@ export function SuccessCelebration({
       icon: <CheckCircle size={32} />,
       color: '#10b981',
       title: 'Saved!',
-      message: "You're safe here 👍",
+      message: "You're safe here.",
     },
   };
 
