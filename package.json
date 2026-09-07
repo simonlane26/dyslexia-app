@@ -14,6 +14,7 @@
     "@headlessui/react": "^2",
     "@heroicons/react": "^2",
     "@supabase/supabase-js": "^2.97.0",
+    "@tabler/icons-react": "^3.46.0",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/file-saver": "^2.0.7",
     "@types/sharp": "^0.31.1",

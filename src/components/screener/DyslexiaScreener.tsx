@@ -7,6 +7,13 @@ import {
 } from '@/lib/screener/data';
 import styles from './Screener.module.css';
 import { EmailCaptureBlock } from './EmailCaptureBlock';
+import {
+  IconSearch, IconUser, IconSchool, IconUsers,
+  IconCircleCheck, IconAlertTriangle, IconInfoCircle,
+  IconCurrencyPound, IconPencil, IconBooks,
+} from '@tabler/icons-react';
+
+type TablerIcon = typeof IconUser;
 
 type Screen = 'intro' | 'questions' | 'results';
 
@@ -99,7 +106,7 @@ export default function DyslexiaScreener() {
     return (
       <div className={styles.wrap}>
         <div className={styles.introHeader}>
-          <span className={styles.introIcon}>🔍</span>
+          <IconSearch className={styles.introIcon} size={48} stroke={1.5} />
           <h1 className={styles.introTitle}>Could it be dyslexia?</h1>
           <p className={styles.introSub}>
             A quick, free screener to help you understand whether your
@@ -124,16 +131,16 @@ export default function DyslexiaScreener() {
         <div className={styles.whoLabel}>Who is this screener for?</div>
         <div className={styles.whoPills}>
           {([
-            { id: 'adult' as UserType, icon: '👤', label: "I'm an adult" },
-            { id: 'young' as UserType, icon: '🧑‍🎓', label: "I'm a young person" },
-            { id: 'parent' as UserType, icon: '👨‍👧', label: 'For my child' },
-          ]).map((w) => (
+            { id: 'adult' as UserType, icon: IconUser, label: "I'm an adult" },
+            { id: 'young' as UserType, icon: IconSchool, label: "I'm a young person" },
+            { id: 'parent' as UserType, icon: IconUsers, label: 'For my child' },
+          ] as { id: UserType; icon: TablerIcon; label: string }[]).map((w) => (
             <button
               key={w.id}
               className={`${styles.whoPill} ${userType === w.id ? styles.whoPillSelected : ''}`}
               onClick={() => setUserType(w.id)}
             >
-              <span className={styles.whoPillIcon}>{w.icon}</span>
+              <w.icon className={styles.whoPillIcon} size={22} stroke={1.5} />
               <span className={styles.whoPillLabel}>{w.label}</span>
             </button>
           ))}
@@ -230,20 +237,20 @@ export default function DyslexiaScreener() {
   // ── RESULTS ──
   if (screen === 'results' && result) {
     const RESULT_CONTENT: Record<RiskLevel, {
-      icon: string; label: string; title: string; text: string; color: string;
+      icon: TablerIcon; label: string; title: string; text: string; color: string;
     }> = {
       low: {
-        icon: '💚', label: 'Few indicators', color: '#1D9E75',
+        icon: IconCircleCheck, label: 'Few indicators', color: '#1D9E75',
         title: 'Your results show few dyslexia indicators',
         text: "Based on your answers, you show relatively few of the indicators commonly associated with dyslexia. This doesn't mean difficulties you experience aren't real — everyone's relationship with reading and writing is different. If you're still concerned, speaking to a professional is always worthwhile.",
       },
       moderate: {
-        icon: '🔶', label: 'Some indicators', color: '#BA7517',
+        icon: IconAlertTriangle, label: 'Some indicators', color: '#BA7517',
         title: 'Your results show some indicators associated with dyslexia',
         text: "Your answers suggest you experience several of the difficulties commonly associated with dyslexia. This doesn't mean you definitely have dyslexia — but it does suggest that a professional assessment could be helpful. Many people find that understanding why they experience these difficulties is the first step toward getting the right support.",
       },
       high: {
-        icon: '💜', label: 'Several indicators', color: '#534AB7',
+        icon: IconInfoCircle, label: 'Several indicators', color: '#534AB7',
         title: 'Your results show several indicators commonly associated with dyslexia',
         text: "Your answers suggest you experience many of the difficulties commonly associated with dyslexia. We would recommend speaking to a qualified professional for a formal assessment. A diagnosis can unlock practical support — including assistive technology, workplace adjustments, and exam access arrangements — that can make a real difference to your daily life.",
       },
@@ -259,7 +266,7 @@ export default function DyslexiaScreener() {
     return (
       <div className={styles.wrap}>
         <div className={styles.resultCard}>
-          <span className={styles.resultIcon}>{content.icon}</span>
+          <content.icon className={styles.resultIcon} size={48} stroke={1.5} color={content.color} />
           <div className={styles.resultLevel} style={{ color: content.color }}>
             {content.label}
           </div>
@@ -314,7 +321,7 @@ export default function DyslexiaScreener() {
               rel="noopener noreferrer"
               className={styles.nextStep}
             >
-              <div className={`${styles.nextStepIcon} ${styles.nextStepPurple}`}>🔍</div>
+              <div className={`${styles.nextStepIcon} ${styles.nextStepPurple}`}><IconSearch size={18} stroke={1.75} /></div>
               <div className={styles.nextStepText}>
                 <div className={styles.nextStepTitle}>Get a professional assessment</div>
                 <div className={styles.nextStepSub}>BDA guide to getting a dyslexia diagnosis</div>
@@ -330,7 +337,7 @@ export default function DyslexiaScreener() {
               rel="noopener noreferrer"
               className={styles.nextStep}
             >
-              <div className={`${styles.nextStepIcon} ${styles.nextStepAmber}`}>💷</div>
+              <div className={`${styles.nextStepIcon} ${styles.nextStepAmber}`}><IconCurrencyPound size={18} stroke={1.75} /></div>
               <div className={styles.nextStepText}>
                 <div className={styles.nextStepTitle}>Access to Work funding</div>
                 <div className={styles.nextStepSub}>Government scheme that can fund assessment and assistive technology</div>
@@ -341,7 +348,7 @@ export default function DyslexiaScreener() {
 
           {(userType === 'parent' || userType === 'young') && (
             <div className={styles.nextStep}>
-              <div className={`${styles.nextStepIcon} ${styles.nextStepBlue}`}>🏫</div>
+              <div className={`${styles.nextStepIcon} ${styles.nextStepBlue}`}><IconSchool size={18} stroke={1.75} /></div>
               <div className={styles.nextStepText}>
                 <div className={styles.nextStepTitle}>Speak to your school&apos;s SENCO</div>
                 <div className={styles.nextStepSub}>They can arrange screening and refer for formal assessment</div>
@@ -351,7 +358,7 @@ export default function DyslexiaScreener() {
           )}
 
           <a href="/app" className={styles.nextStep}>
-            <div className={`${styles.nextStepIcon} ${styles.nextStepTeal}`}>✍️</div>
+            <div className={`${styles.nextStepIcon} ${styles.nextStepTeal}`}><IconPencil size={18} stroke={1.75} /></div>
             <div className={styles.nextStepText}>
               <div className={styles.nextStepTitle}>Try DyslexiaWrite</div>
               <div className={styles.nextStepSub}>AI-powered writing and reading support — free to start</div>
@@ -365,7 +372,7 @@ export default function DyslexiaScreener() {
             rel="noopener noreferrer"
             className={styles.nextStep}
           >
-            <div className={`${styles.nextStepIcon} ${styles.nextStepPurple}`}>📚</div>
+            <div className={`${styles.nextStepIcon} ${styles.nextStepPurple}`}><IconBooks size={18} stroke={1.75} /></div>
             <div className={styles.nextStepText}>
               <div className={styles.nextStepTitle}>Learn more about dyslexia</div>
               <div className={styles.nextStepSub}>British Dyslexia Association — information and support</div>

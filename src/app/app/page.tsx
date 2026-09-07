@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import {
   Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText, Lock, Save, Highlighter, Undo2, Redo2, SpellCheck, Edit3, Eye,
 } from 'lucide-react';
+import { IconPencil, IconCheck, IconSparkles, IconKey, IconStar } from '@tabler/icons-react';
 import { Card } from '@/components/Card';
 import { ModernButton } from '@/components/ModernButton';
 import { UpgradeButton } from '@/components/UpgradeButton';
@@ -988,27 +989,27 @@ function PageBody() {
     const tier = Math.floor(count / 25);
     if (count <= 25) {
       const msgs = [
-        "Great start — you're writing ✨",
-        "Every word counts 💪",
-        "You've begun — that's the hardest part 👍",
-        "Writing clarity: building nicely 🌱",
+        "Great start — you're writing",
+        "Every word counts",
+        "You've begun — that's the hardest part",
+        "Writing clarity: building nicely",
       ];
       return msgs[tier % msgs.length];
     }
     if (count <= 100) {
       const msgs = [
-        "Writing clarity: improving 📈",
-        "Clear and easy to follow 👍",
-        "Your ideas are coming through ✨",
-        "Getting clearer with every sentence 💪",
+        "Writing clarity: improving",
+        "Clear and easy to follow",
+        "Your ideas are coming through",
+        "Getting clearer with every sentence",
       ];
       return msgs[tier % msgs.length];
     }
     const msgs = [
-      "Clear and easy to read 🌟",
-      "Strong writing — well done 💪",
-      "Writing clarity: really clear 👍",
-      "Your writing is flowing well ✨",
+      "Clear and easy to read",
+      "Strong writing — well done",
+      "Writing clarity: really clear",
+      "Your writing is flowing well",
     ];
     return msgs[tier % msgs.length];
   }
@@ -1288,8 +1289,8 @@ function PageBody() {
           backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.15)' : 'rgba(139, 92, 246, 0.08)',
           borderBottom: `1px solid ${darkMode ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.15)'}`,
         }}>
-          <p style={{ margin: 0, fontSize: '14px', color: darkMode ? '#c4b5fd' : '#6d28d9', fontWeight: 500 }}>
-            ✏️ Start anywhere. There&apos;s no right way to write here.
+          <p style={{ margin: 0, fontSize: '14px', color: darkMode ? '#c4b5fd' : '#6d28d9', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <IconPencil size={16} stroke={2} style={{ flexShrink: 0 }} /> Start anywhere. There&apos;s no right way to write here.
           </p>
           <button
             type="button"
@@ -1392,8 +1393,8 @@ function PageBody() {
                 Document Title
               </label>
               {currentDocId && (
-                <span style={{ fontSize: '12px', color: theme.primary, fontWeight: 500 }}>
-                  ✓ Editing existing document
+                <span style={{ fontSize: '12px', color: theme.primary, fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <IconCheck size={14} stroke={2.5} /> Editing existing document
                 </span>
               )}
             </div>
@@ -1419,9 +1420,9 @@ function PageBody() {
             <label
               htmlFor="text"
               className="text-lg font-semibold"
-              style={{ color: theme.text, margin: 0 }}
+              style={{ color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}
             >
-              ✨ Your Writing
+              <IconSparkles size={18} stroke={2} /> Your Writing
             </label>
             {getConfidenceMessage(text.trim() ? text.trim().split(/\s+/).filter(w => w.length > 0).length : 0) && (
               <span style={{
@@ -1430,7 +1431,11 @@ function PageBody() {
                 color: theme.primary,
                 opacity: 0.85,
                 letterSpacing: '0.01em',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
               }}>
+                <IconSparkles size={14} stroke={2} />
                 {getConfidenceMessage(text.trim() ? text.trim().split(/\s+/).filter(w => w.length > 0).length : 0)}
               </span>
             )}
@@ -1525,7 +1530,7 @@ function PageBody() {
                   variant="primary"
                   size="sm"
                 >
-                  🔑 Sign In to Save Your Work
+                  <IconKey size={16} stroke={2} /> Sign In to Save Your Work
                 </ModernButton>
               </SignInButton>
             </div>
@@ -1823,7 +1828,9 @@ function PageBody() {
               </button>
             ))}
             {!isPro && (
-              <span style={{ fontSize: '11px', color: darkMode ? '#94a3b8' : '#94a3b8', marginLeft: '4px' }}>⭐ Pro</span>
+              <span style={{ fontSize: '11px', color: darkMode ? '#94a3b8' : '#94a3b8', marginLeft: '4px', display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
+                <IconStar size={12} stroke={2} fill="currentColor" /> Pro
+              </span>
             )}
           </div>
         </>

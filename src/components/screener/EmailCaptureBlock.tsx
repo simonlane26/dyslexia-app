@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
+import { IconCircleCheck } from '@tabler/icons-react';
 import styles from './Screener.module.css';
 
 type Audience = 'self' | 'parent-sen' | 'employer';
@@ -62,7 +63,7 @@ export function EmailCaptureBlock({ screenerResult, resultTitle, source = 'free-
     return (
       <div className={styles.leadBox}>
         <div className={styles.leadSuccess}>
-          <span aria-hidden="true" style={{ fontSize: 22 }}>✅</span>
+          <IconCircleCheck aria-hidden="true" size={22} stroke={1.75} color="#1D9E75" />
           <div>
             <div className={styles.leadSuccessTitle}>Sent — check your inbox in the next minute.</div>
             <div className={styles.leadSuccessSub}>
