@@ -29,7 +29,9 @@ const securityHeaders = [
       "default-src 'self'",
       // Next.js needs unsafe-inline + unsafe-eval; GA and JSON-LD need unsafe-inline
       // clerk.dyslexiawrite.com is the Clerk custom domain — must be in script-src
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.dyslexiawrite.com https://www.googletagmanager.com https://www.google-analytics.com",
+      // googleads.g.doubleclick.net: Google Ads conversion tracking (via GTM/gtag)
+      // connect.facebook.net: Meta Pixel (fbevents.js)
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.dyslexiawrite.com https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://connect.facebook.net",
       // React inline styles are used throughout the app
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' data: https://fonts.gstatic.com",
@@ -47,6 +49,12 @@ const securityHeaders = [
         "https://api.elevenlabs.io",
         "https://www.google-analytics.com",
         "https://stats.g.doubleclick.net",
+        // Google Ads conversion/remarketing pings (googleads.g.doubleclick.net script
+        // reports its hits to google.com and ad.doubleclick.net)
+        "https://www.google.com",
+        "https://ad.doubleclick.net",
+        // Meta Pixel
+        "https://www.facebook.com",
       ].join(" "),
       // Clerk uses Cloudflare Turnstile; block all other frames
       "frame-src https://clerk.dyslexiawrite.com https://challenges.cloudflare.com https://accounts.google.com",
