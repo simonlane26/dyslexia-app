@@ -115,7 +115,7 @@ export function VocabularyReview({ words, onClose, onComplete, theme, darkMode }
           </p>
           <button
             onClick={onClose}
-            style={{ background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 32px', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
+            style={{ background: '#d97706', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 32px', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
           >
             Done
           </button>
@@ -133,7 +133,7 @@ export function VocabularyReview({ words, onClose, onComplete, theme, darkMode }
             {index + 1} of {words.length}
           </span>
           <div style={{ flex: 1, margin: '0 16px', height: 6, background: darkMode ? '#334155' : '#e2e8f0', borderRadius: 3, overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: `${((index) / words.length) * 100}%`, background: '#7c3aed', borderRadius: 3, transition: 'width 0.3s' }} />
+            <div style={{ height: '100%', width: `${((index) / words.length) * 100}%`, background: '#d97706', borderRadius: 3, transition: 'width 0.3s' }} />
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: darkMode ? '#94a3b8' : '#64748b' }}>
             <X size={20} />
@@ -149,7 +149,7 @@ export function VocabularyReview({ words, onClose, onComplete, theme, darkMode }
             </h2>
             <button
               onClick={() => speak(card.word)}
-              style={{ background: speaking ? '#ede9fe' : 'none', border: 'none', cursor: 'pointer', padding: 6, borderRadius: 8, color: '#7c3aed', transition: 'background 0.15s' }}
+              style={{ background: speaking ? '#fffbeb' : 'none', border: 'none', cursor: 'pointer', padding: 6, borderRadius: 8, color: '#d97706', transition: 'background 0.15s' }}
               title="Hear pronunciation"
             >
               <Volume2 size={22} />
@@ -158,7 +158,7 @@ export function VocabularyReview({ words, onClose, onComplete, theme, darkMode }
 
           {/* Phonetic */}
           {card.phonetic && (
-            <p style={{ fontSize: 16, color: darkMode ? '#7c3aed' : '#7c3aed', marginBottom: 12, fontStyle: 'italic' }}>
+            <p style={{ fontSize: 16, color: '#d97706', marginBottom: 12, fontStyle: 'italic' }}>
               {card.phonetic}
             </p>
           )}
@@ -182,13 +182,13 @@ export function VocabularyReview({ words, onClose, onComplete, theme, darkMode }
               </p>
               <button
                 onClick={() => speak(card.word)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#7c3aed', fontSize: 13, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 6, margin: '0 auto 20px' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d97706', fontSize: 13, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 6, margin: '0 auto 20px' }}
               >
                 <Volume2 size={14} /> Hear it
               </button>
               <button
                 onClick={() => { setRevealed(true); speak(card.word); }}
-                style={{ background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 12, padding: '14px 40px', fontSize: 16, fontWeight: 600, cursor: 'pointer', width: '100%' }}
+                style={{ background: '#d97706', color: '#fff', border: 'none', borderRadius: 12, padding: '14px 40px', fontSize: 16, fontWeight: 600, cursor: 'pointer', width: '100%' }}
               >
                 Show answer
               </button>
@@ -199,7 +199,7 @@ export function VocabularyReview({ words, onClose, onComplete, theme, darkMode }
           {revealed && (
             <>
               <div style={{ background: darkMode ? '#0f172a' : '#f8fafc', border: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`, borderRadius: 12, padding: '16px 20px', marginBottom: 16, textAlign: 'left' }}>
-                <p style={{ fontSize: 13, fontWeight: 600, color: '#7c3aed', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Definition</p>
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#d97706', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Definition</p>
                 <p style={{ fontSize: 16, color: darkMode ? '#e2e8f0' : '#1e293b', lineHeight: 1.6, margin: 0 }}>
                   {card.definition || 'No definition saved.'}
                 </p>

@@ -104,7 +104,7 @@ export function VocabularyPanel({ isOpen, onClose, theme, darkMode }: Vocabulary
       }}>
         {/* Header */}
         <div style={{ padding: '20px 20px 16px', borderBottom: `1px solid ${border}`, display: 'flex', alignItems: 'center', gap: 12 }}>
-          <BookOpen size={22} style={{ color: '#7c3aed', flexShrink: 0 }} />
+          <BookOpen size={22} style={{ color: '#d97706', flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <h2 style={{ fontSize: 17, fontWeight: 700, color: text, margin: 0 }}>My Vocabulary</h2>
             <p style={{ fontSize: 12, color: muted, margin: 0 }}>Words you&apos;ve decoded — growing over time</p>
@@ -117,7 +117,7 @@ export function VocabularyPanel({ isOpen, onClose, theme, darkMode }: Vocabulary
         {/* Stats row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 1, background: border, borderBottom: `1px solid ${border}` }}>
           {[
-            { icon: <BookOpen size={14} />, value: stats.total, label: 'Total', color: '#7c3aed' },
+            { icon: <BookOpen size={14} />, value: stats.total, label: 'Total', color: '#d97706' },
             { icon: <Flame size={14} />, value: stats.due, label: 'Due today', color: '#dc2626' },
             { icon: <Trophy size={14} />, value: stats.mastered, label: 'Mastered', color: '#166534' },
           ].map(s => (
@@ -133,11 +133,11 @@ export function VocabularyPanel({ isOpen, onClose, theme, darkMode }: Vocabulary
 
         {/* Review CTA */}
         {stats.due > 0 && (
-          <div style={{ padding: '12px 16px', background: darkMode ? '#2d1b69' : '#ede9fe', borderBottom: `1px solid ${border}` }}>
+          <div style={{ padding: '12px 16px', background: darkMode ? '#451a03' : '#fffbeb', borderBottom: `1px solid ${border}` }}>
             <button
               onClick={() => setShowReview(true)}
               style={{
-                width: '100%', background: '#7c3aed', color: '#fff', border: 'none',
+                width: '100%', background: '#d97706', color: '#fff', border: 'none',
                 borderRadius: 10, padding: '11px 16px', fontSize: 14, fontWeight: 600,
                 cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               }}
@@ -170,7 +170,7 @@ export function VocabularyPanel({ isOpen, onClose, theme, darkMode }: Vocabulary
               <div key={w.id} style={{
                 padding: '14px 16px',
                 borderBottom: `1px solid ${border}`,
-                background: due ? (darkMode ? '#2d1b69' : '#faf5ff') : bg,
+                background: due ? (darkMode ? '#451a03' : '#fffbeb') : bg,
               }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
                   <div style={{ flex: 1 }}>
@@ -179,7 +179,7 @@ export function VocabularyPanel({ isOpen, onClose, theme, darkMode }: Vocabulary
                         {w.word}
                       </span>
                       {w.phonetic && (
-                        <span style={{ fontSize: 12, color: '#7c3aed', fontStyle: 'italic' }}>{w.phonetic}</span>
+                        <span style={{ fontSize: 12, color: '#d97706', fontStyle: 'italic' }}>{w.phonetic}</span>
                       )}
                       {due && (
                         <span style={{ fontSize: 10, fontWeight: 700, background: '#dc2626', color: '#fff', borderRadius: 4, padding: '2px 6px' }}>DUE</span>
