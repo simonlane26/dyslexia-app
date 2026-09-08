@@ -1380,7 +1380,7 @@ function PageBody() {
         </div>
       )}
 
-      <div className="px-4 mx-auto" style={{ marginTop: '12px', maxWidth: '808px' }}>
+      <div className="px-4 mx-auto" style={{ marginTop: '12px', maxWidth: '872px' }}>
       <Card className="mb-6">
         <div className="p-6" style={{ padding: '32px' }}>
           {/* Document Title */}
