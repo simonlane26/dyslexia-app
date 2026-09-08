@@ -372,7 +372,7 @@ export function ReadingSupportPanel({
               >
                 <span style={{ display: 'block' }}>
                   {m.charAt(0).toUpperCase() + m.slice(1)}
-                  {locked && <span style={{ marginLeft: 4, fontSize: 9, background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', color: '#fff', borderRadius: 3, padding: '1px 4px', fontWeight: 700, verticalAlign: 'middle' }}>Pro</span>}
+                  {locked && <span style={{ marginLeft: 4, fontSize: 9, background: '#d97706', color: '#fff', borderRadius: 3, padding: '1px 4px', fontWeight: 700, verticalAlign: 'middle' }}>Pro</span>}
                 </span>
                 <span style={{ display: 'block', fontSize: 10, marginTop: 1, color: darkMode ? '#555' : '#bbb', fontWeight: 400 }}>
                   {m === 'clean' ? 'Just the text' : m === 'guided' ? 'Visual support' : 'Full audio'}
@@ -394,8 +394,8 @@ export function ReadingSupportPanel({
           ].map(f => (
             <span key={f.label} style={{
               fontSize: 10, padding: '2px 8px', borderRadius: 10,
-              background: f.on ? (darkMode ? 'rgba(15,110,86,0.2)' : '#E1F5EE') : (darkMode ? '#2a2a2a' : '#f5f5f0'),
-              color: f.on ? (darkMode ? '#5DCAA5' : '#085041') : (darkMode ? '#555' : '#bbb'),
+              background: f.on ? (darkMode ? 'rgba(217,119,6,0.2)' : '#fef3c7') : (darkMode ? '#2a2a2a' : '#f5f5f0'),
+              color: f.on ? (darkMode ? '#fbbf24' : '#92400e') : (darkMode ? '#555' : '#bbb'),
               opacity: f.on ? 1 : 0.5,
             }}>
               {f.label}

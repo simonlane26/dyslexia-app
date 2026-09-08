@@ -252,12 +252,6 @@ export function AgentChat({
     return () => window.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
-  // Prevent body scroll when open
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [isOpen]);
-
   // Auto-focus input when opened (after type selected)
   useEffect(() => {
     if (isOpen && writingType) {
@@ -409,13 +403,16 @@ export function AgentChat({
     }
   }
 
+  // The mentor's one accent — the same amber used everywhere else in the
+  // app, instead of the blue/violet gradient it used to run on its own.
+  const ACCENT = '#d97706';
   const panelBg = darkMode ? '#1e293b' : '#f8fafc';
   const panelText = darkMode ? '#f1f5f9' : '#1e293b';
   const borderColor = darkMode ? '#334155' : '#e2e8f0';
-  const userBubbleBg = '#2563eb';
+  const userBubbleBg = '#1f2937';
   const assistantBubbleBg = darkMode ? '#334155' : '#f1f5f9';
-  const draftBubbleBg = darkMode ? '#1e3a5f' : '#eff6ff';
-  const draftBorderColor = darkMode ? '#2563eb' : '#bfdbfe';
+  const draftBubbleBg = darkMode ? '#451a03' : '#fffbeb';
+  const draftBorderColor = darkMode ? ACCENT : '#fde68a';
   const inputBg = darkMode ? '#0f172a' : '#ffffff';
 
   // Show "Write this up" after 2 user messages, no draft yet, nothing loading (non-assignment only)
@@ -435,18 +432,10 @@ export function AgentChat({
 
   return (
     <>
-      {/* Backdrop */}
-      {isOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            zIndex: 40,
-          }}
-          onClick={onClose}
-        />
-      )}
+      {/* No dimming backdrop, deliberately — the mentor is a lightweight,
+          easy-to-ignore presence next to the writing, not a modal that
+          takes over the screen. It's dismissed via the close button or Esc,
+          and the document behind it stays fully lit and interactive. */}
 
       {/* Drawer */}
       <div
@@ -486,7 +475,7 @@ export function AgentChat({
                 width: '32px',
                 height: '32px',
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
+                background: ACCENT,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -577,8 +566,8 @@ export function AgentChat({
                 <div
                   style={{
                     borderRadius: '10px',
-                    border: `1px solid ${darkMode ? '#7c3aed55' : '#ddd6fe'}`,
-                    backgroundColor: darkMode ? '#2d1b69' : '#faf5ff',
+                    border: `1px solid ${darkMode ? ACCENT + '55' : '#fde68a'}`,
+                    backgroundColor: darkMode ? '#451a03' : '#fffbeb',
                     padding: '10px 12px',
                     display: 'flex',
                     flexDirection: 'column',
@@ -610,8 +599,8 @@ export function AgentChat({
                       style={{
                         alignSelf: 'flex-start',
                         background: 'none',
-                        border: `1px solid ${darkMode ? '#7c3aed' : '#8b5cf6'}`,
-                        color: darkMode ? '#a78bfa' : '#7c3aed',
+                        border: `1px solid ${darkMode ? ACCENT : '#f59e0b'}`,
+                        color: darkMode ? '#fbbf24' : '#b45309',
                         borderRadius: '6px',
                         padding: '4px 10px',
                         fontSize: '12px',
@@ -664,8 +653,8 @@ export function AgentChat({
                           transition: 'border-color 0.15s, background-color 0.15s',
                         }}
                         onMouseEnter={e => {
-                          (e.currentTarget as HTMLButtonElement).style.borderColor = '#2563eb';
-                          (e.currentTarget as HTMLButtonElement).style.backgroundColor = darkMode ? '#1e3a5f' : '#eff6ff';
+                          (e.currentTarget as HTMLButtonElement).style.borderColor = ACCENT;
+                          (e.currentTarget as HTMLButtonElement).style.backgroundColor = darkMode ? '#451a03' : '#fffbeb';
                         }}
                         onMouseLeave={e => {
                           (e.currentTarget as HTMLButtonElement).style.borderColor = borderColor;
@@ -728,8 +717,8 @@ export function AgentChat({
                           style={{
                             padding: '6px 12px',
                             borderRadius: '16px',
-                            border: `1px solid ${assignmentSubType === sub ? '#2563eb' : borderColor}`,
-                            backgroundColor: assignmentSubType === sub ? '#2563eb' : (darkMode ? '#334155' : '#ffffff'),
+                            border: `1px solid ${assignmentSubType === sub ? ACCENT : borderColor}`,
+                            backgroundColor: assignmentSubType === sub ? ACCENT : (darkMode ? '#334155' : '#ffffff'),
                             color: assignmentSubType === sub ? 'white' : panelText,
                             fontSize: '12px',
                             fontWeight: assignmentSubType === sub ? 600 : 400,
@@ -752,7 +741,7 @@ export function AgentChat({
                       padding: '10px',
                       borderRadius: '10px',
                       border: 'none',
-                      background: assignmentTitle.trim() ? 'linear-gradient(135deg, #2563eb, #7c3aed)' : (darkMode ? '#334155' : '#e2e8f0'),
+                      background: assignmentTitle.trim() ? ACCENT : (darkMode ? '#334155' : '#e2e8f0'),
                       color: assignmentTitle.trim() ? 'white' : (darkMode ? '#64748b' : '#94a3b8'),
                       fontSize: '14px',
                       fontWeight: 600,
@@ -789,7 +778,7 @@ export function AgentChat({
                             fontWeight: i === currentSectionIndex ? 700 : 400,
                             backgroundColor:
                               i < currentSectionIndex ? (darkMode ? '#14532d33' : '#dcfce7') :
-                              i === currentSectionIndex ? '#2563eb' : 'transparent',
+                              i === currentSectionIndex ? ACCENT : 'transparent',
                             color:
                               i < currentSectionIndex ? '#16a34a' :
                               i === currentSectionIndex ? 'white' :
@@ -833,7 +822,7 @@ export function AgentChat({
                           gap: '6px',
                           fontSize: '12px',
                           fontWeight: 700,
-                          color: '#2563eb',
+                          color: ACCENT,
                         }}
                       >
                         <FileText size={12} />
@@ -869,7 +858,7 @@ export function AgentChat({
                               setInsertedIndex(i);
                             }}
                             style={{
-                              background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
+                              background: ACCENT,
                               color: 'white',
                               border: 'none',
                               borderRadius: '8px',
@@ -923,7 +912,7 @@ export function AgentChat({
                           cursor: 'pointer',
                           padding: '2px 4px',
                           borderRadius: '4px',
-                          color: speakingIndex === i ? theme.primary : panelText,
+                          color: speakingIndex === i ? ACCENT : panelText,
                           opacity: speakingIndex === i ? 1 : 0.35,
                           display: 'flex',
                           alignItems: 'center',
@@ -966,7 +955,7 @@ export function AgentChat({
                 style={{
                   padding: '10px 16px',
                   borderTop: `1px solid ${borderColor}`,
-                  backgroundColor: darkMode ? '#1e3a5f' : '#eff6ff',
+                  backgroundColor: darkMode ? '#451a03' : '#fffbeb',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -981,7 +970,7 @@ export function AgentChat({
                   type="button"
                   onClick={advanceSection}
                   style={{
-                    background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
+                    background: ACCENT,
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
@@ -1022,7 +1011,7 @@ export function AgentChat({
                   type="button"
                   onClick={handleWriteItUp}
                   style={{
-                    background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
+                    background: ACCENT,
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
@@ -1137,7 +1126,7 @@ export function AgentChat({
                   height: '40px',
                   borderRadius: '10px',
                   border: 'none',
-                  background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
+                  background: ACCENT,
                   color: 'white',
                   cursor: loading || draftLoading || !input.trim() ? 'not-allowed' : 'pointer',
                   opacity: loading || draftLoading || !input.trim() ? 0.5 : 1,
