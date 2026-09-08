@@ -50,10 +50,10 @@ export function HeaderBar() {
                   type="button"
                   onClick={() => router.push(href)}
                   className={[
-                    'px-4 py-1.5 rounded-lg text-sm font-medium transition',
+                    'px-4 py-1.5 rounded-lg text-sm transition border-b-2',
                     active
-                      ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800',
+                      ? 'font-semibold text-slate-900 dark:text-slate-100 border-slate-900 dark:border-slate-100'
+                      : 'font-medium text-slate-500 dark:text-slate-400 border-transparent hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800',
                   ].join(' ')}
                 >
                   {label}
@@ -100,15 +100,15 @@ export function HeaderBar() {
                 <button
                   type="button"
                   onClick={() => router.push('/pricing')}
-                  className="hidden sm:block rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:opacity-90"
+                  className="hidden sm:block rounded-lg bg-amber-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-amber-700"
                 >
                   {t('header.upgradePro')}
                 </button>
               )}
 
-              {/* Pro Member badge */}
+              {/* Pro Member badge — flat, not a gradient, so it doesn't out-shout the brand accent */}
               {isPro && (
-                <div className="items-center hidden gap-2 px-3 py-1 text-sm font-medium text-white rounded-full shadow-sm bg-gradient-to-r from-purple-600 to-pink-600 sm:flex">
+                <div className="items-center hidden gap-2 px-3 py-1 text-sm font-medium rounded-full sm:flex bg-amber-50 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
                   {t('header.proMember')}
                 </div>
               )}

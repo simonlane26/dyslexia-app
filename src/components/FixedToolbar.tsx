@@ -179,11 +179,14 @@ export function FixedToolbar({
   // Three quiet weight tiers instead of one uniform button style, so the eye
   // isn't asked to treat every action as equally important. Save is the one
   // filled, high-contrast button — everything else is outline or muted text.
+  // Every interactive/active state routes through the one brand accent
+  // (amber — same hue as the logo mark) rather than a mix of blue/purple/green.
+  const ACCENT = '#d97706';
   type Weight = 'bold' | 'soft' | 'ghost' | 'filled';
   function tierStyle(weight: Weight, active: boolean): React.CSSProperties {
     if (active) {
       return {
-        backgroundColor: theme.primary,
+        backgroundColor: ACCENT,
         color: '#ffffff',
         border: '1.5px solid transparent',
       };
@@ -191,8 +194,8 @@ export function FixedToolbar({
     switch (weight) {
       case 'filled':
         return {
-          backgroundColor: darkMode ? '#f1f5f9' : '#111827',
-          color: darkMode ? '#111827' : '#ffffff',
+          backgroundColor: ACCENT,
+          color: '#ffffff',
           border: '1.5px solid transparent',
         };
       case 'bold':
@@ -554,7 +557,8 @@ export function FixedToolbar({
           style={{
             fontSize: '13px',
             fontWeight: 600,
-            color: theme.primary,
+            color: theme.text,
+            opacity: 0.7,
             letterSpacing: '0.01em',
           }}
         >
@@ -600,7 +604,7 @@ export function FixedToolbar({
               {isListening ? <MicOff size={12} /> : <Mic size={12} />}
               {t('toolbar.dictate')}
             </ModernButton>
-            <ModernButton variant="success" size="sm" onClick={onSave} disabled={isSaving}>
+            <ModernButton variant="accent" size="sm" onClick={onSave} disabled={isSaving}>
               <Save size={12} />
               {isSaving ? t('toolbar.saving') : t('toolbar.save')}
             </ModernButton>

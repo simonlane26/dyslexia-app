@@ -259,7 +259,7 @@ export function AccessibilityDrawer({
                     width: '100%',
                     aspectRatio: '1',
                     backgroundColor: swatch.value,
-                    border: bgColor === swatch.value ? `3px solid ${theme.primary}` : `1px solid ${theme.border}`,
+                    border: bgColor === swatch.value ? '3px solid #d97706' : `1px solid ${theme.border}`,
                     borderRadius: '8px',
                     cursor: 'pointer',
                   }}

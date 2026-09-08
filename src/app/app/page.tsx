@@ -1394,7 +1394,7 @@ function PageBody() {
                 Document Title
               </label>
               {currentDocId && (
-                <span style={{ fontSize: '12px', color: theme.primary, fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ fontSize: '12px', color: theme.text, opacity: 0.6, fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                   <IconCheck size={14} stroke={2.5} /> Editing existing document
                 </span>
               )}
@@ -1429,8 +1429,8 @@ function PageBody() {
               <span style={{
                 fontSize: '13px',
                 fontWeight: 500,
-                color: theme.primary,
-                opacity: 0.85,
+                color: theme.text,
+                opacity: 0.65,
                 letterSpacing: '0.01em',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -1460,9 +1460,9 @@ function PageBody() {
                     borderRadius: '50%',
                     backgroundColor: tint.value,
                     border: bgColor === tint.value
-                      ? `2px solid ${theme.primary}`
+                      ? '2px solid #d97706'
                       : '1px solid rgba(0,0,0,0.15)',
-                    boxShadow: bgColor === tint.value ? `0 0 0 2px ${theme.primary}33` : 'none',
+                    boxShadow: bgColor === tint.value ? '0 0 0 2px #d9770633' : 'none',
                     cursor: 'pointer',
                     padding: 0,
                   }}

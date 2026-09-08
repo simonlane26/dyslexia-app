@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-type Variant = 'primary' | 'secondary' | 'success' | 'danger' | 'ghost';
+type Variant = 'primary' | 'secondary' | 'success' | 'danger' | 'ghost' | 'accent';
 type Size = 'sm' | 'md' | 'lg';
 
 export interface ModernButtonProps
@@ -49,6 +49,10 @@ export function ModernButton({
       'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md hover:scale-[1.02] active:scale-[0.98]',
     ghost:
       'bg-transparent text-slate-500 border border-slate-200 hover:scale-[1.02] active:scale-[0.98]',
+    // The single brand accent — anything interactive/actionable (Save, upgrade CTAs)
+    // routes through this one colour instead of a mix of blue/purple/green.
+    accent:
+      'bg-amber-600 text-white shadow-md hover:bg-amber-700 hover:scale-[1.02] active:scale-[0.98]',
   };
 
   const classes = [base, sizes[size], variants[variant], className]
