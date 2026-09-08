@@ -238,35 +238,8 @@ export function AccessibilityDrawer({
             />
           </div>
 
-          {/* Background Color */}
-          <div style={{ marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: theme.text }}>
-              {t('a11y.bgColor')}
-            </h3>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))',
-                gap: '8px',
-              }}
-            >
-              {PAGE_TINTS.map((swatch) => (
-                <button
-                  key={swatch.value}
-                  onClick={() => setBgColor(swatch.value)}
-                  title={swatch.name}
-                  style={{
-                    width: '100%',
-                    aspectRatio: '1',
-                    backgroundColor: swatch.value,
-                    border: bgColor === swatch.value ? '3px solid #d97706' : `1px solid ${theme.border}`,
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                  }}
-                />
-              ))}
-            </div>
-          </div>
+          {/* Page tint now lives on the main writing page, directly above the
+              editor, rather than buried here — see page.tsx's "Page tint" row. */}
 
           {/* Display Mode */}
           <div style={{ marginBottom: '24px' }}>
