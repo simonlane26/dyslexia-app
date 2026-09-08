@@ -325,17 +325,18 @@ function GrammarHighlightedText({
         onBlur={() => setIsEditing(false)}
         autoFocus
         placeholder="Start writing here..."
-        className="w-full p-4 transition-all duration-200 resize-none rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        className="w-full transition-all duration-200 resize-none rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         style={{
           backgroundColor: darkMode ? '#374151' : bgColor,
           fontFamily,
           fontSize: `${fontSize}px`,
           color: editorTextColor,
           caretColor: editorTextColor,
-          border: `2px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : '#e5e7eb'}`,
+          border: `1px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : 'rgba(0,0,0,0.06)'}`,
           minHeight: '60vh',
           maxHeight: '70vh',
-          lineHeight: '1.6',
+          padding: '56px 64px',
+          lineHeight: '1.9',
         }}
       />
     );
@@ -349,15 +350,15 @@ function GrammarHighlightedText({
         fontFamily,
         fontSize: `${fontSize}px`,
         color: editorTextColor,
-        border: `2px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : '#e5e7eb'}`,
+        border: `1px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : 'rgba(0,0,0,0.06)'}`,
         borderRadius: '12px',
-        padding: '16px',
+        padding: '56px 64px',
         minHeight: '60vh',
         maxHeight: '70vh',
         overflowY: 'auto',
         whiteSpace: 'pre-wrap',
         wordWrap: 'break-word',
-        lineHeight: '1.6',
+        lineHeight: '1.9',
         cursor: 'text',
       }}
       title="Double-click to edit text"

@@ -1,8 +1,8 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { IconLock } from '@tabler/icons-react';
 import { ModernButton } from './ModernButton';
+import { PAGE_TINTS } from '@/lib/pageTints';
 import { AccessibilityPresets } from './AccessibilityPresets';
 import { WritingTemplates } from './WritingTemplates';
 import { FocusMode } from './FocusMode';
@@ -48,32 +48,6 @@ interface AccessibilityDrawerProps {
   onSelectTemplate: (template: string) => void;
   editorTextColor: string;
 }
-
-const FREE_COLOR_HEXES = new Set<string>([
-  "#f9f7ed", // Cream
-  "#f0f0f0", // Light Gray
-  "#fff0f5", // Pink
-  "#ffffff", // White
-]);
-
-const COLOR_SWATCHES = [
-  { name: 'Cream', value: '#f9f7ed' },
-  { name: 'Light Gray', value: '#f0f0f0' },
-  { name: 'Soft Yellow', value: '#fff9db' },
-  { name: 'Pale Blue', value: '#eef4ff' },
-  { name: 'Pink', value: '#fff0f5' },
-  { name: 'White', value: '#ffffff' },
-  { name: 'Mint', value: '#ECFDF5' },
-  { name: 'Aqua', value: '#ECFEFF' },
-  { name: 'Sage', value: '#F1F8F5' },
-  { name: 'Lavender', value: '#F5F3FF' },
-  { name: 'Lilac', value: '#EEF2FF' },
-  { name: 'Peach', value: '#FFF4E6' },
-  { name: 'Buff', value: '#F3E7C9' },
-  { name: 'Sepia Light', value: '#F5E6C8' },
-  { name: 'Off-White Warm', value: '#FAFAF7' },
-  { name: 'Pale Teal', value: '#E6FAF5' },
-] as const;
 
 export function AccessibilityDrawer({
   isOpen,
@@ -276,34 +250,21 @@ export function AccessibilityDrawer({
                 gap: '8px',
               }}
             >
-              {COLOR_SWATCHES.map((swatch) => {
-                const isFree = FREE_COLOR_HEXES.has(swatch.value);
-                const isLocked = !isPro && !isFree;
-                return (
-                  <button
-                    key={swatch.value}
-                    onClick={() => {
-                      if (!isLocked) {
-                        setBgColor(swatch.value);
-                      }
-                    }}
-                    disabled={isLocked}
-                    title={isLocked ? `${swatch.name} (Pro)` : swatch.name}
-                    style={{
-                      width: '100%',
-                      aspectRatio: '1',
-                      backgroundColor: swatch.value,
-                      border: bgColor === swatch.value ? `3px solid ${theme.primary}` : `1px solid ${theme.border}`,
-                      borderRadius: '8px',
-                      cursor: isLocked ? 'not-allowed' : 'pointer',
-                      position: 'relative',
-                      opacity: isLocked ? 0.5 : 1,
-                    }}
-                  >
-                    {isLocked && <IconLock size={15} stroke={1.75} />}
-                  </button>
-                );
-              })}
+              {PAGE_TINTS.map((swatch) => (
+                <button
+                  key={swatch.value}
+                  onClick={() => setBgColor(swatch.value)}
+                  title={swatch.name}
+                  style={{
+                    width: '100%',
+                    aspectRatio: '1',
+                    backgroundColor: swatch.value,
+                    border: bgColor === swatch.value ? `3px solid ${theme.primary}` : `1px solid ${theme.border}`,
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                  }}
+                />
+              ))}
             </div>
           </div>
 
@@ -387,7 +348,7 @@ export function AccessibilityDrawer({
             <AccessibilityPassport
               font={font}
               fontSize={fontSize}
-              bgColour={COLOR_SWATCHES.find(s => s.value === bgColor)?.name ?? bgColor}
+              bgColour={PAGE_TINTS.find(s => s.value === bgColor)?.name ?? bgColor}
               darkMode={darkMode}
               voiceId={voiceId}
             />

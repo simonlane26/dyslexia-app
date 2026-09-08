@@ -15,7 +15,7 @@ interface PresetSettings {
 }
 
 const PRESET_DEFS = [
-  { id: 'default',             icon: <Palette size={20} />, nameKey: 'presets.default.name'      as const, descKey: 'presets.default.desc'      as const, settings: { bgColor: '#f9f7ed',  font: 'Lexend',        fontSize: 18, highContrast: false, darkMode: false } },
+  { id: 'default',             icon: <Palette size={20} />, nameKey: 'presets.default.name'      as const, descKey: 'presets.default.desc'      as const, settings: { bgColor: '#ffffff',  font: 'Lexend',        fontSize: 20, highContrast: false, darkMode: false } },
   { id: 'high-contrast',       icon: <Eye     size={20} />, nameKey: 'presets.highContrast.name' as const, descKey: 'presets.highContrast.desc' as const, settings: { bgColor: '#ffffff',  font: 'Lexend',        fontSize: 20, highContrast: true,  darkMode: false } },
   { id: 'dark-reader',         icon: <Moon    size={20} />, nameKey: 'presets.darkMode.name'     as const, descKey: 'presets.darkMode.desc'     as const, settings: { bgColor: '#0f1629',  font: 'Lexend',        fontSize: 18, highContrast: false, darkMode: true  } },
   { id: 'dyslexia-optimized',  icon: <Zap     size={20} />, nameKey: 'presets.dyslexia.name'     as const, descKey: 'presets.dyslexia.desc'     as const, settings: { bgColor: '#f9f7ed',  font: 'Open Dyslexic', fontSize: 20, highContrast: false, darkMode: false } },

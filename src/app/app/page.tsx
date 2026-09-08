@@ -41,6 +41,7 @@ import { getCopy } from '@/lib/schoolCopy';
 import { useT, useLanguage } from '@/lib/i18n';
 import { SuccessCelebration } from '@/components/Onboarding';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import { PAGE_TINTS } from '@/lib/pageTints';
 import {
   saveLocalDocument,
   getCurrentDocumentId,
@@ -176,9 +177,9 @@ function PageBody() {
   const copy = getCopy(schoolMode.isSchoolMode);
 
   // UI settings
-  const [bgColor, setBgColor] = useState('#f9f7ed');
+  const [bgColor, setBgColor] = useState('#ffffff');
   const [font, setFont] = useState('Lexend');
-  const [fontSize, setFontSize] = useState(18);
+  const [fontSize, setFontSize] = useState(20);
   const [highContrast, setHighContrast] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
@@ -252,9 +253,9 @@ function PageBody() {
         return def;
       }
     };
-    setBgColor(load('bgColor', '#f9f7ed'));
+    setBgColor(load('bgColor', '#ffffff'));
     setFont(load('font', 'Lexend'));
-    setFontSize(load('fontSize', 18));
+    setFontSize(load('fontSize', 20));
     setHighContrast(load('highContrast', false));
     setDarkMode(load('darkMode', false));
     setVoiceId(load('voiceId', '21m00Tcm4TlvDq8ikWAM'));
@@ -1379,9 +1380,9 @@ function PageBody() {
         </div>
       )}
 
-      <div className="max-w-6xl px-4 mx-auto" style={{ marginTop: '12px' }}>
+      <div className="px-4 mx-auto" style={{ marginTop: '12px', maxWidth: '808px' }}>
       <Card className="mb-6">
-        <div className="p-6">
+        <div className="p-6" style={{ padding: '32px' }}>
           {/* Document Title */}
           <div style={{ marginBottom: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -1411,7 +1412,7 @@ function PageBody() {
                 fontSize: '16px',
                 fontWeight: 600,
                 color: editorTextColor,
-                border: `2px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : '#e5e7eb'}`,
+                border: `1px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : 'rgba(0,0,0,0.08)'}`,
               }}
             />
           </div>
@@ -1439,6 +1440,35 @@ function PageBody() {
                 {getConfidenceMessage(text.trim() ? text.trim().split(/\s+/).filter(w => w.length > 0).length : 0)}
               </span>
             )}
+          </div>
+
+          {/* Page tint — a considered set of 6, not a colour picker; a user preference saved to their device */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+            <span style={{ fontSize: '13px', color: theme.text, opacity: 0.65 }}>Page tint</span>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              {PAGE_TINTS.map((tint) => (
+                <button
+                  key={tint.value}
+                  type="button"
+                  onClick={() => setBgColor(tint.value)}
+                  title={tint.name}
+                  aria-label={`${tint.name} page tint`}
+                  aria-pressed={bgColor === tint.value}
+                  style={{
+                    width: '22px',
+                    height: '22px',
+                    borderRadius: '50%',
+                    backgroundColor: tint.value,
+                    border: bgColor === tint.value
+                      ? `2px solid ${theme.primary}`
+                      : '1px solid rgba(0,0,0,0.15)',
+                    boxShadow: bgColor === tint.value ? `0 0 0 2px ${theme.primary}33` : 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                  }}
+                />
+              ))}
+            </div>
           </div>
 
           <ReadingSupportPanel
@@ -1498,12 +1528,13 @@ function PageBody() {
                   backgroundColor: darkMode ? '#374151' : bgColor,
                   fontFamily: getFontFamily(),
                   fontSize: `${fontSize}px`,
+                  lineHeight: 1.9,
                   color: editorTextColor,
                   caretColor: editorTextColor,
-                  border: `2px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : '#e5e7eb'}`,
+                  border: `1px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : 'rgba(0,0,0,0.06)'}`,
                   minHeight: '60vh',
                   maxHeight: '70vh',
-                  padding: '30px',
+                  padding: '56px 64px',
                 }}
               />
             )}

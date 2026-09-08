@@ -49,13 +49,13 @@ export function SentenceHighlighter({
   return (
     <div
       style={{
-        padding: '20px',
+        padding: '56px 64px',
         backgroundColor: darkMode ? '#374151' : bgColor,
         borderRadius: '12px',
-        border: `2px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : '#e5e7eb'}`,
+        border: `1px solid ${darkMode ? '#6b7280' : highContrast ? '#000000' : 'rgba(0,0,0,0.06)'}`,
         fontSize: `${fontSize}px`,
         fontFamily: fontFamily,
-        lineHeight: 1.8,
+        lineHeight: 1.9,
         color: editorTextColor,
         minHeight: '200px',
       }}
