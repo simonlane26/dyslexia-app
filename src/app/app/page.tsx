@@ -1325,8 +1325,8 @@ function PageBody() {
           <div style={{ maxWidth: '1152px', margin: '0 auto', display: 'flex', alignItems: 'flex-start', gap: '12px', flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: darkMode ? '#93c5fd' : '#2563eb', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  Today&apos;s Task
+                <span style={{ fontSize: '12px', fontWeight: 700, color: darkMode ? '#93c5fd' : '#2563eb' }}>
+                  Today&apos;s task
                 </span>
                 {activeAssignment.due_date && (
                   <span style={{ fontSize: '11px', color: darkMode ? '#93c5fd' : '#3b82f6', opacity: 0.8 }}>
@@ -1370,7 +1370,7 @@ function PageBody() {
           backgroundColor: darkMode ? 'rgba(124,58,237,0.12)' : 'rgba(124,58,237,0.06)',
           borderLeft: '3px solid #7c3aed',
         }}>
-          <span style={{ fontSize: '12px', fontWeight: 700, color: darkMode ? '#c4b5fd' : '#7c3aed', marginRight: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <span style={{ fontSize: '13px', fontWeight: 700, color: darkMode ? '#c4b5fd' : '#7c3aed', marginRight: '8px' }}>
             Teacher note
           </span>
           <span style={{ fontSize: '13px', color: darkMode ? '#e2d9f3' : '#4c1d95' }}>

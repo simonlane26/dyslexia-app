@@ -269,12 +269,10 @@ export function SentenceRewriteModal({
           >
             <div
               style={{
-                fontSize: '12px',
+                fontSize: '13px',
                 fontWeight: '600',
                 color: darkMode ? '#9ca3af' : '#6b7280',
                 marginBottom: '8px',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
               }}
             >
               Original
@@ -365,11 +363,9 @@ export function SentenceRewriteModal({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div
                 style={{
-                  fontSize: '12px',
+                  fontSize: '13px',
                   fontWeight: '600',
                   color: darkMode ? '#9ca3af' : '#6b7280',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
                 }}
               >
                 Choose one:

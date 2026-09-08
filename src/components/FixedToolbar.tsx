@@ -4,17 +4,16 @@ import {
   Mic,
   MicOff,
   BookOpen,
+  Book,
   Sparkles,
   Download,
   Save,
   Highlighter,
-  SpellCheck,
-  Eye,
   FileText,
-  Lock,
   ChevronDown,
-  Type,
-  Clock,
+  Edit3,
+  Volume2,
+  MoreHorizontal,
   MessageSquare,
   Settings,
   Brain,
@@ -116,7 +115,6 @@ export function FixedToolbar({
   isSchoolMode,
 }: FixedToolbarProps) {
   const t = useT();
-  const [exportMenuOpen, setExportMenuOpen] = useState(false);
   // Start as 'full' to match SSR, then load from localStorage after mount
   const [toolbarState, setToolbarState] = useState<'full' | 'collapsed' | 'focus'>('full');
 
@@ -173,18 +171,153 @@ export function FixedToolbar({
     return t('wordcount.keep', { n: count.toLocaleString() });
   }
 
-  const groupLabelStyle: React.CSSProperties = {
-    fontSize: '10px',
-    fontWeight: 700,
-    textTransform: 'uppercase',
-    letterSpacing: '0.08em',
-    color: theme.text,
-    opacity: 0.45,
-    paddingLeft: '2px',
-    marginBottom: '4px',
-  };
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [exportExpanded, setExportExpanded] = useState(false);
 
   const tbTransition = 'max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease';
+
+  // Three quiet weight tiers instead of one uniform button style, so the eye
+  // isn't asked to treat every action as equally important. Save is the one
+  // filled, high-contrast button — everything else is outline or muted text.
+  type Weight = 'bold' | 'soft' | 'ghost' | 'filled';
+  function tierStyle(weight: Weight, active: boolean): React.CSSProperties {
+    if (active) {
+      return {
+        backgroundColor: theme.primary,
+        color: '#ffffff',
+        border: '1.5px solid transparent',
+      };
+    }
+    switch (weight) {
+      case 'filled':
+        return {
+          backgroundColor: darkMode ? '#f1f5f9' : '#111827',
+          color: darkMode ? '#111827' : '#ffffff',
+          border: '1.5px solid transparent',
+        };
+      case 'bold':
+        return {
+          backgroundColor: 'transparent',
+          color: theme.text,
+          border: `1.5px solid ${darkMode ? 'rgba(255,255,255,0.32)' : 'rgba(17,24,39,0.32)'}`,
+        };
+      case 'soft':
+        return {
+          backgroundColor: 'transparent',
+          color: theme.text,
+          opacity: 0.8,
+          border: `1px solid ${darkMode ? 'rgba(255,255,255,0.16)' : 'rgba(17,24,39,0.14)'}`,
+        };
+      case 'ghost':
+      default:
+        return {
+          backgroundColor: 'transparent',
+          color: theme.text,
+          opacity: 0.65,
+          border: '1.5px solid transparent',
+        };
+    }
+  }
+
+  function ToolbarButton({
+    weight,
+    active = false,
+    disabled = false,
+    onClick,
+    title,
+    icon,
+    label,
+    pro = false,
+  }: {
+    weight: Weight;
+    active?: boolean;
+    disabled?: boolean;
+    onClick: () => void;
+    title: string;
+    icon?: React.ReactNode;
+    label: string;
+    pro?: boolean;
+  }) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={disabled}
+        title={title}
+        style={{
+          ...tierStyle(weight, active),
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          padding: '10px 16px',
+          borderRadius: '10px',
+          fontSize: '14px',
+          fontWeight: weight === 'bold' || active || weight === 'filled' ? 600 : 500,
+          fontFamily: 'inherit',
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          opacity: disabled ? 0.45 : (tierStyle(weight, active).opacity ?? 1),
+          whiteSpace: 'nowrap',
+          transition: 'background-color 0.15s, border-color 0.15s, opacity 0.15s',
+        }}
+      >
+        {pro && !active && <Star size={11} style={{ flexShrink: 0 }} />}
+        {icon}
+        {label}
+      </button>
+    );
+  }
+
+  function MoreMenuItem({
+    icon,
+    label,
+    onClick,
+    active = false,
+    disabled = false,
+    pro = false,
+    trailing,
+    theme: itemTheme,
+  }: {
+    icon: React.ReactNode;
+    label: string;
+    onClick: () => void;
+    active?: boolean;
+    disabled?: boolean;
+    pro?: boolean;
+    trailing?: React.ReactNode;
+    theme: Theme;
+  }) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={disabled}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          width: '100%',
+          padding: '10px 10px',
+          borderRadius: '8px',
+          border: 'none',
+          backgroundColor: active ? `${itemTheme.primary}1a` : 'transparent',
+          color: active ? itemTheme.primary : itemTheme.text,
+          fontFamily: 'inherit',
+          fontSize: '14px',
+          fontWeight: active ? 600 : 500,
+          textAlign: 'left',
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          opacity: disabled ? 0.4 : 1,
+        }}
+        onMouseEnter={(e) => { if (!disabled && !active) e.currentTarget.style.backgroundColor = darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'; }}
+        onMouseLeave={(e) => { if (!disabled && !active) e.currentTarget.style.backgroundColor = 'transparent'; }}
+      >
+        <span style={{ display: 'flex', flexShrink: 0 }}>{icon}</span>
+        <span style={{ flex: 1 }}>{label}</span>
+        {pro && <Star size={12} style={{ flexShrink: 0, opacity: 0.7 }} />}
+        {trailing}
+      </button>
+    );
+  }
 
   return (
     <div
@@ -211,327 +344,206 @@ export function FixedToolbar({
         gap: '16px',
         flexWrap: 'wrap',
       }}>
-      {/* Left side — grouped tools */}
-      <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+      {/* Left side — three quiet groups: write, read, dictate/save/more */}
+      <div style={{ display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
 
-        {/* WRITING TOOLS */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={groupLabelStyle}>{t('toolbar.group.writing')}</span>
-          <div
-            style={{
-              display: 'flex',
-              gap: '6px',
-              alignItems: 'center',
-              padding: '6px 10px',
-              backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.08)' : 'rgba(139, 92, 246, 0.05)',
-              borderRadius: '10px',
-              border: `1px solid ${darkMode ? 'rgba(139, 92, 246, 0.2)' : 'rgba(139, 92, 246, 0.15)'}`,
-            }}
-          >
-            {isPro ? (
-              <ModernButton
-                variant="secondary"
-                onClick={onRewrite}
-                disabled={!text.trim()}
-                title="Rewrite selected sentence with multiple tones"
-                size="sm"
-              >
-                {t('toolbar.rewrite')}
-              </ModernButton>
-            ) : (
-              // Free users can open the rewrite modal — Simpler mode only (3/day), enforced in modal
-              <ModernButton
-                variant="secondary"
-                onClick={onRewrite}
-                disabled={!text.trim()}
-                title="Rewrite — Simpler mode free (3/day)"
-                size="sm"
-              >
-                {t('toolbar.rewrite')}
-              </ModernButton>
+        {/* Write */}
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <ToolbarButton
+            weight="bold"
+            disabled={!text.trim()}
+            onClick={onRewrite}
+            title={isPro ? 'Rewrite selected sentence with multiple tones' : 'Rewrite — Simpler mode free (3/day)'}
+            icon={<Edit3 size={15} />}
+            label={t('toolbar.rewrite')}
+          />
+
+          <div style={{ position: 'relative' }}>
+            <ToolbarButton
+              weight="bold"
+              disabled={loading || !text.trim()}
+              onClick={() => { onSimplify(); dismissSimplifyTip(); }}
+              title="Simplify text"
+              icon={<Sparkles size={15} />}
+              label={copy.simplifyLabel}
+            />
+            {showSimplifyTip && (
+              <FeatureTip
+                message={t('tip.simplify')}
+                onDismiss={dismissSimplifyTip}
+                gotItLabel={t('tip.gotIt')}
+              />
+            )}
+          </div>
+
+          <div style={{ position: 'relative' }}>
+            <ToolbarButton
+              weight="soft"
+              active={coachPanelOpen}
+              pro={!isPro}
+              onClick={() => isPro ? onCoachPanelToggle() : setProPopover(proPopover === 'coach' ? null : 'coach')}
+              title={isPro ? `Toggle ${copy.aiCoachLabel} panel` : `${copy.aiCoachLabel} — Pro feature`}
+              icon={<Brain size={15} />}
+              label={copy.aiCoachButton}
+            />
+            {proPopover === 'coach' && (
+              <ProUpgradePopover
+                message={t('pro.coachDesc')}
+                onUpgrade={() => { setProPopover(null); onUpgradeClick(); }}
+                onDismiss={() => setProPopover(null)}
+                unlockLabel={t('pro.unlock')}
+                laterLabel={t('pro.later')}
+                darkMode={darkMode}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div style={{ width: '1px', height: '32px', backgroundColor: theme.border, opacity: 0.5 }} />
+
+        {/* Read */}
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <ToolbarButton
+            weight="soft"
+            onClick={onReadAloud}
+            title="Read text aloud"
+            icon={<Volume2 size={15} />}
+            label={t('toolbar.readAloud')}
+          />
+          <ToolbarButton
+            weight="soft"
+            active={highlightMode}
+            onClick={onHighlightToggle}
+            title="Toggle sentence highlighting"
+            icon={<Highlighter size={15} />}
+            label={t('toolbar.highlight')}
+          />
+        </div>
+
+        {/* Divider */}
+        <div style={{ width: '1px', height: '32px', backgroundColor: theme.border, opacity: 0.5 }} />
+
+        {/* Dictate / Save / More */}
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <ToolbarButton
+            weight="ghost"
+            active={isListening}
+            onClick={onDictateToggle}
+            title="Toggle dictation (Ctrl+D)"
+            icon={isListening ? <MicOff size={15} /> : <Mic size={15} />}
+            label={t('toolbar.dictate')}
+          />
+
+          <ToolbarButton
+            weight="filled"
+            disabled={isSaving}
+            onClick={onSave}
+            title="Save document (Ctrl+S)"
+            icon={<Save size={15} />}
+            label={isSaving ? t('toolbar.saving') : t('toolbar.save')}
+          />
+
+          <div style={{ position: 'relative' }}>
+            <ToolbarButton
+              weight="ghost"
+              active={moreMenuOpen}
+              onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+              title="More tools"
+              icon={<MoreHorizontal size={16} />}
+              label="More"
+            />
+            {showA11yTip && (
+              <FeatureTip
+                message={t('tip.accessibility')}
+                onDismiss={dismissA11yTip}
+                gotItLabel={t('tip.gotIt')}
+              />
             )}
 
-            <div style={{ position: 'relative' }}>
-              <ModernButton
-                variant="secondary"
-                onClick={() => { onSimplify(); dismissSimplifyTip(); }}
-                disabled={loading || !text.trim()}
-                title="Simplify text"
-                size="sm"
-              >
-                <Sparkles size={14} /> {copy.simplifyLabel}
-              </ModernButton>
-              {showSimplifyTip && (
-                <FeatureTip
-                  message={t('tip.simplify')}
-                  onDismiss={dismissSimplifyTip}
-                  gotItLabel={t('tip.gotIt')}
+            {moreMenuOpen && (
+              <>
+                <div
+                  style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 30 }}
+                  onClick={() => { setMoreMenuOpen(false); setExportExpanded(false); }}
                 />
-              )}
-            </div>
-
-            {isPro ? (
-              <ModernButton
-                variant={coachPanelOpen ? 'primary' : 'secondary'}
-                onClick={onCoachPanelToggle}
-                title={`Toggle ${copy.aiCoachLabel} panel`}
-                size="sm"
-              >
-                <Brain size={14} /> {copy.aiCoachButton}
-              </ModernButton>
-            ) : (
-              <div style={{ position: 'relative' }}>
-                <ModernButton
-                  variant="secondary"
-                  onClick={() => setProPopover(proPopover === 'coach' ? null : 'coach')}
-                  title={`${copy.aiCoachLabel} — Pro feature`}
-                  size="sm"
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 6px)',
+                    right: 0,
+                    backgroundColor: theme.surface,
+                    border: `1px solid ${theme.border}`,
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
+                    padding: '8px',
+                    minWidth: '220px',
+                    zIndex: 31,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                  }}
                 >
-                  <Star size={11} style={{ marginRight: 2 }} /><Brain size={14} /> {copy.aiCoachButton}
-                </ModernButton>
-                {proPopover === 'coach' && (
-                  <ProUpgradePopover
-                    message={t('pro.coachDesc')}
-                    onUpgrade={() => { setProPopover(null); onUpgradeClick(); }}
-                    onDismiss={() => setProPopover(null)}
-                    unlockLabel={t('pro.unlock')}
-                    laterLabel={t('pro.later')}
-                    darkMode={darkMode}
-                  />
-                )}
-              </div>
-            )}
-
-            {isPro ? (
-              <ModernButton
-                variant={agentOpen ? 'primary' : 'secondary'}
-                onClick={onAgentToggle}
-                title="Toggle Writing Mentor"
-                size="sm"
-              >
-                {t('toolbar.mentor')}
-              </ModernButton>
-            ) : (
-              <div style={{ position: 'relative' }}>
-                <ModernButton
-                  variant="secondary"
-                  onClick={() => setProPopover(proPopover === 'agent' ? null : 'agent')}
-                  title="Writing Mentor — Pro feature"
-                  size="sm"
-                >
-                  <Star size={11} style={{ marginRight: 2 }} /> {t('toolbar.mentor')}
-                </ModernButton>
-                {proPopover === 'agent' && (
-                  <ProUpgradePopover
-                    message={t('pro.mentorDesc')}
-                    onUpgrade={() => { setProPopover(null); onUpgradeClick(); }}
-                    onDismiss={() => setProPopover(null)}
-                    unlockLabel={t('pro.unlock')}
-                    laterLabel={t('pro.later')}
-                    darkMode={darkMode}
-                  />
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-            <ModernButton
-              variant="secondary"
-              onClick={onVocabToggle}
-              title="My Vocabulary — words you've decoded"
-              size="sm"
-            >
-              <BookOpen size={14} /> Vocabulary
-            </ModernButton>
-
-        {/* Divider */}
-        <div style={{ width: '1px', height: '48px', backgroundColor: theme.border, opacity: 0.5, marginBottom: '2px' }} />
-
-        {/* READING SUPPORT */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={groupLabelStyle}>{t('toolbar.group.reading')}</span>
-          <div
-            style={{
-              display: 'flex',
-              gap: '6px',
-              alignItems: 'center',
-              padding: '6px 10px',
-              backgroundColor: darkMode ? 'rgba(16, 185, 129, 0.08)' : 'rgba(16, 185, 129, 0.05)',
-              borderRadius: '10px',
-              border: `1px solid ${darkMode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.15)'}`,
-            }}
-          >
-            <ModernButton
-              variant="secondary"
-              onClick={onReadAloud}
-              title="Read text aloud"
-              size="sm"
-            >
-              {t('toolbar.readAloud')}
-            </ModernButton>
-
-            <ModernButton
-              variant={highlightMode ? 'primary' : 'secondary'}
-              onClick={onHighlightToggle}
-              title="Toggle sentence highlighting"
-              size="sm"
-            >
-              {t('toolbar.highlight')}
-            </ModernButton>
-
-            <ModernButton
-              variant="secondary"
-              onClick={onReadWithSupport}
-              title="Open Memory Reading — chunked reading with word help and summaries"
-              size="sm"
-            >
-              <BookOpen size={14} /> Memory Read
-            </ModernButton>
-
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div style={{ width: '1px', height: '48px', backgroundColor: theme.border, opacity: 0.5, marginBottom: '2px' }} />
-
-        {/* INPUT */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={groupLabelStyle}>{t('toolbar.group.input')}</span>
-          <div
-            style={{
-              display: 'flex',
-              gap: '6px',
-              alignItems: 'center',
-              padding: '6px 10px',
-              backgroundColor: darkMode ? 'rgba(59, 130, 246, 0.08)' : 'rgba(59, 130, 246, 0.05)',
-              borderRadius: '10px',
-              border: `1px solid ${darkMode ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.15)'}`,
-            }}
-          >
-            <ModernButton
-              variant={isListening ? 'primary' : 'secondary'}
-              onClick={onDictateToggle}
-              title="Toggle dictation (Ctrl+D)"
-              size="sm"
-            >
-              {isListening ? <MicOff size={14} /> : <Mic size={14} />}
-              {t('toolbar.dictate')}
-            </ModernButton>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div style={{ width: '1px', height: '48px', backgroundColor: theme.border, opacity: 0.5, marginBottom: '2px' }} />
-
-        {/* DOCUMENT ACTIONS */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={groupLabelStyle}>{t('toolbar.group.document')}</span>
-          <div
-            style={{
-              display: 'flex',
-              gap: '6px',
-              alignItems: 'center',
-              padding: '6px 10px',
-              backgroundColor: darkMode ? 'rgba(16, 185, 129, 0.08)' : 'rgba(16, 185, 129, 0.05)',
-              borderRadius: '10px',
-              border: `1px solid ${darkMode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.15)'}`,
-            }}
-          >
-            <ModernButton
-              variant="success"
-              onClick={onSave}
-              disabled={isSaving}
-              title="Save document (Ctrl+S)"
-              size="sm"
-            >
-              <Save size={14} />
-              {isSaving ? t('toolbar.saving') : t('toolbar.save')}
-            </ModernButton>
-
-            <div style={{ position: 'relative' }}>
-              <ModernButton
-                variant="secondary"
-                onClick={() => setExportMenuOpen(!exportMenuOpen)}
-                title="Export document"
-                size="sm"
-              >
-                <Download size={14} />
-                {t('toolbar.export')}
-                <ChevronDown size={12} />
-              </ModernButton>
-
-              {exportMenuOpen && (
-                <>
-                  <div
-                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 30 }}
-                    onClick={() => setExportMenuOpen(false)}
-                  />
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: 'calc(100% + 4px)',
-                      right: 0,
-                      backgroundColor: theme.surface,
-                      border: `1px solid ${theme.border}`,
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                      padding: '8px',
-                      minWidth: '160px',
-                      zIndex: 31,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '4px',
+                  <MoreMenuItem
+                    icon={<MessageSquare size={16} />}
+                    label={t('toolbar.mentor')}
+                    pro={!isPro}
+                    onClick={() => {
+                      setMoreMenuOpen(false);
+                      isPro ? onAgentToggle() : onUpgradeClick();
                     }}
-                  >
-                    <ExportPDFButton text={text} simplifiedText={simplifiedText} documentTitle={documentTitle} isPro={isPro} />
-                    <ExportMP3Button text={text} documentTitle={documentTitle} isPro={isPro} />
-                    <ExportDOCXButton text={text} simplifiedText={simplifiedText} documentTitle={documentTitle} enabled={isPro} />
-                  </div>
-                </>
-              )}
-            </div>
-
-            {isPro ? (
-              <ModernButton
-                variant="secondary"
-                onClick={onCompare}
-                disabled={!simplifiedText}
-                title="Compare original and simplified drafts"
-                size="sm"
-              >
-                <FileText size={14} />
-                {t('toolbar.compare')}
-              </ModernButton>
-            ) : (
-              <ModernButton
-                variant="secondary"
-                onClick={onUpgradeClick}
-                title="Pro Feature - Compare different versions of your writing"
-                size="sm"
-              >
-                <Star size={11} style={{ marginRight: 2 }} />
-                {t('toolbar.compare')}
-              </ModernButton>
+                    active={agentOpen}
+                    theme={theme}
+                  />
+                  <MoreMenuItem
+                    icon={<BookOpen size={16} />}
+                    label="Memory read"
+                    onClick={() => { setMoreMenuOpen(false); onReadWithSupport(); }}
+                    theme={theme}
+                  />
+                  <MoreMenuItem
+                    icon={<Book size={16} />}
+                    label="Vocabulary"
+                    onClick={() => { setMoreMenuOpen(false); onVocabToggle(); }}
+                    theme={theme}
+                  />
+                  <MoreMenuItem
+                    icon={<FileText size={16} />}
+                    label={t('toolbar.compare')}
+                    pro={!isPro}
+                    disabled={isPro && !simplifiedText}
+                    onClick={() => {
+                      if (!isPro) { setMoreMenuOpen(false); onUpgradeClick(); return; }
+                      setMoreMenuOpen(false);
+                      onCompare();
+                    }}
+                    theme={theme}
+                  />
+                  <MoreMenuItem
+                    icon={<Download size={16} />}
+                    label={t('toolbar.export')}
+                    onClick={() => setExportExpanded(!exportExpanded)}
+                    trailing={<ChevronDown size={13} style={{ transform: exportExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />}
+                    theme={theme}
+                  />
+                  {exportExpanded && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '4px 4px 4px 30px' }}>
+                      <ExportPDFButton text={text} simplifiedText={simplifiedText} documentTitle={documentTitle} isPro={isPro} />
+                      <ExportMP3Button text={text} documentTitle={documentTitle} isPro={isPro} />
+                      <ExportDOCXButton text={text} simplifiedText={simplifiedText} documentTitle={documentTitle} enabled={isPro} />
+                    </div>
+                  )}
+                  <div style={{ height: '1px', backgroundColor: theme.border, opacity: 0.5, margin: '4px 0' }} />
+                  <MoreMenuItem
+                    icon={<Settings size={16} />}
+                    label="Settings"
+                    onClick={() => { setMoreMenuOpen(false); onAccessibilityPanelToggle(); dismissA11yTip(); }}
+                    active={accessibilityPanelOpen}
+                    theme={theme}
+                  />
+                </div>
+              </>
             )}
-
-            <div style={{ position: 'relative' }}>
-              <ModernButton
-                variant={accessibilityPanelOpen ? 'primary' : 'secondary'}
-                onClick={() => { onAccessibilityPanelToggle(); dismissA11yTip(); }}
-                title="Accessibility settings"
-                size="sm"
-              >
-                <Settings size={14} />
-              </ModernButton>
-              {showA11yTip && (
-                <FeatureTip
-                  message={t('tip.accessibility')}
-                  onDismiss={dismissA11yTip}
-                  gotItLabel={t('tip.gotIt')}
-                />
-              )}
-            </div>
           </div>
         </div>
       </div>

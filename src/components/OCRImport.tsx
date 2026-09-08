@@ -282,7 +282,7 @@ export default function OCRImport({ onTextAction }: OCRProps) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <div>
-                <span style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, color: '#0369a1' }}>Document Decoder</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#0369a1' }}>Document decoder</span>
                 <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: '2px 0 0' }}>{analysis.documentType}</h3>
               </div>
               <button type="button" onClick={reset} style={{ fontSize: 12, color: '#64748b', background: 'none', border: '1px solid #e2e8f0', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}>
@@ -298,7 +298,7 @@ export default function OCRImport({ onTextAction }: OCRProps) {
             {/* Key facts */}
             {analysis.keyFacts.length > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <p style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, color: '#64748b', marginBottom: 8 }}>Key facts</p>
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#64748b', marginBottom: 8 }}>Key facts</p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 8 }}>
                   {analysis.keyFacts.map((f, i) => (
                     <div key={i} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 12px' }}>
@@ -313,7 +313,7 @@ export default function OCRImport({ onTextAction }: OCRProps) {
             {/* Actions required */}
             {analysis.actionsRequired.length > 0 && (
               <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, padding: 14, marginBottom: 16 }}>
-                <p style={{ fontSize: 12, fontWeight: 600, color: '#92400e', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 }}>Action needed</p>
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#92400e', marginBottom: 8 }}>Action needed</p>
                 {analysis.actionsRequired.map((a, i) => (
                   <p key={i} style={{ fontSize: 14, color: '#78350f', margin: '0 0 4px', paddingLeft: 12, borderLeft: '3px solid #f59e0b' }}>{a}</p>
                 ))}
@@ -331,7 +331,7 @@ export default function OCRImport({ onTextAction }: OCRProps) {
 
             {/* Chat */}
             <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: 16 }}>
-              <p style={{ fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 12, textTransform: 'uppercase', letterSpacing: 1 }}>Ask a question</p>
+              <p style={{ fontSize: 13, fontWeight: 600, color: '#64748b', marginBottom: 12 }}>Ask a question</p>
 
               {/* Suggested questions */}
               {chatMsgs.length === 0 && (

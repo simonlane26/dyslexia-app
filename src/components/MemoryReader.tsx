@@ -374,7 +374,7 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
       {/* ── Key facts strip (free + pro) ── */}
       {keyFacts.length > 0 && mode !== 'clean' && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: '8px 16px', background: amberLight, borderBottom: `2px solid #F0D49C`, flexShrink: 0, zIndex: 100 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px', color: amber, padding: '4px 0', alignSelf: 'center', display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: amber, padding: '4px 0', alignSelf: 'center', display: 'flex', alignItems: 'center', gap: 4 }}>
             <IconPin size={12} stroke={2} /> Key facts
           </span>
           {keyFacts.map((f, i) => {
@@ -418,7 +418,7 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
 
             {/* Running summary */}
             <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, color: teal, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: teal, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <IconClipboardText size={14} stroke={1.75} /> Running summary
               </div>
               {summaries.length === 0 ? (
@@ -445,7 +445,7 @@ export function MemoryReader({ text, documentId, isPro, onClose, darkMode, fontS
 
             {/* Looked-up words */}
             <div>
-              <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, color: purple, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: purple, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <IconBooks size={14} stroke={1.75} /> Words looked up
               </div>
               {Object.keys(lookedUpWords).length === 0 ? (

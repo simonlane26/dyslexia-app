@@ -831,11 +831,9 @@ export function AgentChat({
                           display: 'flex',
                           alignItems: 'center',
                           gap: '6px',
-                          fontSize: '11px',
+                          fontSize: '12px',
                           fontWeight: 700,
                           color: '#2563eb',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.05em',
                         }}
                       >
                         <FileText size={12} />
