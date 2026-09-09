@@ -96,6 +96,7 @@ export function ReadingSupportPanel({
   const [decodeWord, setDecodeWord] = useState<string | null>(null);
   const [wordInfo, setWordInfo] = useState<WordInfo | null>(null);
   const [decodeLoading, setDecodeLoading] = useState(false);
+  const [decodeError, setDecodeError] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sentTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -291,13 +292,9 @@ export function ReadingSupportPanel({
     return () => el.removeEventListener('scroll', onScroll);
   }, [mode]);
 
-  async function handleWordTap(e: React.MouseEvent, word: string) {
-    e.stopPropagation();
-    const clean = word.replace(/[^a-zA-Z'-]/g, '');
-    if (clean.length < 2) return;
-    if (decodeWord === clean) { setDecodeWord(null); setWordInfo(null); return; }
-    setDecodeWord(clean);
+  async function fetchWordInfo(clean: string) {
     setWordInfo(null);
+    setDecodeError(false);
     setDecodeLoading(true);
     try {
       const res = await fetch('/api/word-info', {
@@ -306,8 +303,20 @@ export function ReadingSupportPanel({
         body: JSON.stringify({ word: clean }),
       });
       if (res.ok) setWordInfo(await res.json());
-    } catch {}
+      else setDecodeError(true);
+    } catch {
+      setDecodeError(true);
+    }
     setDecodeLoading(false);
+  }
+
+  async function handleWordTap(e: React.MouseEvent, word: string) {
+    e.stopPropagation();
+    const clean = word.replace(/[^a-zA-Z'-]/g, '');
+    if (clean.length < 2) return;
+    if (decodeWord === clean) { setDecodeWord(null); setWordInfo(null); return; }
+    setDecodeWord(clean);
+    await fetchWordInfo(clean);
   }
 
   const border = darkMode ? '#444' : highContrast ? '#000' : '#e0e0e0';
@@ -556,7 +565,7 @@ export function ReadingSupportPanel({
           }}>
             <button
               type="button"
-              onClick={() => { setDecodeWord(null); setWordInfo(null); }}
+              onClick={() => { setDecodeWord(null); setWordInfo(null); setDecodeError(false); }}
               style={{ position: 'absolute', top: 10, right: 12, border: 'none', background: 'none', color: darkMode ? '#666' : '#999', cursor: 'pointer', fontSize: 14 }}
             ><IconX size={14} stroke={1.75} /></button>
             <div style={{ fontSize: 18, fontWeight: 500, color: darkMode ? '#e0e0e0' : '#1a1a1a', marginBottom: 2 }}>
@@ -581,6 +590,22 @@ export function ReadingSupportPanel({
                   {wordInfo.definition}
                 </div>
               </>
+            ) : decodeError ? (
+              <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 13, color: darkMode ? '#aaa' : '#666' }}>
+                  Couldn&apos;t look that word up.
+                </span>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); fetchWordInfo(decodeWord!); }}
+                  style={{
+                    fontSize: 12, fontWeight: 600, color: '#d97706',
+                    background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                  }}
+                >
+                  Try again
+                </button>
+              </div>
             ) : null}
           </div>
         )}

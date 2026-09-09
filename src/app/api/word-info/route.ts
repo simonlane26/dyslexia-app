@@ -38,6 +38,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         temperature: 0.1,
+        response_format: { type: 'json_object' },
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: word },
@@ -51,7 +52,13 @@ export async function POST(req: Request) {
 
     let parsed: any;
     try { parsed = JSON.parse(content); } catch {
-      return NextResponse.json({ error: 'Parse error' }, { status: 502 });
+      // gpt-4o-mini occasionally wraps output in ```json fences despite
+      // instructions not to — strip them before giving up.
+      try {
+        parsed = JSON.parse(content.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim());
+      } catch {
+        return NextResponse.json({ error: 'Parse error' }, { status: 502 });
+      }
     }
 
     return NextResponse.json({
