@@ -126,7 +126,16 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json(
-    { error: 'AI error', providerStatus: lastError?.status ?? 502, providerMessage: lastError?.message },
+    {
+      error: 'AI error',
+      providerStatus: lastError?.status ?? 502,
+      providerMessage: lastError?.message,
+      // Diagnostics: which providers this deployment actually detected a usable key
+      // for (not the values themselves) — so a missing/misnamed Vercel env var shows
+      // up here instead of looking identical to a genuinely exhausted account.
+      providersTried: candidates.map((c) => c.name),
+      keysDetected: { openai: OPENAI_KEY.length, openrouter: OPENROUTER_KEY.length },
+    },
     { status: 502 }
   );
 }

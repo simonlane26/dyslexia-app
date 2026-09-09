@@ -307,7 +307,10 @@ export function ReadingSupportPanel({
       } else {
         const body = await res.json().catch(() => null);
         const detail = body?.providerMessage || body?.error;
-        setDecodeError(`HTTP ${res.status}${detail ? ` — ${detail}` : ''}`);
+        const keys = body?.keysDetected
+          ? ` [keys seen: openai=${body.keysDetected.openai}, openrouter=${body.keysDetected.openrouter} chars; tried: ${(body.providersTried || []).join(',') || 'none'}]`
+          : '';
+        setDecodeError(`HTTP ${res.status}${detail ? ` — ${detail}` : ''}${keys}`);
       }
     } catch (e: any) {
       setDecodeError(`Network error${e?.message ? ` — ${e.message}` : ''}`);
