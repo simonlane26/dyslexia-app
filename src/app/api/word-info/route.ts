@@ -46,7 +46,11 @@ export async function POST(req: Request) {
       }),
     });
 
-    if (!res.ok) return NextResponse.json({ error: 'AI error' }, { status: 502 });
+    if (!res.ok) {
+      const errBody = await res.text().catch(() => '');
+      console.error('[word-info] OpenAI request failed', res.status, errBody.slice(0, 500));
+      return NextResponse.json({ error: 'AI error' }, { status: 502 });
+    }
     const data = await res.json();
     const content = data?.choices?.[0]?.message?.content || '';
 
@@ -57,6 +61,7 @@ export async function POST(req: Request) {
       try {
         parsed = JSON.parse(content.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim());
       } catch {
+        console.error('[word-info] Could not parse model output:', content.slice(0, 500));
         return NextResponse.json({ error: 'Parse error' }, { status: 502 });
       }
     }
@@ -66,7 +71,8 @@ export async function POST(req: Request) {
       phonetics: String(parsed.phonetics || ''),
       syllables: Array.isArray(parsed.syllables) ? parsed.syllables.map(String) : [word],
     });
-  } catch {
+  } catch (e: any) {
+    console.error('[word-info] Server error:', e?.message || e);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
