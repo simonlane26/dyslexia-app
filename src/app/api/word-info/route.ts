@@ -47,9 +47,14 @@ export async function POST(req: Request) {
     });
 
     if (!res.ok) {
-      const errBody = await res.text().catch(() => '');
-      console.error('[word-info] OpenAI request failed', res.status, errBody.slice(0, 500));
-      return NextResponse.json({ error: 'AI error' }, { status: 502 });
+      const errText = await res.text().catch(() => '');
+      console.error('[word-info] OpenAI request failed', res.status, errText.slice(0, 500));
+      let providerMessage = errText.slice(0, 300);
+      try { providerMessage = JSON.parse(errText)?.error?.message || providerMessage; } catch {}
+      return NextResponse.json(
+        { error: 'AI error', providerStatus: res.status, providerMessage },
+        { status: 502 }
+      );
     }
     const data = await res.json();
     const content = data?.choices?.[0]?.message?.content || '';

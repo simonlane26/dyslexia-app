@@ -96,7 +96,7 @@ export function ReadingSupportPanel({
   const [decodeWord, setDecodeWord] = useState<string | null>(null);
   const [wordInfo, setWordInfo] = useState<WordInfo | null>(null);
   const [decodeLoading, setDecodeLoading] = useState(false);
-  const [decodeError, setDecodeError] = useState(false);
+  const [decodeError, setDecodeError] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sentTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -294,7 +294,7 @@ export function ReadingSupportPanel({
 
   async function fetchWordInfo(clean: string) {
     setWordInfo(null);
-    setDecodeError(false);
+    setDecodeError(null);
     setDecodeLoading(true);
     try {
       const res = await fetch('/api/word-info', {
@@ -302,10 +302,15 @@ export function ReadingSupportPanel({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ word: clean }),
       });
-      if (res.ok) setWordInfo(await res.json());
-      else setDecodeError(true);
-    } catch {
-      setDecodeError(true);
+      if (res.ok) {
+        setWordInfo(await res.json());
+      } else {
+        const body = await res.json().catch(() => null);
+        const detail = body?.providerMessage || body?.error;
+        setDecodeError(`HTTP ${res.status}${detail ? ` — ${detail}` : ''}`);
+      }
+    } catch (e: any) {
+      setDecodeError(`Network error${e?.message ? ` — ${e.message}` : ''}`);
     }
     setDecodeLoading(false);
   }
@@ -565,7 +570,7 @@ export function ReadingSupportPanel({
           }}>
             <button
               type="button"
-              onClick={() => { setDecodeWord(null); setWordInfo(null); setDecodeError(false); }}
+              onClick={() => { setDecodeWord(null); setWordInfo(null); setDecodeError(null); }}
               style={{ position: 'absolute', top: 10, right: 12, border: 'none', background: 'none', color: darkMode ? '#666' : '#999', cursor: 'pointer', fontSize: 14 }}
             ><IconX size={14} stroke={1.75} /></button>
             <div style={{ fontSize: 18, fontWeight: 500, color: darkMode ? '#e0e0e0' : '#1a1a1a', marginBottom: 2 }}>
@@ -591,20 +596,25 @@ export function ReadingSupportPanel({
                 </div>
               </>
             ) : decodeError ? (
-              <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 13, color: darkMode ? '#aaa' : '#666' }}>
-                  Couldn&apos;t look that word up.
-                </span>
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); fetchWordInfo(decodeWord!); }}
-                  style={{
-                    fontSize: 12, fontWeight: 600, color: '#d97706',
-                    background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-                  }}
-                >
-                  Try again
-                </button>
+              <div style={{ marginTop: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                  <span style={{ fontSize: 13, color: darkMode ? '#aaa' : '#666' }}>
+                    Couldn&apos;t look that word up.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); fetchWordInfo(decodeWord!); }}
+                    style={{
+                      fontSize: 12, fontWeight: 600, color: '#d97706',
+                      background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                    }}
+                  >
+                    Try again
+                  </button>
+                </div>
+                <div style={{ fontSize: 11, color: darkMode ? '#666' : '#aaa', fontFamily: 'monospace' }}>
+                  {decodeError}
+                </div>
               </div>
             ) : null}
           </div>

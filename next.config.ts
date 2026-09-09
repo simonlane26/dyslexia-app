@@ -37,6 +37,12 @@ const securityHeaders = [
       "font-src 'self' data: https://fonts.gstatic.com",
       // Images from own domain, data URIs (base64 in doc decoder), blob (TTS audio)
       "img-src 'self' data: blob: https:",
+      // TTS playback: ElevenLabs audio comes back as a data: URI or blob: object URL.
+      // Without this, media-src falls back to default-src 'self' and silently blocks playback.
+      "media-src 'self' data: blob:",
+      // Clerk spins up a blob: worker for session handling. Without this, worker-src
+      // falls back to script-src, which doesn't cover blob: and the worker is blocked.
+      "worker-src 'self' blob:",
       // API connections: Clerk, OpenAI, OpenRouter, ElevenLabs, Supabase, GA
       [
         "connect-src 'self'",
