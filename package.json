@@ -9,8 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.33.3",
-    "@clerk/types": "^4.85.0",
+    "@clerk/nextjs": "^6.39.6",
+    "@clerk/types": "^4.101.26",
     "@headlessui/react": "^2",
     "@heroicons/react": "^2",
     "@supabase/supabase-js": "^2.97.0",
@@ -19,24 +19,30 @@
     "@types/file-saver": "^2.0.7",
     "@types/sharp": "^0.31.1",
     "@types/stripe": "^8.0.417",
-    "docx": "^9.5.1",
+    "docx": "^9.7.1",
     "file-saver": "^2.0.5",
     "jose": "^6.2.1",
-    "jspdf": "^3.0.1",
+    "jspdf": "^4.2.1",
     "lucide-react": "^0.539.0",
     "mammoth": "^1.11.0",
     "micro": "^10.0.1",
-    "next": "^15.5.9",
+    "next": "^15.5.25",
     "openai": "^5.22.0",
     "pdf-parse": "^1.1.1",
     "pdfjs-dist": "^5.4.149",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "resend": "^6.25.0",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.4",
     "stripe": "^14.25.0",
     "svix": "^1.74.1",
     "tesseract.js": "^5.1.1"
+  },
+  "overrides": {
+    "docx": {
+      "nanoid": "^5.1.16"
+    },
+    "postcss": "$postcss"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -48,7 +54,7 @@
     "eslint": "^8",
     "eslint-config-next": "^15.5.8",
     "pdf-lib": "^1.17.1",
-    "postcss": "^8.5.6",
+    "postcss": "^8.5.28",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
   },
