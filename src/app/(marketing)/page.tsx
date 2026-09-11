@@ -10,6 +10,7 @@ import { FundingCompatibilityFAQ } from '@/components/FundingCompatibilityFAQ';
 import { HomeInfoSections } from '@/components/HomeInfoSections';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
 import { Reveal } from '@/components/Reveal';
+import { AccessToWorkGuideOptIn } from '@/components/AccessToWorkGuideOptIn';
 import { landing } from '@/lib/landingTheme';
 import {
   websiteSchema,
@@ -167,6 +168,9 @@ export default function LandingPage() {
           </div>
         </Reveal>
       </div>
+
+      {/* Second door: not ready to buy today, mid Access to Work funding */}
+      <AccessToWorkGuideOptIn source="homepage" />
 
       {/* Footer */}
       <footer style={{ borderTop: `1px solid ${landing.line}`, padding: '40px 20px 30px' }}>

@@ -54,7 +54,7 @@ const S = {
 const faqs = [
   ['Do I need a formal dyslexia diagnosis?', 'No. Access to Work supports anyone whose disability or health condition affects their work. Many people apply with a GP letter, an occupational health referral, or even a self-declaration. You don\'t need a formal diagnosis.'],
   ['Will my employer know I\'ve applied?', 'You apply directly to the DWP yourself. They will need a workplace contact to confirm you work there, but won\'t contact them without your permission. Your employer doesn\'t see the grant details or amount.'],
-  ['How long does the process take?', 'From application to receiving your DyslexiaWrite licence, expect 2–4 weeks. The initial application takes about 20 minutes. Once approved, we can set up your account the same day.'],
+  ['How long does the process take?', "The application itself takes about 20 minutes, and once you're approved we set up your account the same day. The wait for a decision is the part that's currently unpredictable — Access to Work's own target is 25 working days, but DWP-reported backlogs mean many applicants are waiting several months. There's nothing wrong if your application is taking longer than you expected; it's the scheme, not you."],
   ['Does it affect my other benefits?', 'No. Access to Work grants do not affect Universal Credit, PIP, Employment Support Allowance, or any other benefits. It is completely separate from the benefits system.'],
   ['I\'m self-employed. Can I still apply?', 'Yes. Self-employed people are fully eligible. You\'ll need your Unique Taxpayer Reference (UTR) number when you apply. The process is the same as for employed applicants.'],
   ['What if the assessor recommends a different tool?', 'The assessor\'s recommendation is guidance, not a requirement. If they recommend assistive technology and you prefer DyslexiaWrite, you have the right to choose the tool that works best for you.'],
@@ -135,7 +135,7 @@ export default function AccessToWorkClient() {
         <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
           <div style={S.sectionLabel}>Step by step</div>
           <h2 style={S.h2}>How to get your free DyslexiaWrite licence</h2>
-          <p style={S.sectionDesc}>The whole process typically takes 2–4 weeks. Here's exactly what happens at each stage.</p>
+          <p style={S.sectionDesc}>The application itself is quick — it's the decision you'll be waiting on. Access to Work's own target is 25 working days, though current backlogs mean it's often taking much longer. Here's exactly what happens at each stage.</p>
         </div>
         <div style={S.steps}>
           <div style={S.step}>

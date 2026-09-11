@@ -9,6 +9,7 @@ import {
 import Link from 'next/link';
 import React, { type CSSProperties } from 'react';
 import { Check, Star, Users, School, Sparkles, Volume2, Download, Palette, Briefcase } from 'lucide-react';
+import { AccessToWorkGuideOptIn } from '@/components/AccessToWorkGuideOptIn';
 
 /* ---------- Modern Button ---------- */
 
@@ -980,6 +981,9 @@ export default function PricingClient() {
           All prices are subject to VAT.
         </p>
       </div>
+
+      {/* Second door: not ready to buy today, mid Access to Work funding */}
+      <AccessToWorkGuideOptIn source="pricing" />
     </div>
   );
 }
