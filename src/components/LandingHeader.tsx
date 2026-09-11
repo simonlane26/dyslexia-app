@@ -4,16 +4,13 @@ import Link from 'next/link';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 import { landing } from '@/lib/landingTheme';
 
+// Kept deliberately short — Features, Pricing, and a prominent sign-up CTA.
+// Everything else (Access to Work, Schools, comparisons, About, etc.) lives
+// in the footer instead, so the header doesn't compete with the primary
+// goal of getting a visitor to sign up.
 const NAV_LINKS = [
   { href: '#features-section', label: 'Features' },
   { href: '/pricing', label: 'Pricing' },
-  { href: '/enterprise', label: 'For Employers' },
-  { href: '/access-to-work', label: 'Access to Work' },
-  { href: '/schools', label: 'For Schools' },
-  { href: '/screener', label: 'Free Screener' },
-  { href: '/faq', label: 'FAQ' },
-  { href: '/compare', label: 'vs TextHelp' },
-  { href: '/about', label: 'About' },
 ];
 
 export function LandingHeader() {

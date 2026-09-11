@@ -1,258 +1,123 @@
 'use client';
 
 import React from 'react';
-import {
-  Sparkles,
-  BookOpen,
-  Mic,
-  SpellCheck,
-  Edit3,
-  Highlighter,
-  Zap,
-  Shield,
-  Eye,
-  Crown,
-  Brain,
-  Volume2,
-  ScanText,
-} from 'lucide-react';
 import { landing } from '@/lib/landingTheme';
 import { Reveal } from './Reveal';
 
-interface Feature {
-  icon: React.ReactNode;
-  imgSrc?: string;
+interface CoreBenefit {
+  eyebrow: string;
   title: string;
   description: string;
-  isPro?: boolean;
-  isNew?: boolean;
+  imgSrc: string;
+  imgAlt: string;
 }
 
-function FeatureCard({ feature }: { feature: Feature }) {
+const CORE_BENEFITS: CoreBenefit[] = [
+  {
+    eyebrow: 'Writing',
+    title: 'Three ways to say it, one click to apply',
+    description:
+      "Select any sentence and Dyslexia Write offers three real alternatives — Simpler, Clearer, or More confident — each with a plain-English note on why it changed. No grammar jargon, just a version that actually sounds like you.",
+    imgSrc: '/images/screenshots/shot-rewrite.png',
+    imgAlt: 'The Dyslexia Write rewrite panel showing three alternative versions of a sentence — Simpler, Clearer, and More confident — each with an Apply button',
+  },
+  {
+    eyebrow: 'Writing',
+    title: 'Catches the mistakes dyslexic writers make most',
+    description:
+      'Standard spellcheckers miss reversed letters and homophones like their/there or weather/whether. Dyslexia Write catches them specifically, underlines them right where they happen, and explains the fix in plain language.',
+    imgSrc: '/images/screenshots/shot-grammar.png',
+    imgAlt: 'A paragraph of text with grammar and homophone mistakes underlined in red and amber wavy lines, directly in the editor',
+  },
+  {
+    eyebrow: 'Reading',
+    title: 'Reading modes built for how your brain reads',
+    description:
+      "Clean mode strips away distractions. Guided mode focuses your eyes line by line. Supported mode adds a reading ruler, colour tint, and full audio. Switch between them any time — there's no single 'right' way to read.",
+    imgSrc: '/images/screenshots/shot-reading.png',
+    imgAlt: 'A document open in Guided reading mode, with each word underlined to help track along the line',
+  },
+  {
+    eyebrow: 'Writing',
+    title: 'An AI mentor that asks before it helps',
+    description:
+      "Instead of guessing, the Writing Mentor asks what you're writing and who it's for, then gives suggestions tailored to that — an email reads differently to an essay, and it treats them that way.",
+    imgSrc: '/images/screenshots/shot-mentor.png',
+    imgAlt: 'The Writing Mentor side panel, asking "What are you writing today?" with quick-start options like Email, Essay, and Work message',
+  },
+];
+
+function BenefitRow({ benefit, reversed }: { benefit: CoreBenefit; reversed: boolean }) {
   return (
     <div
       style={{
-        backgroundColor: landing.panel,
-        padding: '22px',
-        borderRadius: '12px',
-        border: `1px solid ${landing.line}`,
-        transition: 'transform .2s, border-color .2s',
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+        gap: '48px',
+        alignItems: 'center',
+        padding: '48px 0',
       }}
-      onMouseOver={(e) => {
-        e.currentTarget.style.transform = 'translateY(-3px)';
-        e.currentTarget.style.borderColor = landing.inkFaint;
-      }}
-      onMouseOut={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.borderColor = landing.line;
-      }}
+      className="benefit-row"
     >
-      {feature.imgSrc ? (
+      <div style={{ order: reversed ? 2 : 1 }}>
         <div
           style={{
-            width: '56px',
-            height: '56px',
-            marginBottom: '14px',
-            borderRadius: '10px',
+            fontSize: '13px',
+            fontWeight: 700,
+            color: landing.amberDark,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            marginBottom: '12px',
+          }}
+        >
+          {benefit.eyebrow}
+        </div>
+        <h3
+          style={{
+            fontFamily: landing.fontDisplay,
+            fontSize: 'clamp(21px, 2.6vw, 26px)',
+            fontWeight: 600,
+            color: landing.ink,
+            marginBottom: '12px',
+            lineHeight: 1.25,
+          }}
+        >
+          {benefit.title}
+        </h3>
+        <p style={{ fontSize: '15.5px', color: landing.inkMuted, lineHeight: 1.7, margin: 0 }}>
+          {benefit.description}
+        </p>
+      </div>
+      <div style={{ order: reversed ? 1 : 2 }}>
+        <div
+          style={{
+            borderRadius: '16px',
             border: `1px solid ${landing.line}`,
             overflow: 'hidden',
-            flexShrink: 0,
+            background: '#f1f5f9',
+            boxShadow: '0 12px 32px rgba(43, 42, 40, 0.08)',
+            height: '360px',
             display: 'flex',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             justifyContent: 'center',
-            background: '#fff',
           }}
         >
           <img
-            src={feature.imgSrc}
-            alt={feature.title}
-            style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+            src={benefit.imgSrc}
+            alt={benefit.imgAlt}
+            loading="lazy"
+            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
           />
         </div>
-      ) : (
-        <div
-          style={{
-            width: '34px',
-            height: '34px',
-            marginBottom: '14px',
-            color: landing.amberDark,
-          }}
-        >
-          {feature.icon}
-        </div>
-      )}
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px', flexWrap: 'wrap' }}>
-        {feature.isNew && (
-          <span
-            style={{
-              fontSize: '10.5px',
-              fontWeight: 700,
-              padding: '3px 8px',
-              borderRadius: '10px',
-              letterSpacing: '0.03em',
-              backgroundColor: landing.tealTint,
-              color: landing.teal,
-            }}
-          >
-            NEW
-          </span>
-        )}
-        {feature.isPro && (
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '3px',
-              fontSize: '10.5px',
-              fontWeight: 700,
-              padding: '3px 8px',
-              borderRadius: '10px',
-              letterSpacing: '0.03em',
-              backgroundColor: landing.amberTint,
-              color: landing.amberDark,
-            }}
-          >
-            <Crown size={10} /> PRO
-          </span>
-        )}
       </div>
-
-      <h3 style={{ fontFamily: landing.fontDisplay, fontSize: '16.5px', fontWeight: 600, margin: '0 0 8px', color: landing.ink }}>
-        {feature.title}
-      </h3>
-      <p style={{ fontSize: '13.5px', color: landing.inkMuted, lineHeight: 1.55, margin: 0 }}>{feature.description}</p>
-    </div>
-  );
-}
-
-function CatDivider({ label }: { label: string }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', margin: '52px 0 24px' }}>
-      <span
-        style={{
-          fontSize: '12px',
-          fontWeight: 700,
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
-          color: landing.amberDark,
-          backgroundColor: landing.amberTint,
-          padding: '6px 12px',
-          borderRadius: '14px',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {label}
-      </span>
-      <div style={{ flex: 1, height: '1px', backgroundColor: landing.line }} />
     </div>
   );
 }
 
 export function FeaturesSection() {
-  const writingFeatures: Feature[] = [
-    {
-      icon: <Brain size={28} />,
-      imgSrc: '/images/Notebookpencil.png',
-      title: 'Writing Mentor',
-      description:
-        "Intent-first AI mentor that asks who you're writing for and why, then gives plain-English suggestions tailored to your audience, purpose, and tone. No jargon — just clear guidance.",
-      isPro: true,
-      isNew: true,
-    },
-    {
-      icon: <SpellCheck size={28} />,
-      imgSrc: '/images/Grammarcheck.png',
-      title: 'Real-Time Grammar Check',
-      description:
-        'Dyslexia-aware grammar checking that catches homophones, letter reversals, and common transpositions. Click any underlined word for instant fixes.',
-    },
-    {
-      icon: <Edit3 size={28} />,
-      imgSrc: '/images/Rewrite.png',
-      title: 'AI Sentence Rewriting',
-      description:
-        'Select any sentence and get 3 alternatives: Simpler, More confident, or Clearer. One click to apply — no grammar jargon, just plain language.',
-      isPro: true,
-    },
-    {
-      icon: <Sparkles size={28} />,
-      imgSrc: '/images/Simplification.png',
-      title: 'Smart Simplification',
-      description:
-        'AI-powered simplification that makes complex text easier to understand without losing meaning. Paste anything — an email, a letter, a form — and get a plain-English version.',
-    },
-    {
-      icon: <Mic size={28} />,
-      imgSrc: '/images/Dictation.png',
-      title: 'Voice Dictation',
-      description:
-        'Speak naturally and see your words appear in the editor. Great for when typing feels difficult or you want to capture ideas quickly.',
-    },
-    {
-      icon: <Zap size={28} />,
-      imgSrc: '/images/Progresstrack.png',
-      title: 'Progress Tracking',
-      description:
-        'See your writing improve over time with metrics like average sentence length and complex word usage. Encouraging, not overwhelming.',
-    },
-  ];
-
-  const readingFeatures: Feature[] = [
-    {
-      icon: <Eye size={28} />,
-      imgSrc: '/images/Readingmodes.png',
-      title: 'Three Reading Modes',
-      description:
-        'Clean mode removes all distractions. Guided mode focuses line-by-line with a spotlight. Supported mode adds a reading ruler and colour tint. Choose the mode that works for your brain.',
-      isNew: true,
-    },
-    {
-      icon: <ScanText size={28} />,
-      imgSrc: '/images/Brainbook.png',
-      title: 'Memory Reading',
-      description:
-        'Any document broken into manageable chunks. Tap any word for its definition, pronunciation, and an example sentence. A running summary builds as you read — so nothing slips away.',
-      isPro: true,
-      isNew: true,
-    },
-    {
-      icon: <Volume2 size={28} />,
-      imgSrc: '/images/Readaloud.png',
-      title: 'Read Aloud',
-      description:
-        'Listen to your text with high-quality AI voices. Hear how your writing sounds and catch mistakes you might miss while reading silently.',
-    },
-    {
-      icon: <Highlighter size={28} />,
-      imgSrc: '/images/Sentencehighlight.png',
-      title: 'Sentence Highlighting',
-      description:
-        "Each sentence highlights as it's read aloud. Helps you stay on the right line, follow along with ease, and improve reading comprehension.",
-    },
-  ];
-
-  const workplaceFeatures: Feature[] = [
-    {
-      icon: <BookOpen size={28} />,
-      imgSrc: '/images/Vocabulary.png',
-      title: 'Vocabulary Builder',
-      description:
-        'Every word you look up is saved and scheduled for spaced-repetition review. Build a personal word bank from your reading and lessons, with pronunciation guides and examples.',
-      isPro: true,
-    },
-    {
-      icon: <Shield size={28} />,
-      imgSrc: '/images/Privacy.png',
-      title: 'Privacy-Focused',
-      description:
-        'Your writing stays private. We never train AI models on your content. Documents are stored locally in your browser — nothing leaves your device unless you choose.',
-    },
-  ];
-
   return (
     <div style={{ padding: '70px 20px', backgroundColor: landing.bg }}>
-      <div style={{ maxWidth: '1160px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '1080px', margin: '0 auto' }}>
         <Reveal>
           <div style={{ textAlign: 'center', marginBottom: '10px' }}>
             <div
@@ -281,33 +146,27 @@ export function FeaturesSection() {
           </div>
         </Reveal>
 
-        <CatDivider label="Writing" />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '18px' }}>
-          {writingFeatures.map((f, i) => (
-            <Reveal key={i}>
-              <FeatureCard feature={f} />
-            </Reveal>
-          ))}
-        </div>
-
-        <CatDivider label="Reading" />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '18px' }}>
-          {readingFeatures.map((f, i) => (
-            <Reveal key={i}>
-              <FeatureCard feature={f} />
-            </Reveal>
-          ))}
-        </div>
-
-        <CatDivider label="Also included" />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '18px' }}>
-          {workplaceFeatures.map((f, i) => (
-            <Reveal key={i}>
-              <FeatureCard feature={f} />
-            </Reveal>
+        <div style={{ borderTop: `1px solid ${landing.line}`, marginTop: '40px' }}>
+          {CORE_BENEFITS.map((benefit, i) => (
+            <div key={benefit.title} style={{ borderBottom: `1px solid ${landing.line}` }}>
+              <Reveal>
+                <BenefitRow benefit={benefit} reversed={i % 2 === 1} />
+              </Reveal>
+            </div>
           ))}
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 760px) {
+          .benefit-row {
+            grid-template-columns: 1fr !important;
+          }
+          .benefit-row > div {
+            order: initial !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

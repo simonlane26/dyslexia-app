@@ -113,6 +113,34 @@ export default function LandingPage() {
         <FeaturesSection />
       </div>
 
+      {/* Bridge CTA — for readers who've seen the features but aren't ready
+          to scroll to the very bottom yet */}
+      <div style={{ textAlign: 'center', padding: '10px 20px 60px' }}>
+        <Reveal>
+          <button
+            type="button"
+            onClick={() => router.push('/sign-up')}
+            style={{
+              background: landing.amber,
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: '15px',
+              padding: '14px 32px',
+              borderRadius: '24px',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.background = landing.amberDark)}
+            onMouseOut={(e) => (e.currentTarget.style.background = landing.amber)}
+          >
+            Start your free trial
+          </button>
+          <div style={{ fontSize: '13px', color: landing.inkMuted, marginTop: '14px' }}>
+            No credit card required · 5 free uses per day
+          </div>
+        </Reveal>
+      </div>
+
       {/* Funding and compatibility FAQ */}
       <FundingCompatibilityFAQ />
 
@@ -195,8 +223,12 @@ export default function LandingPage() {
           <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
             {[
               ['Pricing', '/pricing'],
+              ['For Employers', '/enterprise'],
               ['Access to Work', '/access-to-work'],
               ['For Schools', '/schools'],
+              ['Free Screener', '/screener'],
+              ['FAQ', '/faq'],
+              ['About', '/about'],
               ['vs TextHelp', '/compare'],
               ['vs Grammarly', '/vs/grammarly'],
               ['vs ClaroRead', '/vs/claroread'],
