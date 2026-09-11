@@ -139,9 +139,9 @@ export default function SchoolsClient() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    await fetch('mailto:Dyslexiawrite@gmail.com');
+    await fetch('mailto:support@dyslexiawrite.com');
     const body = `School inquiry from ${form.firstName} ${form.lastName}\nEmail: ${form.email}\nSchool: ${form.schoolName}\nRole: ${form.role}\nSchool type: ${form.schoolType}\nSEN students: ${form.senCount}\n\n${form.message}`;
-    window.location.href = `mailto:Dyslexiawrite@gmail.com?subject=School demo request — ${form.schoolName}&body=${encodeURIComponent(body)}`;
+    window.location.href = `mailto:support@dyslexiawrite.com?subject=School demo request — ${form.schoolName}&body=${encodeURIComponent(body)}`;
     setSubmitted(true);
   }
 
@@ -391,7 +391,7 @@ export default function SchoolsClient() {
           <div style={{ maxWidth: 560, margin: '0 auto', textAlign: 'center', background: 'rgba(255,255,255,0.08)', borderRadius: 16, padding: 40, border: '1px solid rgba(255,255,255,0.15)' }}>
             <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}><Check size={48} /></div>
             <h3 style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: 22, color: '#fff', marginBottom: 8 }}>Thanks — we&apos;ll be in touch!</h3>
-            <p style={{ fontSize: 14, color: '#9FE1CB' }}>We respond within 1 working day. If your email client didn&apos;t open, email us directly at <a href="mailto:Dyslexiawrite@gmail.com" style={{ color: '#5DCAA5' }}>Dyslexiawrite@gmail.com</a></p>
+            <p style={{ fontSize: 14, color: '#9FE1CB' }}>We respond within 1 working day. If your email client didn&apos;t open, email us directly at <a href="mailto:support@dyslexiawrite.com" style={{ color: '#5DCAA5' }}>support@dyslexiawrite.com</a></p>
           </div>
         ) : (
           <form style={S.formWrap} onSubmit={handleSubmit}>

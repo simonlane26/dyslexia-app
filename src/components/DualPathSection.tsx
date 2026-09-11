@@ -6,10 +6,10 @@ import { landing } from '@/lib/landingTheme';
 import { Reveal } from './Reveal';
 
 const QUOTE_MAILTO =
-  "mailto:Dyslexiawrite@gmail.com?subject=Quote%20request&body=Hi%2C%0A%0AI'd%20like%20a%20quote%20for%20Dyslexia%20Write.%0A%0AThis%20is%20for%3A%20(employer%20%2F%20Access%20to%20Work%20%2F%20school%20or%20college)%0ANumber%20of%20people%3A%20%0A%0AThanks";
+  "mailto:support@dyslexiawrite.com?subject=Quote%20request&body=Hi%2C%0A%0AI'd%20like%20a%20quote%20for%20Dyslexia%20Write.%0A%0AThis%20is%20for%3A%20(employer%20%2F%20Access%20to%20Work%20%2F%20school%20or%20college)%0ANumber%20of%20people%3A%20%0A%0AThanks";
 
 const WALKTHROUGH_MAILTO =
-  'mailto:Dyslexiawrite@gmail.com?subject=Walkthrough%20request&body=Hi%2C%0A%0ACould%20we%20set%20up%20a%2015-minute%20walkthrough%20of%20Dyslexia%20Write%3F%0A%0AA%20few%20times%20that%20work%20for%20me%3A%20%0A%0AThanks';
+  'mailto:support@dyslexiawrite.com?subject=Walkthrough%20request&body=Hi%2C%0A%0ACould%20we%20set%20up%20a%2015-minute%20walkthrough%20of%20Dyslexia%20Write%3F%0A%0AA%20few%20times%20that%20work%20for%20me%3A%20%0A%0AThanks';
 
 function Bullet({ children }: { children: string }) {
   return (

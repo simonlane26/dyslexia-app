@@ -97,7 +97,7 @@ export default function EnterpriseClient() {
       '',
       form.message,
     ].join('\n');
-    window.location.href = `mailto:Dyslexiawrite@gmail.com?subject=${encodeURIComponent(
+    window.location.href = `mailto:support@dyslexiawrite.com?subject=${encodeURIComponent(
       `Enterprise inquiry — ${form.companyName || 'unnamed company'}`
     )}&body=${encodeURIComponent(body)}`;
     setSubmitted(true);

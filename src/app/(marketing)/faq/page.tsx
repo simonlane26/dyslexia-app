@@ -84,7 +84,7 @@ const faqs: { q: string; a: string }[] = [
   },
   {
     q: 'Is Dyslexia Write funded by Access to Work?',
-    a: "Yes. Dyslexia Write is assistive software that can be funded in full through an Access to Work grant for employed and self-employed adults in the UK — you pay nothing. Once your Access to Work assessment recommends dyslexia writing support and your grant is approved, send us your Access to Work reference number and we'll set up your account and invoice the DWP directly, so there's no paperwork on your end. Employers, disability leads and SENCOs can also buy multi-seat licences directly for a team or school. Email Dyslexiawrite@gmail.com for a quote, help with your application, or a free trial before you apply.",
+    a: "Yes. Dyslexia Write is assistive software that can be funded in full through an Access to Work grant for employed and self-employed adults in the UK — you pay nothing. Once your Access to Work assessment recommends dyslexia writing support and your grant is approved, send us your Access to Work reference number and we'll set up your account and invoice the DWP directly, so there's no paperwork on your end. Employers, disability leads and SENCOs can also buy multi-seat licences directly for a team or school. Email support@dyslexiawrite.com for a quote, help with your application, or a free trial before you apply.",
   },
   {
     q: 'Does Dyslexia Write work with Microsoft Word and Google Docs?',

@@ -153,7 +153,7 @@ export default function AccessibilityPage() {
       <p>
         <strong>Simon Lane</strong><br />
         Founder – DyslexiaWrite<br />
-        <a href="mailto:Dyslexiawrite@gmail.com">Dyslexiawrite@gmail.com</a><br />
+        <a href="mailto:support@dyslexiawrite.com">support@dyslexiawrite.com</a><br />
         <a href="https://www.dyslexiawrite.com">https://www.dyslexiawrite.com</a>
       </p>
     </main>

@@ -181,7 +181,7 @@ export default function SchoolsPrivacyPage() {
       </p>
       <p>
         <strong>Email:</strong>{" "}
-        <a href="mailto:privacy@dyslexiawrite.com">privacy@dyslexiawrite.com</a>
+        <a href="mailto:support@dyslexiawrite.com">support@dyslexiawrite.com</a>
         <br />
         <strong>Subject line:</strong> Schools Data Request
       </p>

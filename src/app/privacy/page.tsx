@@ -89,7 +89,7 @@ export default function PrivacyPage() {
         Under UK GDPR you have the right to access, correct, delete, restrict, or port your
         personal data, and to object to certain processing. To exercise any of these rights,
         contact us at{' '}
-        <a href="mailto:privacy.ignistech@gmail.com">privacy.ignistech@gmail.com</a>.
+        <a href="mailto:support@dyslexiawrite.com">support@dyslexiawrite.com</a>.
       </p>
 
       <h2>7. Security</h2>
@@ -121,7 +121,7 @@ export default function PrivacyPage() {
       </p>
       <p>
         <strong>Email:</strong>{' '}
-        <a href="mailto:privacy.ignistech@gmail.com">privacy.ignistech@gmail.com</a>
+        <a href="mailto:support@dyslexiawrite.com">support@dyslexiawrite.com</a>
       </p>
       <p>
         We will acknowledge your complaint within 30 days and investigate it promptly. We aim
@@ -147,7 +147,7 @@ export default function PrivacyPage() {
       <h2>12. Contact</h2>
       <p>
         For any privacy-related questions:{' '}
-        <a href="mailto:privacy.ignistech@gmail.com">privacy.ignistech@gmail.com</a>
+        <a href="mailto:support@dyslexiawrite.com">support@dyslexiawrite.com</a>
         <br />
         IgnisTech Ltd · United Kingdom
       </p>

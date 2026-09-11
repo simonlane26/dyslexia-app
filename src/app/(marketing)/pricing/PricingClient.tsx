@@ -962,7 +962,7 @@ export default function PricingClient() {
           <ModernButton
             variant="ghost"
             onClick={() =>
-              (window.location.href = 'mailto:support@dyslexiawriter.com')
+              (window.location.href = 'mailto:support@dyslexiawrite.com')
             }
           >
             Contact Support
