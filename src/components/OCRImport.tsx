@@ -207,9 +207,9 @@ export default function OCRImport({ onTextAction }: OCRProps) {
             style={{
               flex: 1, padding: '12px 16px', fontSize: 14, fontWeight: 500, border: 'none',
               cursor: 'pointer', transition: 'all 0.15s',
-              background: mode === m ? '#f0f9ff' : '#f8fafc',
-              color: mode === m ? '#0369a1' : '#64748b',
-              borderBottom: mode === m ? '2px solid #0369a1' : '2px solid transparent',
+              background: mode === m ? '#fffbeb' : '#f8fafc',
+              color: mode === m ? '#d97706' : '#64748b',
+              borderBottom: mode === m ? '2px solid #d97706' : '2px solid transparent',
             }}
           >
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -282,7 +282,7 @@ export default function OCRImport({ onTextAction }: OCRProps) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <div>
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#0369a1' }}>Document decoder</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#d97706' }}>Document decoder</span>
                 <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: '2px 0 0' }}>{analysis.documentType}</h3>
               </div>
               <button type="button" onClick={reset} style={{ fontSize: 12, color: '#64748b', background: 'none', border: '1px solid #e2e8f0', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}>
@@ -291,8 +291,8 @@ export default function OCRImport({ onTextAction }: OCRProps) {
             </div>
 
             {/* Summary */}
-            <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 8, padding: 14, marginBottom: 16 }}>
-              <p style={{ fontSize: 14, color: '#0c4a6e', lineHeight: 1.6, margin: 0 }}>{analysis.summary}</p>
+            <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, padding: 14, marginBottom: 16 }}>
+              <p style={{ fontSize: 14, color: '#78350f', lineHeight: 1.6, margin: 0 }}>{analysis.summary}</p>
             </div>
 
             {/* Key facts */}
@@ -352,7 +352,7 @@ export default function OCRImport({ onTextAction }: OCRProps) {
                     <div key={i} style={{
                       padding: '10px 12px', borderRadius: 8, fontSize: 14, lineHeight: 1.6, maxWidth: '90%',
                       alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
-                      background: m.role === 'user' ? '#0369a1' : '#f1f5f9',
+                      background: m.role === 'user' ? '#d97706' : '#f1f5f9',
                       color: m.role === 'user' ? '#fff' : '#0f172a',
                     }}>
                       {m.content}
@@ -381,7 +381,7 @@ export default function OCRImport({ onTextAction }: OCRProps) {
                   type="button"
                   onClick={() => sendChat(chatInput)}
                   disabled={chatLoading || !chatInput.trim()}
-                  style={{ padding: '10px 16px', borderRadius: 8, background: '#0369a1', color: '#fff', border: 'none', fontSize: 14, fontWeight: 500, cursor: 'pointer', opacity: chatLoading || !chatInput.trim() ? 0.5 : 1 }}
+                  style={{ padding: '10px 16px', borderRadius: 8, background: '#d97706', color: '#fff', border: 'none', fontSize: 14, fontWeight: 500, cursor: 'pointer', opacity: chatLoading || !chatInput.trim() ? 0.5 : 1 }}
                 >
                   Ask
                 </button>

@@ -228,10 +228,10 @@ export function SentenceRewriteModal({
             <div style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '10px 14px', marginBottom: '16px', borderRadius: '10px',
-              background: freeLeft === 0 ? 'rgba(239,68,68,0.08)' : 'rgba(139,92,246,0.07)',
-              border: `1px solid ${freeLeft === 0 ? 'rgba(239,68,68,0.25)' : 'rgba(139,92,246,0.2)'}`,
+              background: freeLeft === 0 ? 'rgba(239,68,68,0.08)' : 'rgba(217,119,6,0.08)',
+              border: `1px solid ${freeLeft === 0 ? 'rgba(239,68,68,0.25)' : 'rgba(217,119,6,0.25)'}`,
             }}>
-              <span style={{ fontSize: '13px', color: freeLeft === 0 ? '#ef4444' : (darkMode ? '#a78bfa' : '#7c3aed') }}>
+              <span style={{ fontSize: '13px', color: freeLeft === 0 ? '#ef4444' : '#d97706' }}>
                 {freeLeft === 0
                   ? 'Daily limit reached — upgrade for unlimited rewrites'
                   : `${freeLeft} of ${FREE_DAILY_LIMIT} free rewrites left today · Simpler mode only`}
@@ -240,7 +240,7 @@ export function SentenceRewriteModal({
                 type="button"
                 onClick={onUpgradeClick}
                 style={{
-                  background: 'linear-gradient(135deg,#7c3aed,#4f46e5)',
+                  background: '#d97706',
                   border: 'none', borderRadius: '6px', color: '#fff',
                   fontSize: '12px', fontWeight: 700, padding: '4px 10px', cursor: 'pointer',
                 }}
@@ -395,12 +395,12 @@ export function SentenceRewriteModal({
                         <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>
                           {alt.label}
                         </span>
-                        {isLocked && <span style={{ fontSize: '11px', background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', color: '#fff', borderRadius: '4px', padding: '1px 6px', fontWeight: 700 }}>Pro</span>}
+                        {isLocked && <span style={{ fontSize: '11px', background: '#d97706', color: '#fff', borderRadius: '4px', padding: '1px 6px', fontWeight: 700 }}>Pro</span>}
                       </div>
                       {!isApplied && !isLocked && (
                         <ModernButton
                           onClick={() => handleApply(alt, index)}
-                          variant="primary"
+                          variant="accent"
                           size="sm"
                         >
                           Apply
@@ -411,7 +411,7 @@ export function SentenceRewriteModal({
                           type="button"
                           title="Upgrade to Pro"
                           onClick={onUpgradeClick}
-                          style={{ background: 'linear-gradient(135deg,#7c3aed,#4f46e5)', border: 'none', borderRadius: '6px', color: '#fff', fontSize: '12px', fontWeight: 700, padding: '6px 12px', cursor: 'pointer' }}
+                          style={{ background: '#d97706', border: 'none', borderRadius: '6px', color: '#fff', fontSize: '12px', fontWeight: 700, padding: '6px 12px', cursor: 'pointer' }}
                         >
                           Upgrade →
                         </button>
@@ -457,7 +457,7 @@ export function SentenceRewriteModal({
                             cursor: 'pointer',
                             padding: '4px 0',
                             fontSize: '13px',
-                            color: darkMode ? '#a78bfa' : '#7c3aed',
+                            color: '#d97706',
                             fontWeight: '500',
                             display: 'flex',
                             alignItems: 'center',

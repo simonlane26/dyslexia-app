@@ -1592,7 +1592,7 @@ function PageBody() {
                   marginBottom: '16px',
                 }}
               >
-                <Sparkles size={24} style={{ color: '#8b5cf6' }} />
+                <Sparkles size={24} style={{ color: '#d97706' }} />
                 <h2
                   style={{
                     fontSize: '1.25rem',
@@ -1608,7 +1608,7 @@ function PageBody() {
                   padding: '20px',
                   backgroundColor: darkMode ? '#374151' : bgColor,
                   borderRadius: '12px',
-                  border: `2px solid ${highContrast ? '#000000' : '#e9d5ff'}`,
+                  border: `2px solid ${highContrast ? '#000000' : '#fde68a'}`,
                   fontSize: `${fontSize}px`,
                   fontFamily: getFontFamily(),
                   lineHeight: 1.6,
@@ -1626,7 +1626,7 @@ function PageBody() {
                     alignItems: 'center',
                     gap: '8px',
                     padding: '8px 16px',
-                    backgroundColor: '#7c3aed',
+                    backgroundColor: '#d97706',
                     color: '#fff',
                     border: 'none',
                     borderRadius: '8px',
@@ -1803,9 +1803,9 @@ function PageBody() {
 
       {loading && (
         <div className="mt-6 text-center">
-          <div className="inline-flex items-center gap-3 px-6 py-3 border border-blue-200 bg-blue-50 rounded-xl">
-            <div className="w-5 h-5 border-b-2 border-blue-600 rounded-full animate-spin" />
-            <span className="font-medium text-blue-700">Simplifying your text...</span>
+          <div className="inline-flex items-center gap-3 px-6 py-3 border border-amber-200 bg-amber-50 rounded-xl">
+            <div className="w-5 h-5 border-b-2 border-amber-600 rounded-full animate-spin" />
+            <span className="font-medium text-amber-700">Simplifying your text...</span>
           </div>
         </div>
       )}
@@ -1844,10 +1844,10 @@ function PageBody() {
                 type="button"
                 onMouseDown={(e) => { e.preventDefault(); triggerFloatingRewrite(); }}
                 style={{
-                  background: darkMode ? 'rgba(139,92,246,0.15)' : 'rgba(139,92,246,0.08)',
-                  border: `1px solid ${darkMode ? 'rgba(139,92,246,0.3)' : 'rgba(139,92,246,0.2)'}`,
+                  background: darkMode ? 'rgba(217,119,6,0.15)' : 'rgba(217,119,6,0.08)',
+                  border: `1px solid ${darkMode ? 'rgba(217,119,6,0.3)' : 'rgba(217,119,6,0.2)'}`,
                   borderRadius: '8px',
-                  color: darkMode ? '#c4b5fd' : '#7c3aed',
+                  color: '#d97706',
                   fontSize: '13px',
                   fontWeight: 600,
                   padding: '4px 10px',
