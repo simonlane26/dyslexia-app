@@ -42,6 +42,13 @@ const isPublicApi = createRouteMatcher([
   '/api/tone-check',
   '/api/coach/rewrite-sentence',
   '/api/coach',
+  // Anonymous lead-capture forms — must stay public or every signed-out
+  // visitor (i.e. everyone the form is aimed at) gets a silent 401.
+  '/api/screener/lead',
+  '/api/access-to-work-guide/lead',
+  // Self-authenticating via a bearer secret, not Clerk — see each route.
+  '/api/cron/access-to-work-nurture',
+  '/api/admin/atw-guide-leads/export',
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/access-to-work-nurture",
+      "schedule": "0 9 * * *"
+    }
+  ]
+}
