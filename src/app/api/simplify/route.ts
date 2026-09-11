@@ -34,27 +34,31 @@ function getSiteOrigin(): string {
   return 'https://www.dyslexiawrite.com';
 }
 
-function pickProvider(): { provider: Provider; key: string; url?: string; model?: string } {
+// Ordered candidates — OpenAI first (cheaper), OpenRouter as a fallback so a
+// single exhausted/misbehaving account doesn't take the whole feature down.
+// The route tries each in turn on failure rather than committing to one.
+function providers(): { provider: Provider; key: string; url: string; model: string }[] {
   const oa = clean(process.env.OPENAI_API_KEY);
   const or = clean(process.env.OPENROUTER_API_KEY);
+  const list: { provider: Provider; key: string; url: string; model: string }[] = [];
 
-  if (oa) {
-    return {
+  if (oa.length > 20) {
+    list.push({
       provider: 'openai',
       key: oa,
       url: 'https://api.openai.com/v1/chat/completions',
       model: 'gpt-4o-mini',
-    };
+    });
   }
-  if (or) {
-    return {
+  if (or.length > 20) {
+    list.push({
       provider: 'openrouter',
       key: or,
       url: 'https://openrouter.ai/api/v1/chat/completions',
       model: 'openai/gpt-4o-mini',
-    };
+    });
   }
-  return { provider: 'none', key: '' };
+  return list;
 }
 
 // ---------- simple in-memory quota (resets on deploy)
@@ -110,8 +114,8 @@ export async function POST(req: NextRequest) {
     }
 
     // 3) provider + key
-    const sel = pickProvider();
-    if (sel.provider === 'none') {
+    const candidates = providers();
+    if (candidates.length === 0) {
       return NextResponse.json(
         { error: 'NO_PROVIDER_KEY' },
         { status: 500, headers: H }
@@ -132,62 +136,77 @@ export async function POST(req: NextRequest) {
     const newCount = current + 1;
     dailyUsage.set(rateLimitKey, { count: newCount, date: today });
 
-    // 6) upstream call (fetch)
-    const payload = {
-      model: sel.model,
+    // 6) upstream call (fetch) — try each provider in turn until one works
+    const payload = (model: string) => ({
+      model,
       temperature: 0.2,
       messages: [
         { role: 'system', content: isSchoolMode ? SCHOOL_SYSTEM_PROMPT : SYSTEM_PROMPT },
         { role: 'user', content: text },
       ],
-    };
+    });
 
-    const headers: Record<string, string> = {
-      Authorization: `Bearer ${sel.key}`,
-      'Content-Type': 'application/json',
-    };
+    let lastFailure: { status: number; statusText: string; detail: any } | null = null;
 
-    if (sel.provider === 'openrouter') {
-      headers['HTTP-Referer'] = getSiteOrigin();
-      headers['X-Title'] = 'DyslexiaWrite';
-    }
+    for (const sel of candidates) {
+      const headers: Record<string, string> = {
+        Authorization: `Bearer ${sel.key}`,
+        'Content-Type': 'application/json',
+      };
+      if (sel.provider === 'openrouter') {
+        headers['HTTP-Referer'] = getSiteOrigin();
+        headers['X-Title'] = 'DyslexiaWrite';
+      }
 
-    const upstream = await fetch(sel.url!, { method: 'POST', headers, body: JSON.stringify(payload) });
+      let upstream: Response;
+      try {
+        upstream = await fetch(sel.url, { method: 'POST', headers, body: JSON.stringify(payload(sel.model)) });
+      } catch (fetchErr: any) {
+        console.error(`[simplify] ${sel.provider} network error:`, fetchErr?.message || fetchErr);
+        lastFailure = { status: 502, statusText: 'Network error', detail: fetchErr?.message || 'fetch failed' };
+        continue;
+      }
 
-    const ctype = upstream.headers.get('content-type') || '';
-    const raw = await upstream.text();
-    const data = ctype.includes('application/json')
-      ? (() => { try { return JSON.parse(raw); } catch { return { raw }; } })()
-      : { raw };
+      const ctype = upstream.headers.get('content-type') || '';
+      const raw = await upstream.text();
+      const data = ctype.includes('application/json')
+        ? (() => { try { return JSON.parse(raw); } catch { return { raw }; } })()
+        : { raw };
 
-    if (!upstream.ok) {
+      if (!upstream.ok) {
+        console.error(`[simplify] ${sel.provider} request failed`, upstream.status, JSON.stringify(data).slice(0, 500));
+        lastFailure = { status: upstream.status, statusText: upstream.statusText, detail: data };
+        continue; // try the next provider, if any
+      }
+
+      const simplified =
+        data?.choices?.[0]?.message?.content ??
+        data?.choices?.[0]?.message?.text ??
+        data?.choices?.[0]?.text ?? '';
+
+      if (!simplified || !String(simplified).trim()) {
+        console.error(`[simplify] ${sel.provider} returned empty content`, data);
+        lastFailure = { status: 502, statusText: 'Empty response', detail: 'Provider returned no content' };
+        continue;
+      }
+
       return NextResponse.json(
         {
-          error: 'PROVIDER_ERROR',
-          providerStatus: upstream.status,
-          providerStatusText: upstream.statusText,
-          detail: data,
+          simplifiedText: String(simplified).trim(),
+          usage: { count: newCount, limit: 5, isPro: false },
         },
-        { status: 502, headers: H }
+        { headers: H }
       );
-    }
-
-    const simplified =
-      data?.choices?.[0]?.message?.content ??
-      data?.choices?.[0]?.message?.text ??
-      data?.choices?.[0]?.text ?? '';
-
-    if (!simplified || !String(simplified).trim()) {
-      console.error('[simplify] empty provider response', data);
-      return NextResponse.json({ error: 'EMPTY_RESPONSE' }, { status: 502, headers: H });
     }
 
     return NextResponse.json(
       {
-        simplifiedText: String(simplified).trim(),
-        usage: { count: newCount, limit: 5, isPro: false },
+        error: 'PROVIDER_ERROR',
+        providerStatus: lastFailure?.status ?? 502,
+        providerStatusText: lastFailure?.statusText ?? 'Unknown error',
+        detail: lastFailure?.detail,
       },
-      { headers: H }
+      { status: 502, headers: H }
     );
   } catch (e: any) {
     return NextResponse.json({ error: 'INTERNAL' }, { status: 500, headers: H });
