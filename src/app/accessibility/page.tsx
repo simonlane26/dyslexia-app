@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: "Accessibility Statement | DyslexiaWrite",
   description:
     "DyslexiaWrite's commitment to providing an accessible, inclusive writing environment for dyslexic and neurodiverse users.",
+  alternates: { canonical: "https://www.dyslexiawrite.com/accessibility" },
 };
 
 export default function AccessibilityPage() {

@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Terms of Service | Dyslexia Write",
   description:
     "Terms and conditions for using the Dyslexia Write website and app.",
+  alternates: { canonical: "https://www.dyslexiawrite.com/terms" },
 };
 
 export default function TermsPage() {

@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Schools Privacy Policy | Dyslexia Write",
   description:
     "How Dyslexia Write handles student data for schools — GDPR compliant, EU-hosted, no student writing stored, no ads.",
+  alternates: { canonical: "https://www.dyslexiawrite.com/schools-privacy" },
 };
 
 export default function SchoolsPrivacyPage() {

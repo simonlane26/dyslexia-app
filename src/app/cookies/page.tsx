@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Cookie Policy | Dyslexia Write",
   description:
     "How we use cookies and similar technologies on Dyslexia Write.",
+  alternates: { canonical: "https://www.dyslexiawrite.com/cookies" },
 };
 
 export default function CookiesPage() {

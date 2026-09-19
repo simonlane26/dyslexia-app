@@ -28,6 +28,7 @@ export default function robots(): MetadataRoute.Robots {
           "/workplace",
           "/workplace/*",
           "/extension-connect",
+          "/assist",
         ],
       },
       // Explicit allow rules for AI crawlers/answer engines. Functionally
