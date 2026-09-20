@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Terms of Service | Dyslexia Write",
   description:
-    "Terms and conditions for using the Dyslexia Write website and app.",
+    "Dyslexia Write Terms of Service: account rules, Free/Pro/School plans, Stripe-processed payments and renewals, and acceptable use of our AI writing tools.",
   alternates: { canonical: "https://www.dyslexiawrite.com/terms" },
 };
 
@@ -23,7 +23,7 @@ export default function TermsPage() {
       </p>
 
       <p>
-        Welcome to <strong>[DyslexiaWrite.com]</strong> (“we”, “our”, “us”). By
+        Welcome to <strong>DyslexiaWrite.com</strong> (“we”, “our”, “us”). By
         accessing or using our website and app, you agree to these Terms of
         Service.
       </p>
