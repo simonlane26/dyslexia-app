@@ -10,6 +10,7 @@ export default function SignInPage() {
   return (
     <Suspense fallback={<div className="p-8">Loading sign-in…</div>}>
       <div className="flex min-h-[60vh] items-center justify-center p-6">
+        <h1 className="sr-only">Sign in to Dyslexia Write</h1>
         <ClerkLoading>
           <div className="px-4 py-3 text-sm border rounded-lg">Loading authentication…</div>
         </ClerkLoading>
