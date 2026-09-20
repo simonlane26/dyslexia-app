@@ -107,7 +107,7 @@ export default function OnboardingWizard() {
           router.push('/app?tab=decoder');
           break;
         case 'extension':
-          window.open('https://chrome.google.com/webstore/detail/dyslexiawrite', '_blank');
+          window.open('https://chromewebstore.google.com/detail/dyslexia-write/kokkanejochocedpilnmpdeffjkjnmdc', '_blank');
           router.push('/app');
           break;
         default:
