@@ -115,9 +115,9 @@ export default function LandingPage() {
             rel="noopener noreferrer"
           >
             <img
-              src="https://www.vibecheck.it.com/api/badge/cmtvz6lwe0003slmfmn4u3sb4"
-              alt="Checked by vibecheck"
-              width={164}
+              src="https://www.vibecheck.it.com/vibechecked-badge.png"
+              alt="Vibechecked — Security scanned, source verified"
+              width={250}
               style={{ display: 'block' }}
             />
           </a>
