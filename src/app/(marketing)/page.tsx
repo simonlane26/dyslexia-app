@@ -106,6 +106,25 @@ export default function LandingPage() {
             Supporting neurodiverse staff in the workplace
           </p>
         </div>
+
+        {/* Vibecheck Security Scan Badge */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+          <a
+            href="https://www.vibecheck.it.com/verified/cmtvz6lwe0003slmfmn4u3sb4"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src="https://www.vibecheck.it.com/api/badge/cmtvz6lwe0003slmfmn4u3sb4"
+              alt="Checked by vibecheck"
+              width={164}
+              style={{ display: 'block' }}
+            />
+          </a>
+          <p style={{ fontSize: '13px', color: landing.inkMuted, margin: 0, textAlign: 'center' }}>
+            Security scanned &amp; source verified
+          </p>
+        </div>
       </div>
 
       {/* Features Section */}
