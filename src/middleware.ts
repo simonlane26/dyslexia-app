@@ -22,6 +22,7 @@ const isPublicPage = createRouteMatcher([
   '/vs/immersive-reader',
   '/about',
   '/assist',
+  '/appsumo',
   '/robots.txt',
   '/sitemap.xml',
   '/sign-in(.*)',

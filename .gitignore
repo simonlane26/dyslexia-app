@@ -33,6 +33,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# generated AppSumo redemption codes — sensitive, single-use, never commit
+/appsumo-codes-*.csv
+
 # vercel
 .vercel
 
