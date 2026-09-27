@@ -38,13 +38,15 @@ const OPENAI_KEY = cleanEnv(process.env.OPENAI_API_KEY);
 const OPENROUTER_KEY = cleanEnv(process.env.OPENROUTER_API_KEY);
 const SITE_URL = cleanEnv(process.env.NEXT_PUBLIC_SITE_URL) || 'http://localhost:3000';
 
-function buildRewritePrompt(intent?: { audience: string; purpose: string; tone: string }) {
+function buildRewritePrompt(intent?: { audience: string; purpose: string; tone: string }, simplerOnly?: boolean) {
   let basePrompt =
     'You are a helpful writing assistant for dyslexic users. ' +
-    'Your job is to rewrite a selected sentence in 3 different ways.\n\n' +
+    (simplerOnly
+      ? 'Your job is to rewrite a selected sentence in a simpler way.\n\n'
+      : 'Your job is to rewrite a selected sentence in 3 different ways.\n\n') +
     '⚠️ CRITICAL RULES:\n' +
     '- NEVER use grammar terminology\n' +
-    '- Each rewrite should have a different goal\n' +
+    (simplerOnly ? '' : '- Each rewrite should have a different goal\n') +
     '- Keep the core meaning intact\n' +
     '- Be genuinely helpful and encouraging\n\n';
 
@@ -75,25 +77,41 @@ function buildRewritePrompt(intent?: { audience: string; purpose: string; tone: 
       `Tailor ALL rewrites to match this context.\n\n`;
   }
 
-  basePrompt +=
-    'Return JSON with exactly 3 alternatives:\n' +
-    '{\n' +
-    '  "alternatives": [\n' +
-    '    {\n' +
-    '      "label": "Simpler" | "More confident" | "More formal" | "Clearer" | "Shorter",\n' +
-    '      "icon": "✨" | "💪" | "👔" | "💡" | "⚡",\n' +
-    '      "text": "The rewritten sentence",\n' +
-    '      "explanation": "Friendly word-level explanation of what changed and why — no grammar jargon. Use plain language. If a word was swapped, say what each word means. Add 1-2 short example sentences. E.g. \\"\'Too\' means extra or also. \'To\' is used before a verb. Example: I want to run. I want to talk.\\""\n' +
-    '    }\n' +
-    '  ]\n' +
-    '}\n\n' +
-    'Choose labels that fit the sentence. Vary your approach:\n' +
-    '- Simpler: Use easier words, shorter structure\n' +
-    '- More confident: Remove hedging words (maybe, might, sort of)\n' +
-    '- More formal: Professional language\n' +
-    '- Clearer: Make the meaning more obvious\n' +
-    '- Shorter: Cut unnecessary words\n\n' +
-    'Match the tone and audience from the context!';
+  if (simplerOnly) {
+    basePrompt +=
+      'Return JSON with exactly 1 alternative:\n' +
+      '{\n' +
+      '  "alternatives": [\n' +
+      '    {\n' +
+      '      "label": "Simpler",\n' +
+      '      "icon": "✨",\n' +
+      '      "text": "The rewritten sentence",\n' +
+      '      "explanation": "Friendly word-level explanation of what changed and why — no grammar jargon. Use plain language. If a word was swapped, say what each word means. Add 1-2 short example sentences. E.g. \\"\'Too\' means extra or also. \'To\' is used before a verb. Example: I want to run. I want to talk.\\""\n' +
+      '    }\n' +
+      '  ]\n' +
+      '}\n\n' +
+      'Use easier words and a shorter structure. Match the tone and audience from the context!';
+  } else {
+    basePrompt +=
+      'Return JSON with exactly 3 alternatives:\n' +
+      '{\n' +
+      '  "alternatives": [\n' +
+      '    {\n' +
+      '      "label": "Simpler" | "More confident" | "More formal" | "Clearer" | "Shorter",\n' +
+      '      "icon": "✨" | "💪" | "👔" | "💡" | "⚡",\n' +
+      '      "text": "The rewritten sentence",\n' +
+      '      "explanation": "Friendly word-level explanation of what changed and why — no grammar jargon. Use plain language. If a word was swapped, say what each word means. Add 1-2 short example sentences. E.g. \\"\'Too\' means extra or also. \'To\' is used before a verb. Example: I want to run. I want to talk.\\""\n' +
+      '    }\n' +
+      '  ]\n' +
+      '}\n\n' +
+      'Choose labels that fit the sentence. Vary your approach:\n' +
+      '- Simpler: Use easier words, shorter structure\n' +
+      '- More confident: Remove hedging words (maybe, might, sort of)\n' +
+      '- More formal: Professional language\n' +
+      '- Clearer: Make the meaning more obvious\n' +
+      '- Shorter: Cut unnecessary words\n\n' +
+      'Match the tone and audience from the context!';
+  }
 
   return basePrompt;
 }
@@ -283,7 +301,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Build system prompt with intent context
-  const systemPrompt = buildRewritePrompt(intent);
+  const systemPrompt = buildRewritePrompt(intent, !isPro);
 
   // Timeout guard
   const ctrl = new AbortController();
