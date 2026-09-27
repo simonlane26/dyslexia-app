@@ -2,7 +2,8 @@ import 'server-only';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
-import { auth } from '@clerk/nextjs/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { createSupabaseServerClient } from '@/lib/supabase';
 
 function getExtensionSecret() {
   const s = process.env.EXTENSION_TOKEN_SECRET;
@@ -61,8 +62,7 @@ function providers(): { provider: Provider; key: string; url: string; model: str
   return list;
 }
 
-// ---------- simple in-memory quota (resets on deploy)
-const dailyUsage = new Map<string, { count: number; date: string }>();
+const FREE_SIMPLIFY_LIMIT = 5;
 
 // ---------- CORS (for Chrome extension)
 const CORS_HEADERS: Record<string, string> = {
@@ -94,23 +94,44 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Text too long (max 10,000 characters)' }, { status: 400, headers: H });
     }
 
-    // 2) Auth — accept extension JWT or Clerk session
+    // 2) Auth — accept extension JWT or Clerk session; resolve both to a
+    // single userId + isPro so rate limiting below is consistent either way.
     const authHeader = req.headers.get('authorization') ?? '';
     const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
     const secret = getExtensionSecret();
+
+    let userId: string | null = null;
+    let isPro = false;
+
     if (bearerToken) {
-      if (secret) {
-        try {
-          await jwtVerify(bearerToken, secret);
-        } catch {
-          return NextResponse.json({ error: 'INVALID_TOKEN', message: 'Token invalid or expired. Reconnect at dyslexiawrite.com/extension-connect.' }, { status: 401, headers: H });
-        }
+      if (!secret) {
+        return NextResponse.json({ error: 'SIGN_IN_REQUIRED', message: 'Sign in to use AI Simplify.' }, { status: 401, headers: H });
       }
-    } else {
-      const { userId } = await auth();
+      try {
+        const { payload } = await jwtVerify(bearerToken, secret);
+        userId = (payload.userId as string) ?? null;
+      } catch {
+        return NextResponse.json({ error: 'INVALID_TOKEN', message: 'Token invalid or expired. Reconnect at dyslexiawrite.com/extension-connect.' }, { status: 401, headers: H });
+      }
       if (!userId) {
         return NextResponse.json({ error: 'SIGN_IN_REQUIRED', message: 'Sign in to use AI Simplify.' }, { status: 401, headers: H });
       }
+      // No session cookie on this path — fetch metadata fresh from Clerk.
+      try {
+        const client = await clerkClient();
+        const user = await client.users.getUser(userId);
+        isPro = (user.publicMetadata as any)?.isPro === true;
+      } catch {
+        isPro = false;
+      }
+    } else {
+      const session = await auth();
+      userId = session.userId ?? null;
+      if (!userId) {
+        return NextResponse.json({ error: 'SIGN_IN_REQUIRED', message: 'Sign in to use AI Simplify.' }, { status: 401, headers: H });
+      }
+      const meta = (session.sessionClaims?.publicMetadata ?? {}) as Record<string, unknown>;
+      isPro = meta.isPro === true;
     }
 
     // 3) provider + key
@@ -122,19 +143,32 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 4) Rate limiting (IP-based for free tier)
+    // 4) Rate limiting — Pro accounts are unlimited. Free accounts get
+    // FREE_SIMPLIFY_LIMIT/day, tracked per userId in Supabase (not memory)
+    // so it's enforced consistently across serverless instances.
     const today = todayStr();
-    const rateLimitKey = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'anonymous';
-    const rec = dailyUsage.get(rateLimitKey);
-    const current = rec && rec.date === today ? rec.count : 0;
-    if (current >= 5) {
-      return NextResponse.json(
-        { error: 'Daily limit reached (5/5). Try again tomorrow or upgrade to Pro for unlimited use.', usage: { count: current, limit: 5, isPro: false } },
-        { status: 429, headers: H }
-      );
+    let usageCount = 0;
+
+    if (!isPro) {
+      const db = createSupabaseServerClient();
+      const { data: usage } = await db
+        .from('simplify_usage')
+        .select('count')
+        .eq('user_id', userId)
+        .eq('date', today)
+        .maybeSingle();
+      usageCount = (usage as any)?.count ?? 0;
+
+      if (usageCount >= FREE_SIMPLIFY_LIMIT) {
+        return NextResponse.json(
+          {
+            error: `Daily limit reached (${FREE_SIMPLIFY_LIMIT}/${FREE_SIMPLIFY_LIMIT}). Try again tomorrow or upgrade to Pro for unlimited use.`,
+            usage: { count: usageCount, limit: FREE_SIMPLIFY_LIMIT, isPro: false },
+          },
+          { status: 429, headers: H }
+        );
+      }
     }
-    const newCount = current + 1;
-    dailyUsage.set(rateLimitKey, { count: newCount, date: today });
 
     // 6) upstream call (fetch) — try each provider in turn until one works
     const payload = (model: string) => ({
@@ -190,10 +224,21 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
+      // Only count toward the daily quota on a genuine successful
+      // simplification — not on every attempt (matches decoder_usage).
+      if (!isPro) {
+        const db = createSupabaseServerClient();
+        const { data: incremented } = await db.rpc('increment_simplify_usage', {
+          p_user_id: userId,
+          p_date: today,
+        });
+        usageCount = typeof incremented === 'number' ? incremented : usageCount + 1;
+      }
+
       return NextResponse.json(
         {
           simplifiedText: String(simplified).trim(),
-          usage: { count: newCount, limit: 5, isPro: false },
+          usage: { count: isPro ? 0 : usageCount, limit: FREE_SIMPLIFY_LIMIT, isPro },
         },
         { headers: H }
       );
