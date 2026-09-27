@@ -528,14 +528,24 @@ export default function PricingClient() {
                   Then £6.99 / month. Cancel anytime.
                 </div>
 
-                <ModernButton
-                  variant="primary"
-                  size="lg"
-                  style={{ width: '100%' }}
-                  onClick={() => handleGetPro('pro_monthly')}
-                >
-                  Get Pro Monthly
-                </ModernButton>
+                <SignedIn>
+                  <ModernButton
+                    variant="primary"
+                    size="lg"
+                    style={{ width: '100%' }}
+                    onClick={() => handleGetPro('pro_monthly')}
+                  >
+                    Get Pro Monthly
+                  </ModernButton>
+                </SignedIn>
+
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <ModernButton variant="primary" size="lg" style={{ width: '100%' }}>
+                      Sign in to upgrade
+                    </ModernButton>
+                  </SignInButton>
+                </SignedOut>
               </div>
             </PricingCard>
 
