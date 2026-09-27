@@ -3,7 +3,10 @@ import 'server-only';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
-import { auth } from '@clerk/nextjs/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { createSupabaseServerClient } from '@/lib/supabase';
+
+const FREE_DAILY_LIMIT = 200;
 
 function getExtensionSecret() {
   const s = process.env.EXTENSION_TOKEN_SECRET;
@@ -59,20 +62,6 @@ function jsonError(status: number, payload: any) {
 }
 
 export async function POST(req: NextRequest) {
-  const authHeader = req.headers.get('authorization') ?? '';
-  const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
-  const secret = getExtensionSecret();
-
-  if (bearerToken) {
-    if (secret) {
-      try { await jwtVerify(bearerToken, secret); }
-      catch { return jsonError(401, { error: 'INVALID_TOKEN' }); }
-    }
-  } else {
-    const { userId } = await auth();
-    if (!userId) return jsonError(401, { error: 'SIGN_IN_REQUIRED' });
-  }
-
   if (!OPENAI_KEY || OPENAI_KEY.length < 20) return jsonError(500, { error: 'NO_API_KEY' });
 
   let body: any = {};
@@ -83,6 +72,62 @@ export async function POST(req: NextRequest) {
 
   if (!text || text.length < 10) return NextResponse.json({ suggestions: [] }, { status: 200, headers: { 'Cache-Control': 'no-store', ...CORS_HEADERS } });
   if (text.length > 3000) return jsonError(400, { error: 'TOO_LONG' });
+
+  // Auth — accept either a Clerk session (web app) or extension JWT token;
+  // resolve both to a single userId + isPro so rate limiting is consistent.
+  const authHeader = req.headers.get('authorization') ?? '';
+  const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
+  const secret = getExtensionSecret();
+
+  let userId: string | null = null;
+  let isPro = false;
+
+  if (bearerToken) {
+    if (!secret) return jsonError(401, { error: 'SIGN_IN_REQUIRED' });
+    try {
+      const { payload } = await jwtVerify(bearerToken, secret);
+      userId = (payload.userId as string) ?? null;
+    } catch {
+      return jsonError(401, { error: 'INVALID_TOKEN' });
+    }
+    if (!userId) return jsonError(401, { error: 'SIGN_IN_REQUIRED' });
+    try {
+      const client = await clerkClient();
+      const user = await client.users.getUser(userId);
+      isPro = (user.publicMetadata as any)?.isPro === true;
+    } catch {
+      isPro = false;
+    }
+  } else {
+    const session = await auth();
+    userId = session.userId ?? null;
+    if (!userId) return jsonError(401, { error: 'SIGN_IN_REQUIRED' });
+    const meta = (session.sessionClaims?.publicMetadata ?? {}) as Record<string, unknown>;
+    isPro = meta.isPro === true;
+  }
+
+  // Free tier: FREE_DAILY_LIMIT/day (generous — anti-abuse ceiling rather
+  // than a business-tier restriction), claimed atomically up front. Pro is
+  // unlimited. Refunded below if the provider call fails.
+  const today = new Date().toISOString().split('T')[0];
+  const db = !isPro ? createSupabaseServerClient() : null;
+
+  if (db) {
+    const { data: claimed, error: claimErr } = await db.rpc('try_increment_api_usage', {
+      p_user_id: userId,
+      p_feature: 'check_message',
+      p_date: today,
+      p_limit: FREE_DAILY_LIMIT,
+    });
+
+    if (claimErr) {
+      console.error('[check-message] usage claim error:', claimErr);
+      return jsonError(500, { error: 'INTERNAL' });
+    }
+    if (typeof claimed !== 'number') {
+      return jsonError(429, { error: 'LIMIT_REACHED', message: `Daily limit reached (${FREE_DAILY_LIMIT}/${FREE_DAILY_LIMIT}).` });
+    }
+  }
 
   let systemPrompt = SYSTEM_PROMPT;
   if (userPatterns.length > 0) {
@@ -110,7 +155,10 @@ export async function POST(req: NextRequest) {
     });
 
     clearTimeout(to);
-    if (!rsp.ok) return jsonError(502, { error: 'PROVIDER_ERROR', status: rsp.status });
+    if (!rsp.ok) {
+      if (db) void db.rpc('refund_api_usage', { p_user_id: userId, p_feature: 'check_message', p_date: today });
+      return jsonError(502, { error: 'PROVIDER_ERROR', status: rsp.status });
+    }
 
     const j = await rsp.json();
     const content = (j?.choices?.[0]?.message?.content || '').trim();
@@ -129,6 +177,7 @@ export async function POST(req: NextRequest) {
   } catch (e: any) {
     clearTimeout(to);
     console.error('[check-message] internal error', e);
+    if (db) void db.rpc('refund_api_usage', { p_user_id: userId, p_feature: 'check_message', p_date: today });
     return jsonError(500, { error: 'INTERNAL' });
   }
 }

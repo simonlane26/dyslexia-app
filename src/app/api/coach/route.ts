@@ -175,8 +175,19 @@ export function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session.userId;
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  // AI Writing Coach & Mentor is a Pro-only feature (see pricing page).
+  const meta = (session.sessionClaims?.publicMetadata ?? {}) as Record<string, unknown>;
+  const isPro = meta.isPro === true;
+  if (!isPro) {
+    return NextResponse.json(
+      { error: 'NOT_PRO', message: 'The Writing Coach is a Pro feature. Upgrade to get personalized feedback.' },
+      { status: 403 }
+    );
+  }
 
   const p = chooseProvider();
   const baseHdrs: Record<string, string> = {

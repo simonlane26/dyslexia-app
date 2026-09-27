@@ -3,12 +3,18 @@ import 'server-only';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth, clerkClient } from '@clerk/nextjs/server';
+import { createSupabaseServerClient } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const DEFAULT_VOICE_ID = 'ZT9u07TYPVl83ejeLakq'; // e.g. Rachelle
 const MODEL_ID = 'eleven_multilingual_v2';
+// Free tier gets the default voice (see "Read Aloud — Rachelle voice" on
+// the pricing page) but with no stated numeric limit — this is a generous
+// anti-abuse ceiling on ElevenLabs cost exposure, not a business-tier
+// restriction. Pro remains fully unlimited.
+const FREE_TTS_DAILY_LIMIT = 20;
 
 const VOICE_MAP: Record<string, string> = {
   rachelle: DEFAULT_VOICE_ID,
@@ -90,6 +96,33 @@ export async function POST(req: NextRequest) {
     return res;
   }
 
+  // 6) Free-tier daily cap — Pro is unlimited. Claimed atomically up front
+  // (see 013_simplify_usage_atomic.sql), refunded below if ElevenLabs fails.
+  const today = new Date().toISOString().split('T')[0];
+  const db = !isPro && userId ? createSupabaseServerClient() : null;
+
+  if (db) {
+    const { data: claimed, error: claimErr } = await db.rpc('try_increment_api_usage', {
+      p_user_id: userId,
+      p_feature: 'tts',
+      p_date: today,
+      p_limit: FREE_TTS_DAILY_LIMIT,
+    });
+
+    if (claimErr) {
+      console.error('[text-to-speech] usage claim error:', claimErr);
+      return NextResponse.json({ error: 'INTERNAL' }, { status: 500 });
+    }
+    if (typeof claimed !== 'number') {
+      const res = NextResponse.json(
+        { error: 'LIMIT_REACHED', message: `Daily limit reached (${FREE_TTS_DAILY_LIMIT}/${FREE_TTS_DAILY_LIMIT}). Upgrade to Pro for unlimited read-aloud.` },
+        { status: 429 }
+      );
+      res.headers.set('x-pro', String(isPro));
+      return res;
+    }
+  }
+
   const makeUrl = (voice: string) =>
     `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(
       voice
@@ -129,6 +162,7 @@ export async function POST(req: NextRequest) {
         const fb = await callTTS(DEFAULT_VOICE_ID);
         if (!fb.ok) {
           const d2 = await fb.text().catch(() => '');
+          if (db) void db.rpc('refund_api_usage', { p_user_id: userId, p_feature: 'tts', p_date: today });
           const res = NextResponse.json(
             {
               error: 'PROVIDER_ERROR',
@@ -155,6 +189,7 @@ export async function POST(req: NextRequest) {
         return res;
       }
 
+      if (db) void db.rpc('refund_api_usage', { p_user_id: userId, p_feature: 'tts', p_date: today });
       const res = NextResponse.json(
         {
           error: 'PROVIDER_ERROR',
@@ -185,6 +220,7 @@ export async function POST(req: NextRequest) {
     return res;
   } catch (e: any) {
     console.error('❌ TTS route failure:', e?.message || e);
+    if (db) void db.rpc('refund_api_usage', { p_user_id: userId, p_feature: 'tts', p_date: today });
     return NextResponse.json({ error: 'INTERNAL' }, { status: 500 });
   }
 }

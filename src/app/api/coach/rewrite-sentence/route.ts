@@ -3,7 +3,10 @@ import 'server-only';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
-import { auth } from '@clerk/nextjs/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { createSupabaseServerClient } from '@/lib/supabase';
+
+const FREE_REWRITE_LIMIT = 3;
 
 function getExtensionSecret() {
   const s = process.env.EXTENSION_TOKEN_SECRET;
@@ -186,28 +189,6 @@ export async function POST(req: NextRequest) {
     ...CORS_HEADERS,
   };
 
-  // Auth — accept either a Clerk session (web app) or extension JWT token
-  const authHeader = req.headers.get('authorization') ?? '';
-  const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
-  const secret = getExtensionSecret();
-
-  if (bearerToken) {
-    // Extension path: validate JWT
-    if (secret) {
-      try {
-        await jwtVerify(bearerToken, secret);
-      } catch {
-        return jsonError(401, { error: 'INVALID_TOKEN', message: 'Token invalid or expired. Reconnect at dyslexiawrite.com/extension-connect.' }, baseHdrs);
-      }
-    }
-  } else {
-    // Web app path: validate Clerk session
-    const { userId } = await auth();
-    if (!userId) {
-      return jsonError(401, { error: 'SIGN_IN_REQUIRED', message: 'Please sign in to use AI Rewrite.' }, baseHdrs);
-    }
-  }
-
   if (!p) {
     return jsonError(500, {
       error: 'NO_PROVIDER',
@@ -230,6 +211,76 @@ export async function POST(req: NextRequest) {
 
   // Extract intent if provided
   const intent = body?.intent;
+
+  // Auth — accept either a Clerk session (web app) or extension JWT token;
+  // resolve both to a single userId + isPro so rate limiting is consistent.
+  const authHeader = req.headers.get('authorization') ?? '';
+  const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
+  const secret = getExtensionSecret();
+
+  let userId: string | null = null;
+  let isPro = false;
+
+  if (bearerToken) {
+    if (!secret) {
+      return jsonError(401, { error: 'SIGN_IN_REQUIRED', message: 'Please sign in to use AI Rewrite.' }, baseHdrs);
+    }
+    try {
+      const { payload } = await jwtVerify(bearerToken, secret);
+      userId = (payload.userId as string) ?? null;
+    } catch {
+      return jsonError(401, { error: 'INVALID_TOKEN', message: 'Token invalid or expired. Reconnect at dyslexiawrite.com/extension-connect.' }, baseHdrs);
+    }
+    if (!userId) {
+      return jsonError(401, { error: 'SIGN_IN_REQUIRED', message: 'Please sign in to use AI Rewrite.' }, baseHdrs);
+    }
+    try {
+      const client = await clerkClient();
+      const user = await client.users.getUser(userId);
+      isPro = (user.publicMetadata as any)?.isPro === true;
+    } catch {
+      isPro = false;
+    }
+  } else {
+    const session = await auth();
+    userId = session.userId ?? null;
+    if (!userId) {
+      return jsonError(401, { error: 'SIGN_IN_REQUIRED', message: 'Please sign in to use AI Rewrite.' }, baseHdrs);
+    }
+    const meta = (session.sessionClaims?.publicMetadata ?? {}) as Record<string, unknown>;
+    isPro = meta.isPro === true;
+  }
+
+  // Free tier: FREE_REWRITE_LIMIT/day, claimed atomically up front (see
+  // 013_simplify_usage_atomic.sql for why check-and-increment needs to be
+  // one DB call). Pro is unlimited. Refunded below if every provider fails.
+  const today = new Date().toISOString().split('T')[0];
+  const db = !isPro ? createSupabaseServerClient() : null;
+
+  if (db) {
+    const { data: claimed, error: claimErr } = await db.rpc('try_increment_api_usage', {
+      p_user_id: userId,
+      p_feature: 'rewrite',
+      p_date: today,
+      p_limit: FREE_REWRITE_LIMIT,
+    });
+
+    if (claimErr) {
+      console.error('[rewrite-sentence] usage claim error:', claimErr);
+      return jsonError(500, { error: 'INTERNAL' }, baseHdrs);
+    }
+
+    if (typeof claimed !== 'number') {
+      return jsonError(
+        429,
+        {
+          error: 'LIMIT_REACHED',
+          message: `Daily limit reached (${FREE_REWRITE_LIMIT}/${FREE_REWRITE_LIMIT}). Upgrade to Pro for unlimited rewrites.`,
+        },
+        baseHdrs
+      );
+    }
+  }
 
   // Build system prompt with intent context
   const systemPrompt = buildRewritePrompt(intent);
@@ -266,6 +317,7 @@ export async function POST(req: NextRequest) {
           detail = 'No provider body';
         }
       }
+      if (db) void db.rpc('refund_api_usage', { p_user_id: userId, p_feature: 'rewrite', p_date: today });
       return jsonError(502, {
         error: 'PROVIDER_ERROR',
         providerStatus: rsp.status,
@@ -278,6 +330,7 @@ export async function POST(req: NextRequest) {
     const safe = (content || '').trim();
 
     if (!safe) {
+      if (db) void db.rpc('refund_api_usage', { p_user_id: userId, p_feature: 'rewrite', p_date: today });
       return jsonError(502, {
         error: 'EMPTY',
         detail: 'Provider returned no content.',
@@ -293,6 +346,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (e: any) {
     clearTimeout(to);
+    if (db) void db.rpc('refund_api_usage', { p_user_id: userId, p_feature: 'rewrite', p_date: today });
     return jsonError(500, { error: 'INTERNAL' }, baseHdrs);
   }
 }
