@@ -144,30 +144,40 @@ export async function POST(req: NextRequest) {
     }
 
     // 4) Rate limiting — Pro accounts are unlimited. Free accounts get
-    // FREE_SIMPLIFY_LIMIT/day, tracked per userId in Supabase (not memory)
-    // so it's enforced consistently across serverless instances.
+    // FREE_SIMPLIFY_LIMIT/day, tracked per userId in Supabase (not memory,
+    // so it's enforced consistently across serverless instances). The slot
+    // is claimed atomically up front — check-and-increment in one DB call —
+    // so concurrent requests from the same user can't all read the same
+    // under-the-limit count and race past it. If the AI call fails after
+    // the slot is claimed, it's refunded below so a provider hiccup doesn't
+    // cost the user one of their daily uses.
     const today = todayStr();
     let usageCount = 0;
+    const db = !isPro ? createSupabaseServerClient() : null;
 
-    if (!isPro) {
-      const db = createSupabaseServerClient();
-      const { data: usage } = await db
-        .from('simplify_usage')
-        .select('count')
-        .eq('user_id', userId)
-        .eq('date', today)
-        .maybeSingle();
-      usageCount = (usage as any)?.count ?? 0;
+    if (db) {
+      const { data: claimed, error: claimErr } = await db.rpc('try_increment_simplify_usage', {
+        p_user_id: userId,
+        p_date: today,
+        p_limit: FREE_SIMPLIFY_LIMIT,
+      });
 
-      if (usageCount >= FREE_SIMPLIFY_LIMIT) {
+      if (claimErr) {
+        console.error('[simplify] usage claim error:', claimErr);
+        return NextResponse.json({ error: 'INTERNAL' }, { status: 500, headers: H });
+      }
+
+      if (typeof claimed !== 'number') {
         return NextResponse.json(
           {
             error: `Daily limit reached (${FREE_SIMPLIFY_LIMIT}/${FREE_SIMPLIFY_LIMIT}). Try again tomorrow or upgrade to Pro for unlimited use.`,
-            usage: { count: usageCount, limit: FREE_SIMPLIFY_LIMIT, isPro: false },
+            usage: { count: FREE_SIMPLIFY_LIMIT, limit: FREE_SIMPLIFY_LIMIT, isPro: false },
           },
           { status: 429, headers: H }
         );
       }
+
+      usageCount = claimed;
     }
 
     // 6) upstream call (fetch) — try each provider in turn until one works
@@ -224,17 +234,6 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
-      // Only count toward the daily quota on a genuine successful
-      // simplification — not on every attempt (matches decoder_usage).
-      if (!isPro) {
-        const db = createSupabaseServerClient();
-        const { data: incremented } = await db.rpc('increment_simplify_usage', {
-          p_user_id: userId,
-          p_date: today,
-        });
-        usageCount = typeof incremented === 'number' ? incremented : usageCount + 1;
-      }
-
       return NextResponse.json(
         {
           simplifiedText: String(simplified).trim(),
@@ -242,6 +241,12 @@ export async function POST(req: NextRequest) {
         },
         { headers: H }
       );
+    }
+
+    // Every provider failed after the slot was already claimed above —
+    // refund it so this doesn't cost the user one of their daily uses.
+    if (db) {
+      void db.rpc('refund_simplify_usage', { p_user_id: userId, p_date: today });
     }
 
     return NextResponse.json(
