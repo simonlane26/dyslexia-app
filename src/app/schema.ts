@@ -1,5 +1,26 @@
 // Schema.org structured data — shared across marketing pages
 
+export function guideArticleSchema(guide: { slug: string; title: string; description: string; publishedAt: string }) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: guide.title,
+    description: guide.description,
+    author: { '@type': 'Organization', name: 'DyslexiaWrite', url: 'https://www.dyslexiawrite.com' },
+    publisher: {
+      '@type': 'Organization',
+      name: 'DyslexiaWrite',
+      logo: { '@type': 'ImageObject', url: 'https://www.dyslexiawrite.com/LogoNew.png' },
+    },
+    datePublished: guide.publishedAt,
+    dateModified: guide.publishedAt,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `https://www.dyslexiawrite.com/guides/${guide.slug}`,
+    },
+  };
+}
+
 export const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -290,6 +311,46 @@ export const faqSchema = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Story Mode is a feature for children that generates personalised AI stories based on a chosen theme and reading level. Stories include warmup vocabulary words before reading, karaoke-style word highlighting as the story is read aloud, and a tap-to-decode vocabulary lookup. Free users get one AI-generated story per week; Pro users get unlimited stories.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Why is spelling hard for people with dyslexia?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: "Dyslexia affects how the brain processes the sounds within words (phonological processing), which makes it harder to reliably match letters to sounds — especially in English, where spelling is often inconsistent with pronunciation. This is why dyslexic writers often produce spellings that sound right but look wrong (like 'becuase' or 'recieve'), and why standard spellcheckers, which are built for typos rather than phonetic patterns, frequently fail to suggest the intended word.",
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is phonetic spelling and why do dyslexic people do it?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: "Phonetic spelling is writing a word the way it sounds rather than how it's conventionally spelled — for example 'fone' for 'phone' or 'thort' for 'thought'. Dyslexic writers do this because dyslexia affects phonological processing, so sounding a word out and matching it to English's often-irregular spelling rules is genuinely harder. Standard spellcheckers, built mainly to catch typos and near-misses, often can't find the intended word from a phonetic spelling — this is a common gap that dyslexia-specific tools are built to close.",
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How can I proofread my writing if I have dyslexia?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: "Reading your own writing aloud — or having text-to-speech read it back to you — is one of the most effective proofreading methods for dyslexic writers, since it catches errors your eyes skip over. Other approaches that help: reading backwards sentence-by-sentence to focus on individual wording rather than flow, increasing line spacing and font size to reduce visual crowding, and using a tool built for dyslexic spelling patterns (not just generic spellcheck) to catch phonetic errors and commonly confused homophones like their/there/they're.",
+      },
+    },
+    {
+      '@type': 'Question',
+      name: "What's the difference between dyslexia and poor spelling?",
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: "Poor spelling from lack of practice or teaching tends to improve steadily with more reading and writing. Dyslexia is a specific, lifelong difference in how the brain processes language — it persists even in people who read widely and write often, and it typically comes with a distinctive pattern: phonetic spelling, letter reversals, and difficulty with homophones, alongside otherwise strong vocabulary and ideas. A formal diagnostic assessment is the only way to confirm dyslexia specifically, but the pattern of errors is often a useful first clue.",
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Does dyslexia affect grammar as well as spelling?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: "Yes, for many people, though usually less severely than spelling. Dyslexia can make it harder to hold a long sentence's structure in mind while writing it, which sometimes leads to run-on sentences, missing small words, or inconsistent tense — not because the underlying grammar isn't understood, but because writing it down accurately takes more working memory. Reading text back aloud, or breaking long sentences into shorter ones, are two of the most effective ways to catch this while proofreading.",
       },
     },
   ],

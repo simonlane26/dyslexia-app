@@ -251,6 +251,7 @@ export default function LandingPage() {
               ['Access to Work', '/access-to-work'],
               ['For Schools', '/schools'],
               ['Free Screener', '/screener'],
+              ['Guides', '/guides'],
               ['FAQ', '/faq'],
               ['About', '/about'],
               ['vs TextHelp', '/compare'],

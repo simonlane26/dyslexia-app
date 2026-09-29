@@ -90,6 +90,26 @@ const faqs: { q: string; a: string }[] = [
     q: 'Does Dyslexia Write work with Microsoft Word and Google Docs?',
     a: "It depends where you're writing. Dyslexia Write works inside Gmail, Google Docs, Outlook on the web, Slack and Microsoft Teams through our Chrome extension, plus its own built-in web editor — no need to copy text into a separate app for any of those. It doesn't yet have a native add-in for the Microsoft Word desktop app; if you write mainly in desktop Word, paste your text into the Dyslexia Write editor to get the same corrections. The web editor works in any modern browser on Windows, Mac, iOS and Android.",
   },
+  {
+    q: 'Why is spelling hard for people with dyslexia?',
+    a: "Dyslexia affects how the brain processes the sounds within words (phonological processing), which makes it harder to reliably match letters to sounds — especially in English, where spelling is often inconsistent with pronunciation. This is why dyslexic writers often produce spellings that sound right but look wrong (like 'becuase' or 'recieve'), and why standard spellcheckers, which are built for typos rather than phonetic patterns, frequently fail to suggest the intended word.",
+  },
+  {
+    q: 'What is phonetic spelling and why do dyslexic people do it?',
+    a: "Phonetic spelling is writing a word the way it sounds rather than how it's conventionally spelled — for example 'fone' for 'phone' or 'thort' for 'thought'. Dyslexic writers do this because dyslexia affects phonological processing, so sounding a word out and matching it to English's often-irregular spelling rules is genuinely harder. Standard spellcheckers, built mainly to catch typos and near-misses, often can't find the intended word from a phonetic spelling — this is a common gap that dyslexia-specific tools are built to close.",
+  },
+  {
+    q: 'How can I proofread my writing if I have dyslexia?',
+    a: "Reading your own writing aloud — or having text-to-speech read it back to you — is one of the most effective proofreading methods for dyslexic writers, since it catches errors your eyes skip over. Other approaches that help: reading backwards sentence-by-sentence to focus on individual wording rather than flow, increasing line spacing and font size to reduce visual crowding, and using a tool built for dyslexic spelling patterns (not just generic spellcheck) to catch phonetic errors and commonly confused homophones like their/there/they're.",
+  },
+  {
+    q: "What's the difference between dyslexia and poor spelling?",
+    a: "Poor spelling from lack of practice or teaching tends to improve steadily with more reading and writing. Dyslexia is a specific, lifelong difference in how the brain processes language — it persists even in people who read widely and write often, and it typically comes with a distinctive pattern: phonetic spelling, letter reversals, and difficulty with homophones, alongside otherwise strong vocabulary and ideas. A formal diagnostic assessment is the only way to confirm dyslexia specifically, but the pattern of errors is often a useful first clue.",
+  },
+  {
+    q: 'Does dyslexia affect grammar as well as spelling?',
+    a: "Yes, for many people, though usually less severely than spelling. Dyslexia can make it harder to hold a long sentence's structure in mind while writing it, which sometimes leads to run-on sentences, missing small words, or inconsistent tense — not because the underlying grammar isn't understood, but because writing it down accurately takes more working memory. Reading text back aloud, or breaking long sentences into shorter ones, are two of the most effective ways to catch this while proofreading.",
+  },
 ];
 
 export default function FAQPage() {
