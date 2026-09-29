@@ -8,6 +8,7 @@ import { DualPathSection } from '@/components/DualPathSection';
 import { FeaturesSection } from '@/components/FeaturesSection';
 import { FundingCompatibilityFAQ } from '@/components/FundingCompatibilityFAQ';
 import { HomeInfoSections } from '@/components/HomeInfoSections';
+import { ComparisonTeaser } from '@/components/ComparisonTeaser';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
 import { Reveal } from '@/components/Reveal';
 import { AccessToWorkGuideOptIn } from '@/components/AccessToWorkGuideOptIn';
@@ -159,6 +160,10 @@ export default function LandingPage() {
           </div>
         </Reveal>
       </div>
+
+      {/* How we compare — reinforces differentiation earlier in the funnel,
+          not just as footer links */}
+      <ComparisonTeaser />
 
       {/* Funding and compatibility FAQ */}
       <FundingCompatibilityFAQ />
