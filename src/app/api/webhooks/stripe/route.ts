@@ -62,9 +62,21 @@ async function clerkPatchUserMetadata(
   const key = process.env.CLERK_SECRET_KEY;
   if (!key) throw new Error("Missing CLERK_SECRET_KEY");
 
+  // Merge with existing metadata rather than replacing it outright — Clerk's
+  // PATCH fully overwrites public_metadata/private_metadata with whatever is
+  // sent, so skipping this would silently wipe unrelated fields (onboarding
+  // data, AppSumo redemption info, school membership, etc.) every time a
+  // Stripe event fires for a user who has any of that set.
+  const userRes = await fetch(`https://api.clerk.com/v1/users/${encodeURIComponent(userId)}`, {
+    headers: { Authorization: `Bearer ${key}` },
+  });
+  const userData = userRes.ok ? await userRes.json() : {};
+  const existingPublic = userData.public_metadata ?? {};
+  const existingPrivate = userData.private_metadata ?? {};
+
   const body: any = {};
-  if (privateData) body.private_metadata = privateData;
-  if (publicData) body.public_metadata = publicData;
+  if (privateData) body.private_metadata = { ...existingPrivate, ...privateData };
+  if (publicData) body.public_metadata = { ...existingPublic, ...publicData };
 
   const res = await fetch(`https://api.clerk.com/v1/users/${encodeURIComponent(userId)}`, {
     method: "PATCH",
