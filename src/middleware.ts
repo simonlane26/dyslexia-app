@@ -52,6 +52,12 @@ const isPublicApi = createRouteMatcher([
   // Self-authenticating via a bearer secret, not Clerk — see each route.
   '/api/cron/access-to-work-nurture',
   '/api/admin/atw-guide-leads/export',
+  // Server-to-server webhooks (Stripe, Clerk) — authenticated via their own
+  // signature header (stripe-signature / svix-*), never a Clerk session, so
+  // the generic "/api/* requires userId" branch below would 401 every
+  // delivery before the route's own signature check ever runs.
+  '/api/webhooks/stripe',
+  '/api/webhooks/clerk',
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
