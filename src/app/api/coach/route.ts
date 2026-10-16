@@ -2,7 +2,7 @@
 import 'server-only';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -180,8 +180,23 @@ export async function POST(req: NextRequest) {
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   // AI Writing Coach & Mentor is a Pro-only feature (see pricing page).
+  // Session claims are a cached JWT snapshot that only refreshes
+  // periodically, so a recent upgrade (webhook, manual patch, AppSumo
+  // redemption) can still read as NOT_PRO here for a while on an
+  // already-open session. Trust a positive claim immediately (fast path,
+  // already correct); only fall back to a live Clerk lookup before
+  // actually denying a paying user access.
   const meta = (session.sessionClaims?.publicMetadata ?? {}) as Record<string, unknown>;
-  const isPro = meta.isPro === true;
+  let isPro = meta.isPro === true;
+  if (!isPro) {
+    try {
+      const client = await clerkClient();
+      const user = await client.users.getUser(userId);
+      isPro = (user.publicMetadata as any)?.isPro === true;
+    } catch {
+      // leave isPro as false if the lookup itself fails
+    }
+  }
   if (!isPro) {
     return NextResponse.json(
       { error: 'NOT_PRO', message: 'The Writing Coach is a Pro feature. Upgrade to get personalized feedback.' },

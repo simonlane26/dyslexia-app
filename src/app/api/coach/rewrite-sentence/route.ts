@@ -267,6 +267,19 @@ export async function POST(req: NextRequest) {
     }
     const meta = (session.sessionClaims?.publicMetadata ?? {}) as Record<string, unknown>;
     isPro = meta.isPro === true;
+    // sessionClaims is a cached JWT snapshot — a recent upgrade can still
+    // read as false here until the token refreshes. Trust a positive claim
+    // immediately; double-check a negative one before rate-limiting someone
+    // who's actually Pro.
+    if (!isPro) {
+      try {
+        const client = await clerkClient();
+        const user = await client.users.getUser(userId);
+        isPro = (user.publicMetadata as any)?.isPro === true;
+      } catch {
+        // leave isPro as false if the lookup itself fails
+      }
+    }
   }
 
   // Free tier: FREE_REWRITE_LIMIT/day, claimed atomically up front (see
