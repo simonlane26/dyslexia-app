@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { useUser, SignedOut, SignInButton } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import {
-  Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText, Lock, Save, Highlighter, Undo2, Redo2, SpellCheck, Edit3, Eye,
+  Mic, MicOff, BookOpen, Sparkles, Trash2, Download, Play, FileText, Lock, Save, Undo2, Redo2, Edit3, Eye,
 } from 'lucide-react';
 import { IconPencil, IconCheck, IconSparkles, IconKey, IconStar } from '@tabler/icons-react';
 import { Card } from '@/components/Card';

@@ -17,6 +17,7 @@ import {
   Settings,
   Brain,
   Star,
+  SpellCheck,
 } from 'lucide-react';
 import { ModernButton } from './ModernButton';
 import { ExportPDFButton } from './ExportPDFButton';
@@ -408,6 +409,14 @@ export function FixedToolbar({
             title="Read text aloud"
             icon={<Volume2 size={15} />}
             label={t('toolbar.readAloud')}
+          />
+          <ToolbarButton
+            weight="soft"
+            active={grammarCheckEnabled}
+            onClick={onGrammarCheckToggle}
+            title="Check spelling and grammar as you type"
+            icon={<SpellCheck size={15} />}
+            label={t('toolbar.spellCheck')}
           />
         </div>
 
