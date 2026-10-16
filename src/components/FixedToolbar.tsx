@@ -8,7 +8,6 @@ import {
   Sparkles,
   Download,
   Save,
-  Highlighter,
   FileText,
   ChevronDown,
   Edit3,
@@ -48,8 +47,6 @@ interface FixedToolbarProps {
   onSimplify: () => void;
   loading: boolean;
   onRewrite: () => void;
-  highlightMode: boolean;
-  onHighlightToggle: () => void;
   grammarCheckEnabled: boolean;
   onGrammarCheckToggle: () => void;
   isPro: boolean;
@@ -88,8 +85,6 @@ export function FixedToolbar({
   onSimplify,
   loading,
   onRewrite,
-  highlightMode,
-  onHighlightToggle,
   grammarCheckEnabled,
   onGrammarCheckToggle,
   isPro,
@@ -413,14 +408,6 @@ export function FixedToolbar({
             title="Read text aloud"
             icon={<Volume2 size={15} />}
             label={t('toolbar.readAloud')}
-          />
-          <ToolbarButton
-            weight="soft"
-            active={highlightMode}
-            onClick={onHighlightToggle}
-            title="Toggle sentence highlighting"
-            icon={<Highlighter size={15} />}
-            label={t('toolbar.highlight')}
           />
         </div>
 

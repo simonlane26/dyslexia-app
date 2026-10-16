@@ -20,7 +20,6 @@ import CoachPanel from '@/components/CoachPanel';
 import { DocumentManager } from '@/components/DocumentManager';
 import { KeyboardShortcutsHelp } from '@/components/KeyboardShortcutsHelp';
 import { WordCounter } from '@/components/WordCounter';
-import { SentenceHighlighter } from '@/components/SentenceHighlighter';
 import { OnboardingTutorial } from '@/components/OnboardingTutorial';
 import { TextComparison } from '@/components/TextComparison';
 import { WordHelper } from '@/components/WordHelper';
@@ -72,8 +71,6 @@ function PageBody() {
   const [isSaving, setIsSaving] = useState(false);
 
   // Sentence highlighting
-  const [highlightMode, setHighlightMode] = useState(false);
-  const [currentSentenceIndex, setCurrentSentenceIndex] = useState(-1);
 
   // Grammar checking
   const [grammarCheckEnabled, setGrammarCheckEnabled] = useState(false);
@@ -796,7 +793,9 @@ function PageBody() {
     }
   };
 
-  // Browser TTS with sentence highlighting
+  // Browser TTS fallback (used when not on ElevenLabs). Reads sentence by
+  // sentence rather than as one utterance so reading progress can be saved
+  // incrementally as each sentence finishes.
   const playWithBrowserVoice = (textToRead: string) => {
     if (!textToRead.trim()) return;
     const synth = window.speechSynthesis;
@@ -815,78 +814,48 @@ function PageBody() {
     isStoppingRef.current = false;
     currentEngineRef.current = 'browser';
 
-    // Split into sentences if highlight mode is enabled
-    if (highlightMode) {
-      const sentences = textToRead.split(/([.!?]+\s+|[.!?]+$)/).reduce((acc: string[], part, i, arr) => {
-        if (i % 2 === 0 && part.trim()) {
-          const sentence = part + (arr[i + 1] || '');
-          if (sentence.trim()) acc.push(sentence);
-        }
-        return acc;
-      }, []);
+    const sentences = textToRead.split(/([.!?]+\s+|[.!?]+$)/).reduce((acc: string[], part, i, arr) => {
+      if (i % 2 === 0 && part.trim()) {
+        const sentence = part + (arr[i + 1] || '');
+        if (sentence.trim()) acc.push(sentence);
+      }
+      return acc;
+    }, []);
 
-      let currentSentence = 0;
-      setCurrentSentenceIndex(0);
+    let currentSentence = 0;
 
-      const speakNextSentence = () => {
-        if (currentSentence >= sentences.length || mySession !== playbackSessionRef.current) {
-          setIsReading(false);
-          setIsPaused(false);
-          setCurrentSentenceIndex(-1);
-          currentEngineRef.current = null;
-          utterRef.current = null;
-
-          // Update reading progress when finished
-          setReadingProgress(100);
-          const charPosition = textToRead.length;
-          setLastReadPosition(charPosition);
-          return;
-        }
-
-        const u = new SpeechSynthesisUtterance(sentences[currentSentence]);
-        utterRef.current = u;
-        setCurrentSentenceIndex(currentSentence);
-
-        u.onend = () => {
-          if (mySession !== playbackSessionRef.current) return;
-
-          // Update reading progress
-          const progress = Math.round(((currentSentence + 1) / sentences.length) * 100);
-          setReadingProgress(progress);
-
-          // Calculate character position
-          const charPosition = sentences.slice(0, currentSentence + 1).join('').length;
-          setLastReadPosition(charPosition);
-
-          currentSentence++;
-          setTimeout(() => speakNextSentence(), 100);
-        };
-
-        u.onerror = () => {
-          if (isStoppingRef.current || mySession !== playbackSessionRef.current) return;
-          setIsReading(false);
-          setIsPaused(false);
-          setCurrentSentenceIndex(-1);
-          currentEngineRef.current = null;
-          utterRef.current = null;
-        };
-
-        synth.speak(u);
-      };
-
-      speakNextSentence();
-    } else {
-      // Normal playback without highlighting
-      const u = new SpeechSynthesisUtterance(textToRead);
-      utterRef.current = u;
-
-      u.onend = () => {
-        if (mySession !== playbackSessionRef.current) return;
+    const speakNextSentence = () => {
+      if (currentSentence >= sentences.length || mySession !== playbackSessionRef.current) {
         setIsReading(false);
         setIsPaused(false);
         currentEngineRef.current = null;
         utterRef.current = null;
+
+        // Update reading progress when finished
+        setReadingProgress(100);
+        const charPosition = textToRead.length;
+        setLastReadPosition(charPosition);
+        return;
+      }
+
+      const u = new SpeechSynthesisUtterance(sentences[currentSentence]);
+      utterRef.current = u;
+
+      u.onend = () => {
+        if (mySession !== playbackSessionRef.current) return;
+
+        // Update reading progress
+        const progress = Math.round(((currentSentence + 1) / sentences.length) * 100);
+        setReadingProgress(progress);
+
+        // Calculate character position
+        const charPosition = sentences.slice(0, currentSentence + 1).join('').length;
+        setLastReadPosition(charPosition);
+
+        currentSentence++;
+        setTimeout(() => speakNextSentence(), 100);
       };
+
       u.onerror = () => {
         if (isStoppingRef.current || mySession !== playbackSessionRef.current) return;
         setIsReading(false);
@@ -896,7 +865,9 @@ function PageBody() {
       };
 
       synth.speak(u);
-    }
+    };
+
+    speakNextSentence();
   };
 
   // Prefer ElevenLabs for Pro, fallback to browser
@@ -978,7 +949,6 @@ function PageBody() {
 
     setIsReading(false);
     setIsPaused(false);
-    setCurrentSentenceIndex(-1);
     currentEngineRef.current = null;
     isStoppingRef.current = false;
   };
@@ -1252,8 +1222,6 @@ function PageBody() {
         onSimplify={simplifyText}
         loading={loading}
         onRewrite={handleRewriteSentence}
-        highlightMode={highlightMode}
-        onHighlightToggle={() => setHighlightMode(!highlightMode)}
         grammarCheckEnabled={grammarCheckEnabled}
         onGrammarCheckToggle={() => setGrammarCheckEnabled(!grammarCheckEnabled)}
         isPro={isPro}
@@ -1486,19 +1454,7 @@ function PageBody() {
             darkMode={darkMode}
             highContrast={highContrast}
           >
-            {highlightMode && isReading ? (
-              <SentenceHighlighter
-                text={text}
-                currentSentenceIndex={currentSentenceIndex}
-                theme={theme}
-                fontSize={fontSize}
-                fontFamily={getFontFamily()}
-                editorTextColor={editorTextColor}
-                bgColor={bgColor}
-                darkMode={darkMode}
-                highContrast={highContrast}
-              />
-            ) : grammarCheckEnabled ? (
+            {grammarCheckEnabled ? (
               <GrammarCheck
                 text={text}
                 onTextChange={setText}
