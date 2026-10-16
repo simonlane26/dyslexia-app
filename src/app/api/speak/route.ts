@@ -30,11 +30,12 @@ export async function POST(req: Request) {
     if (!text || !text.trim()) return NextResponse.json({ error: 'No text' }, { status: 400 });
     if (text.length > MAX_TEXT_LENGTH) return NextResponse.json({ error: 'Text too long' }, { status: 400 });
     const safeVoiceId = ALLOWED_VOICE_IDS.has(voiceId) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
+    const apiKey = (process.env.ELEVENLABS_API_KEY || '').trim().replace(/^"(.*)"$/, '$1');
 
     const r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${safeVoiceId}`, {
       method: 'POST',
       headers: {
-        'xi-api-key': process.env.ELEVENLABS_API_KEY ?? '',
+        'xi-api-key': apiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
