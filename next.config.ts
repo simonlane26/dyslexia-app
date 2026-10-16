@@ -43,7 +43,7 @@ const securityHeaders = [
       // Clerk spins up a blob: worker for session handling. Without this, worker-src
       // falls back to script-src, which doesn't cover blob: and the worker is blocked.
       "worker-src 'self' blob:",
-      // API connections: Clerk, OpenAI, OpenRouter, ElevenLabs, Supabase, GA
+      // API connections: Clerk, OpenAI, OpenRouter, ElevenLabs, LanguageTool, GA
       [
         "connect-src 'self'",
         "https://clerk.dyslexiawrite.com",
@@ -53,6 +53,8 @@ const securityHeaders = [
         "https://api.openai.com",
         "https://openrouter.ai",
         "https://api.elevenlabs.io",
+        // GrammarCheck.tsx calls this directly from the browser
+        "https://api.languagetool.org",
         "https://www.google-analytics.com",
         "https://stats.g.doubleclick.net",
         // Google Ads conversion/remarketing pings (googleads.g.doubleclick.net script
