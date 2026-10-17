@@ -36,6 +36,11 @@ yarn-error.log*
 # generated AppSumo redemption codes — sensitive, single-use, never commit
 /appsumo-codes-*.csv
 
+# raw/original video exports — far too large to commit; the compressed
+# web-ready derivatives live in /public instead
+/video-source/
+.tmp-video-work/
+
 # vercel
 .vercel
 

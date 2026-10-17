@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { landing } from '@/lib/landingTheme';
+import { HeroVideo } from './HeroVideo';
 
 interface HeroSectionProps {
   onGetStarted: () => void;
@@ -255,6 +256,10 @@ export function HeroSection({ onGetStarted, onSeeFunding }: HeroSectionProps) {
             Start free — no card needed
           </button>
         </div>
+      </div>
+
+      <div style={{ marginTop: '48px' }}>
+        <HeroVideo />
       </div>
 
       <style jsx>{`
