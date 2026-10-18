@@ -126,6 +126,26 @@ export default function LandingPage() {
             Security scanned &amp; source verified
           </p>
         </div>
+
+        {/* AlternativeTo Badge */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+          <a
+            href="https://alternativeto.net/software/dyslexiawrite/about/?utm_source=badge&utm_medium=referral"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src="https://alternativeto.net/static/badges/badge-compact-color.svg"
+              alt="DyslexiaWrite | AlternativeTo"
+              width={171}
+              height={55}
+              style={{ display: 'block', width: '171px', height: '55px' }}
+            />
+          </a>
+          <p style={{ fontSize: '13px', color: landing.inkMuted, margin: 0, textAlign: 'center' }}>
+            Listed on AlternativeTo
+          </p>
+        </div>
       </div>
 
       {/* Features Section */}
