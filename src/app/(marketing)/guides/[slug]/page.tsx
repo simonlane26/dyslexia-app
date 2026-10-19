@@ -55,10 +55,18 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
             lineHeight: 1.25,
           }}
         >
-          {guide.title}
+          {guide.h1 ?? guide.title}
         </h1>
         <div style={{ fontSize: '13px', color: landing.inkFaint, marginBottom: '40px' }}>
-          {new Date(guide.publishedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+          {guide.author && (
+            <>
+              By {guide.author.name}, {guide.author.title}
+              {' · '}
+            </>
+          )}
+          {guide.updatedAt
+            ? `Updated ${new Date(guide.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
+            : new Date(guide.publishedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
           {' · '}
           {guide.readingTime}
         </div>
@@ -115,6 +123,23 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
             Start free — no card needed
           </Link>
         </div>
+
+        {guide.references && guide.references.length > 0 && (
+          <div style={{ marginTop: '40px', paddingTop: '24px', borderTop: `1px solid ${landing.line}` }}>
+            <p style={{ fontSize: '13px', fontWeight: 700, color: landing.inkFaint, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
+              Sources
+            </p>
+            <ul style={{ paddingLeft: '20px', margin: 0 }}>
+              {guide.references.map((ref) => (
+                <li key={ref.url} style={{ fontSize: '14px', marginBottom: '6px' }}>
+                  <a href={ref.url} target="_blank" rel="noopener noreferrer" style={{ color: landing.amberDark }}>
+                    {ref.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {otherGuides.length > 0 && (
           <div style={{ marginTop: '48px', paddingTop: '32px', borderTop: `1px solid ${landing.line}` }}>

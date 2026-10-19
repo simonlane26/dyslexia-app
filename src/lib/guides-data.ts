@@ -14,10 +14,16 @@ export interface GuideSection {
 export interface Guide {
   slug: string;
   title: string;
+  // On-page H1 and schema.org headline. Falls back to `title` when omitted —
+  // only set this when the SEO <title> and the visible heading should differ.
+  h1?: string;
   description: string;
   publishedAt: string; // ISO date
+  updatedAt?: string; // ISO date — set when a guide is substantially revised
   readingTime: string;
+  author?: { name: string; title: string };
   sections: GuideSection[];
+  references?: { label: string; url: string }[];
 }
 
 export const GUIDES: Guide[] = [
@@ -126,14 +132,35 @@ export const GUIDES: Guide[] = [
   {
     slug: 'dyslexia-writing-mistakes-spellcheckers-miss',
     title: "Dyslexia Writing: Why It's Hard and What Actually Helps",
+    h1: 'Dyslexia Writing: The Mistakes, the Causes and What Helps',
     description:
-      "Why standard spellcheck misses so many dyslexic writing errors, and the specific patterns — homophones, phonetic spelling, letter reversals — it's worth checking for by hand.",
+      'Dyslexia writing explained: why spelling, homophones and sentences go wrong, what helps at work and study, and which tools earn their place.',
     publishedAt: '2026-09-29',
-    readingTime: '5 min read',
+    updatedAt: '2026-10-19',
+    readingTime: '8 min read',
+    author: { name: 'Simon Lane', title: 'Founder, DyslexiaWrite' },
     sections: [
       {
         paragraphs: [
-          "Standard spellcheckers are built around one assumption: that a misspelled word will look visually close to the correct one — a swapped letter, a missing character. Most dyslexic writing errors don't work that way, which is why a document can sail through spellcheck with no red underlines and still contain several real mistakes.",
+          "Dyslexia writing is hard for reasons that have nothing to do with effort or intelligence. The difficulty sits in how the brain processes phonology (the sounds within words), working memory (holding information in mind while using it), and sequencing — not in understanding or forming ideas. The British Dyslexia Association describes dyslexia as primarily affecting accurate and fluent word reading and spelling, with phonological processing, verbal memory and processing speed commonly affected alongside it. For writing specifically, that shows up in several distinct ways: how words sound versus how they're conventionally spelled, how a sentence's structure gets held in mind while it's being built, and — for handwriting — how letters get physically formed on the page.",
+        ],
+      },
+      {
+        heading: 'Why writing is hard with dyslexia',
+        paragraphs: [
+          "Spelling, working memory and letter formation are separate skills, and dyslexia can affect each one differently from person to person. Spelling difficulty often comes from weaker phonological processing — the link between a sound and the letters that represent it is less automatic, so spelling has to be worked out consciously rather than recalled instantly. Working memory difficulty shows up mid-sentence: holding a sentence's planned structure in mind while also spelling each word and tracking what's already been written takes more conscious effort, which is why sentences can run on, lose their thread, or drop a word partway through. None of this reflects how good the underlying idea is — it's a production bottleneck between the idea and the page.",
+        ],
+      },
+      {
+        heading: 'Handwriting',
+        paragraphs: [
+          "Handwriting adds a layer that discussions of dyslexia and writing often skip: physically forming letters is a sequencing and motor-planning task in its own right, on top of spelling and sentence structure. For many dyslexic writers, handwriting is slower and more effortful than typing, because typing removes one layer of that sequencing — selecting a whole letter with one keystroke rather than planning and executing its shape by hand. That's a reasonable, common reason to prefer typing or voice dictation for anything beyond a quick note, and it's a legitimate adjustment to ask for at school or work rather than something to push through unaided.",
+        ],
+      },
+      {
+        heading: 'Spelling: the mistakes spellcheckers miss',
+        paragraphs: [
+          "Spelling is the part of dyslexic writing most people already associate with the condition — but even here, the specific patterns are often missed by standard spellcheckers, which are built around one assumption: that a misspelled word will look visually close to the correct one. Most dyslexic spelling errors don't work that way, which is why a document can sail through spellcheck with no red underlines and still contain several real mistakes.",
         ],
       },
       {
@@ -161,11 +188,41 @@ export const GUIDES: Guide[] = [
         ],
       },
       {
-        heading: 'Why this matters for choosing a tool',
+        heading: 'Working memory and writing',
         paragraphs: [
-          "If a writing tool's grammar and spelling check is built on the same generic assumptions as a basic spellchecker — flagging what's visually close to a dictionary word — it will miss most of the above by design, not by accident. DyslexiaWrite's correction is built specifically around these patterns: homophones in context, phonetic matching, and plain-language explanations of what changed and why, rather than grammar jargon.",
+          "Working memory is the mental workspace used to hold a sentence's structure, the word choices made so far, and where the sentence is going, all at once, while also handling spelling and phrasing. For a sentence of any length, that's a lot to hold simultaneously, and dyslexia often means less of that workspace is available for planning because more of it is taken up by decoding spelling as you go. In practice, this is why writing in shorter sentences, or dictating a rough version before editing, tends to work better than trying to build a long, complex sentence correctly in one pass — it reduces how much has to be held in mind at once.",
         ],
       },
+      {
+        heading: 'Strategies for study',
+        paragraphs: [
+          "If dyslexia affects studying, a few adjustments consistently help more than trying to write under the same conditions as everyone else:",
+        ],
+        list: [
+          "Extra time in exams and coursework deadlines, arranged through your school, college or university's support services — this is a standard, recognised adjustment, not a special favour.",
+          'Reading your own writing aloud, or using text-to-speech, instead of silently re-reading it — your eyes tend to skip errors your ears catch.',
+          'Getting ideas down by talking them through or dictating a rough draft first, then editing as a separate pass, rather than trying to get spelling, structure and ideas right in one go.',
+          "In UK higher education, the Disabled Students' Allowance (DSA) can fund specialist software, equipment and support — it's worth checking eligibility through your university's disability service even if you've never used formal support before.",
+        ],
+      },
+      {
+        heading: 'Strategies for the workplace',
+        paragraphs: [
+          'The same difficulties show up at work — emails, reports, meeting notes — and UK employers have a legal duty to help. Under the Equality Act 2010, employers must make reasonable adjustments for employees with a disability, which dyslexia can qualify as. In practice that can mean extra time on written tasks, permission to use assistive software, or written instructions instead of verbal-only ones.',
+          'Access to Work, a UK government grant, can fund assistive software and equipment directly for employed and self-employed adults — often at little or no cost to you or your employer. Asking HR or your manager directly, rather than working around the problem alone, is usually the more effective route.',
+        ],
+      },
+      {
+        heading: 'Where a tool like DyslexiaWrite fits in',
+        paragraphs: [
+          "DyslexiaWrite is built around each of these specifically: phonetic and homophone-aware spelling correction instead of generic spellcheck, text-to-speech read-back with word-level highlighting for proofreading by ear, voice dictation so typing and spelling aren't blocking you from getting ideas down, and sentence rewriting that shortens and clarifies without changing your meaning. There's a free tier with no card required, and UK employees and the self-employed may be able to get it funded through Access to Work.",
+        ],
+      },
+    ],
+    references: [
+      { label: 'British Dyslexia Association — What is dyslexia?', url: 'https://www.bdadyslexia.org.uk/dyslexia' },
+      { label: 'NHS — Dyslexia in adults', url: 'https://www.nhs.uk/conditions/dyslexia-in-adults/' },
+      { label: 'Equality Act 2010 (legislation.gov.uk)', url: 'https://www.legislation.gov.uk/ukpga/2010/15/contents' },
     ],
   },
 ];

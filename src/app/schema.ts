@@ -1,19 +1,29 @@
 // Schema.org structured data — shared across marketing pages
 
-export function guideArticleSchema(guide: { slug: string; title: string; description: string; publishedAt: string }) {
+export function guideArticleSchema(guide: {
+  slug: string;
+  title: string;
+  h1?: string;
+  description: string;
+  publishedAt: string;
+  updatedAt?: string;
+  author?: { name: string; title: string };
+}) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
-    headline: guide.title,
+    headline: guide.h1 ?? guide.title,
     description: guide.description,
-    author: { '@type': 'Organization', name: 'DyslexiaWrite', url: 'https://www.dyslexiawrite.com' },
+    author: guide.author
+      ? { '@type': 'Person', name: guide.author.name, jobTitle: guide.author.title }
+      : { '@type': 'Organization', name: 'DyslexiaWrite', url: 'https://www.dyslexiawrite.com' },
     publisher: {
       '@type': 'Organization',
       name: 'DyslexiaWrite',
       logo: { '@type': 'ImageObject', url: 'https://www.dyslexiawrite.com/LogoNew.png' },
     },
     datePublished: guide.publishedAt,
-    dateModified: guide.publishedAt,
+    dateModified: guide.updatedAt ?? guide.publishedAt,
     mainEntityOfPage: {
       '@type': 'WebPage',
       '@id': `https://www.dyslexiawrite.com/guides/${guide.slug}`,
