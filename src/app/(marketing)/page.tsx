@@ -9,6 +9,7 @@ import { FeaturesSection } from '@/components/FeaturesSection';
 import { FundingCompatibilityFAQ } from '@/components/FundingCompatibilityFAQ';
 import { HomeInfoSections } from '@/components/HomeInfoSections';
 import { ComparisonTeaser } from '@/components/ComparisonTeaser';
+import { DyslexiaWritingSection } from '@/components/DyslexiaWritingSection';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
 import { Reveal } from '@/components/Reveal';
 import { AccessToWorkGuideOptIn } from '@/components/AccessToWorkGuideOptIn';
@@ -147,6 +148,9 @@ export default function LandingPage() {
           </p>
         </div>
       </div>
+
+      {/* Dyslexia writing — why it's hard, how we help, links to the guide */}
+      <DyslexiaWritingSection />
 
       {/* Features Section */}
       <div id="features-section">

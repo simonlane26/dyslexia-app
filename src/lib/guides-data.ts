@@ -125,7 +125,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'dyslexia-writing-mistakes-spellcheckers-miss',
-    title: 'Common Dyslexia Writing Mistakes Spellcheckers Miss',
+    title: "Dyslexia Writing: Why It's Hard and What Actually Helps",
     description:
       "Why standard spellcheck misses so many dyslexic writing errors, and the specific patterns — homophones, phonetic spelling, letter reversals — it's worth checking for by hand.",
     publishedAt: '2026-09-29',
