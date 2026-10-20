@@ -158,7 +158,7 @@ export const GUIDES: Guide[] = [
         ],
       },
       {
-        heading: 'Spelling: the mistakes spellcheckers miss',
+        heading: 'Common dyslexia spelling mistakes spellcheckers miss',
         paragraphs: [
           "Spelling is the part of dyslexic writing most people already associate with the condition — but even here, the specific patterns are often missed by standard spellcheckers, which are built around one assumption: that a misspelled word will look visually close to the correct one. Most dyslexic spelling errors don't work that way, which is why a document can sail through spellcheck with no red underlines and still contain several real mistakes.",
         ],
