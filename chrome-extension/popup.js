@@ -29,6 +29,7 @@ const connectError = document.getElementById('connectError');
 let fontSize   = 17;
 let bgColor    = '#fdf6e3';
 let fontFamily = 'Arial, Helvetica, sans-serif';
+let readRate   = 1;
 let isReading  = false;
 let saveTimer  = null;
 let authToken  = null;
@@ -69,15 +70,33 @@ function showConnectError(msg) {
 }
 
 // ── Load saved settings + draft ──
-chrome.storage.local.get(['dw_draft', 'dw_fontSize', 'dw_bgColor', 'dw_fontFamily', 'dw_token'], (data) => {
+chrome.storage.local.get(['dw_draft', 'dw_fontSize', 'dw_bgColor', 'dw_fontFamily', 'dw_token', 'dw_read_rate'], (data) => {
   if (data.dw_draft)      editor.value = data.dw_draft;
   if (data.dw_fontSize)   { fontSize = data.dw_fontSize; applyFontSize(); }
   if (data.dw_bgColor)    { bgColor = data.dw_bgColor; applyBgColor(); }
   if (data.dw_fontFamily) { fontFamily = data.dw_fontFamily; applyFont(); }
   if (data.dw_token)      { authToken = data.dw_token; }
+  if (data.dw_read_rate)  { readRate = data.dw_read_rate; applyReadRate(); }
   updateWordCount();
   updateAuthUI();
 });
+
+// ── Reading speed ──
+const speedBtns = document.getElementById('speedBtns');
+
+speedBtns.addEventListener('click', (e) => {
+  const btn = e.target.closest('.level-btn');
+  if (!btn) return;
+  readRate = Number(btn.dataset.rate);
+  applyReadRate();
+  chrome.storage.local.set({ dw_read_rate: readRate });
+});
+
+function applyReadRate() {
+  speedBtns.querySelectorAll('.level-btn').forEach(b => {
+    b.classList.toggle('active', Number(b.dataset.rate) === readRate);
+  });
+}
 
 // ── Font ──
 fontSelect.addEventListener('change', () => {
@@ -196,7 +215,7 @@ readBtn.addEventListener('click', () => {
 
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = 'en-GB';
-  utter.rate = 0.9;
+  utter.rate = readRate;
 
   utter.onstart = () => {
     isReading = true;
@@ -488,7 +507,7 @@ doReadPageBtn.addEventListener('click', async () => {
       await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content.js'] });
     } catch { /* already injected or restricted */ }
 
-    chrome.tabs.sendMessage(tab.id, { type: 'DW_READ_PAGE' });
+    chrome.tabs.sendMessage(tab.id, { type: 'DW_READ_PAGE', rate: readRate });
 
     // Close popup so user can see the page being read and use the on-page controls
     window.close();

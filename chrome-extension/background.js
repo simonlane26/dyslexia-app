@@ -93,6 +93,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   // ── Whole-page read aloud (new) ────────────────────────────────────────────
   if (info.menuItemId === 'dw-read-page') {
     await ensureContentScript(tab.id);
-    safeSend(tab.id, { type: 'DW_READ_PAGE' });
+    const { dw_read_rate } = await chrome.storage.local.get('dw_read_rate');
+    safeSend(tab.id, { type: 'DW_READ_PAGE', rate: dw_read_rate || 1 });
   }
 });

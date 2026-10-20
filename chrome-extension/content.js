@@ -328,11 +328,14 @@
 
   const READ_BAR_ID = 'dw-read-bar';
 
+  const READ_RATES = [0.75, 1, 1.25, 1.5, 2];
+
   const readState = {
     active: false,
     paused: false,
     blocks: [],
     index: 0,
+    rate: 1,
     highlightedEl: null,
   };
 
@@ -457,6 +460,8 @@
       <button id="dw-read-pause" type="button"
         style="width:30px;height:30px;border-radius:50%;border:none;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:white;font-size:13px;cursor:pointer;">⏸</button>
       <span id="dw-read-progress" style="font-size:12px;color:#64748b;min-width:44px;text-align:center;">1 / ${readState.blocks.length}</span>
+      <button id="dw-read-speed" type="button" title="Reading speed"
+        style="padding:6px 10px;border-radius:20px;border:none;background:#f1f5f9;color:#475569;font-size:12px;font-weight:600;cursor:pointer;">${readState.rate}x</button>
       <button id="dw-read-stop" type="button"
         style="padding:6px 14px;border-radius:20px;border:none;background:#f1f5f9;color:#475569;font-size:12px;font-weight:600;cursor:pointer;">⏹ Stop</button>
     `;
@@ -472,6 +477,16 @@
         readState.paused = true;
       }
       updateReadBarProgress();
+    });
+
+    document.getElementById('dw-read-speed').addEventListener('click', () => {
+      if (!readState.active) return;
+      const i = READ_RATES.indexOf(readState.rate);
+      readState.rate = READ_RATES[(i + 1) % READ_RATES.length];
+      document.getElementById('dw-read-speed').textContent = `${readState.rate}x`;
+      if (extOk()) chrome.storage.local.set({ dw_read_rate: readState.rate });
+      // Takes effect from the next block — SpeechSynthesisUtterance.rate
+      // can't be changed on an utterance that's already speaking.
     });
 
     document.getElementById('dw-read-stop').addEventListener('click', stopReadPage);
@@ -499,7 +514,7 @@
 
     const utter = new SpeechSynthesisUtterance(block.text);
     utter.lang = 'en-GB';
-    utter.rate = 0.95;
+    utter.rate = readState.rate;
     utter.onend = () => {
       if (!readState.active) return;
       readState.index++;
@@ -513,7 +528,7 @@
     window.speechSynthesis.speak(utter);
   }
 
-  function readPageAloud() {
+  function readPageAloud(rate) {
     window.speechSynthesis.cancel();
     clearReadHighlight();
 
@@ -528,6 +543,7 @@
     readState.paused = false;
     readState.blocks = blocks;
     readState.index = 0;
+    readState.rate = READ_RATES.includes(rate) ? rate : 1;
 
     showReadBar();
     speakNextBlock();
@@ -589,7 +605,7 @@
 
     // New: read the whole page aloud (triggered from popup or background context menu)
     if (msg.type === 'DW_READ_PAGE') {
-      readPageAloud();
+      readPageAloud(msg.rate);
     }
 
   });

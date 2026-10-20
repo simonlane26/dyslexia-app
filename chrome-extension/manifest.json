@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Dyslexia Write",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Confidence support for dyslexic writers — write anywhere with the right tools.",
   "action": {
     "default_popup": "popup.html",
