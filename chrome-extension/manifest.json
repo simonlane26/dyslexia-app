@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Dyslexia Write",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Confidence support for dyslexic writers — write anywhere with the right tools.",
   "action": {
     "default_popup": "popup.html",
@@ -12,7 +12,7 @@
       "128": "icons/icon128.png"
     }
   },
-  "permissions": ["storage", "contextMenus", "scripting"],
+  "permissions": ["storage", "contextMenus", "scripting", "activeTab"],
   "host_permissions": [
     "https://www.dyslexiawrite.com/*",
     "https://mail.google.com/*",
@@ -26,7 +26,13 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": [
+        "https://mail.google.com/*",
+        "https://*.outlook.live.com/*",
+        "https://*.outlook.office.com/*",
+        "https://*.slack.com/*",
+        "https://teams.microsoft.com/*"
+      ],
       "js": ["content.js"],
       "all_frames": true,
       "match_origin_as_fallback": true
