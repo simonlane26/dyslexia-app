@@ -324,6 +324,162 @@
     if (simplified > 0) showToggleBar(simplified);
   }
 
+  // ── Read page aloud ─────────────────────────────────────────────────────────
+
+  const READ_BAR_ID = 'dw-read-bar';
+
+  const readState = {
+    active: false,
+    paused: false,
+    blocks: [],
+    index: 0,
+    highlightedEl: null,
+  };
+
+  function isVisible(el) {
+    const rect = el.getBoundingClientRect();
+    if (rect.width === 0 && rect.height === 0) return false;
+    const style = window.getComputedStyle(el);
+    return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+  }
+
+  function findReadableBlocks() {
+    const seen = new Set();
+    const blocks = [];
+    document.querySelectorAll('h1, h2, h3, h4, p, li, td, th, blockquote, dd, figcaption').forEach(el => {
+      if (seen.has(el)) return;
+      if (el.closest('script, style, code, pre, nav, header, footer, [role="navigation"], [role="banner"], [role="menubar"], form, noscript, [contenteditable="true"]')) return;
+      const text = (el.innerText || '').trim();
+      if (text.length < 15) return;
+      if (!isVisible(el)) return;
+      seen.add(el);
+      blocks.push({ element: el, text });
+    });
+    return blocks;
+  }
+
+  function clearReadHighlight() {
+    if (readState.highlightedEl) {
+      readState.highlightedEl.style.outline = '';
+      readState.highlightedEl.style.outlineOffset = '';
+      readState.highlightedEl.style.backgroundColor = '';
+      readState.highlightedEl = null;
+    }
+  }
+
+  function highlightReadBlock(el) {
+    clearReadHighlight();
+    el.style.outline = '2px solid #0ea5e9';
+    el.style.outlineOffset = '3px';
+    el.style.backgroundColor = 'rgba(14,165,233,0.08)';
+    readState.highlightedEl = el;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function removeReadBar() {
+    document.getElementById(READ_BAR_ID)?.remove();
+  }
+
+  function updateReadBarProgress() {
+    const span = document.getElementById('dw-read-progress');
+    if (span) span.textContent = `${Math.min(readState.index + 1, readState.blocks.length)} / ${readState.blocks.length}`;
+    const pauseBtn = document.getElementById('dw-read-pause');
+    if (pauseBtn) pauseBtn.textContent = readState.paused ? '▶' : '⏸';
+  }
+
+  function showReadBar() {
+    removeReadBar();
+    const bar = document.createElement('div');
+    bar.id = READ_BAR_ID;
+    Object.assign(bar.style, {
+      position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)',
+      zIndex: '2147483647', background: 'white', borderRadius: '28px',
+      padding: '8px 10px', boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+      display: 'flex', alignItems: 'center', gap: '8px',
+      border: '1px solid #e2e8f0', fontFamily: 'Arial, sans-serif',
+      animation: 'dw-fadein 0.2s ease',
+    });
+    bar.innerHTML = `
+      <span style="font-size:13px;">🔊</span>
+      <button id="dw-read-pause" type="button"
+        style="width:30px;height:30px;border-radius:50%;border:none;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:white;font-size:13px;cursor:pointer;">⏸</button>
+      <span id="dw-read-progress" style="font-size:12px;color:#64748b;min-width:44px;text-align:center;">1 / ${readState.blocks.length}</span>
+      <button id="dw-read-stop" type="button"
+        style="padding:6px 14px;border-radius:20px;border:none;background:#f1f5f9;color:#475569;font-size:12px;font-weight:600;cursor:pointer;">⏹ Stop</button>
+    `;
+    document.body.appendChild(bar);
+
+    document.getElementById('dw-read-pause').addEventListener('click', () => {
+      if (!readState.active) return;
+      if (readState.paused) {
+        window.speechSynthesis.resume();
+        readState.paused = false;
+      } else {
+        window.speechSynthesis.pause();
+        readState.paused = true;
+      }
+      updateReadBarProgress();
+    });
+
+    document.getElementById('dw-read-stop').addEventListener('click', stopReadPage);
+  }
+
+  function stopReadPage() {
+    window.speechSynthesis.cancel();
+    clearReadHighlight();
+    removeReadBar();
+    readState.active = false;
+    readState.paused = false;
+    readState.blocks = [];
+    readState.index = 0;
+  }
+
+  function speakNextBlock() {
+    if (!readState.active) return;
+    if (readState.index >= readState.blocks.length) {
+      stopReadPage();
+      return;
+    }
+    const block = readState.blocks[readState.index];
+    highlightReadBlock(block.element);
+    updateReadBarProgress();
+
+    const utter = new SpeechSynthesisUtterance(block.text);
+    utter.lang = 'en-GB';
+    utter.rate = 0.95;
+    utter.onend = () => {
+      if (!readState.active) return;
+      readState.index++;
+      speakNextBlock();
+    };
+    utter.onerror = () => {
+      if (!readState.active) return;
+      readState.index++;
+      speakNextBlock();
+    };
+    window.speechSynthesis.speak(utter);
+  }
+
+  function readPageAloud() {
+    window.speechSynthesis.cancel();
+    clearReadHighlight();
+
+    const blocks = findReadableBlocks();
+    if (blocks.length === 0) {
+      showOverlay('Nothing readable found on this page.');
+      setTimeout(hideOverlay, 3000);
+      return;
+    }
+
+    readState.active = true;
+    readState.paused = false;
+    readState.blocks = blocks;
+    readState.index = 0;
+
+    showReadBar();
+    speakNextBlock();
+  }
+
   // ── Message listener (top frame only) ──────────────────────────────────────
 
   const isTopFrame = window === window.top;
@@ -376,6 +532,11 @@
         showOverlay('Error: ' + (e?.message || 'Something went wrong'));
         setTimeout(hideOverlay, 4000);
       });
+    }
+
+    // New: read the whole page aloud (triggered from popup or background context menu)
+    if (msg.type === 'DW_READ_PAGE') {
+      readPageAloud();
     }
 
   });

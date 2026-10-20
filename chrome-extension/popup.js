@@ -471,3 +471,30 @@ doSimplifyPageBtn.addEventListener('click', async () => {
     alert('Could not reach the page. Try refreshing it first.');
   }
 });
+
+// Read page aloud button — no account needed, uses the browser's built-in voice
+const doReadPageBtn = document.getElementById('doReadPageBtn');
+
+doReadPageBtn.addEventListener('click', async () => {
+  doReadPageBtn.disabled = true;
+  doReadPageBtn.textContent = '⟳ Starting…';
+
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id) throw new Error('No active tab');
+
+    // Inject content script (in case tab was open before extension was installed)
+    try {
+      await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content.js'] });
+    } catch { /* already injected or restricted */ }
+
+    chrome.tabs.sendMessage(tab.id, { type: 'DW_READ_PAGE' });
+
+    // Close popup so user can see the page being read and use the on-page controls
+    window.close();
+  } catch (e) {
+    doReadPageBtn.disabled = false;
+    doReadPageBtn.textContent = '🔊 Read this page aloud';
+    alert('Could not reach the page. Try refreshing it first.');
+  }
+});

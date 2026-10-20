@@ -13,6 +13,12 @@ function createMenus() {
       title: 'Simplify this whole page',
       contexts: ['page'],
     });
+    // Right-click anywhere on the page — read aloud, no account needed
+    chrome.contextMenus.create({
+      id: 'dw-read-page',
+      title: 'Read this page aloud',
+      contexts: ['page'],
+    });
   });
 }
 
@@ -82,5 +88,11 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     }
 
     safeSend(tab.id, { type: 'DW_SIMPLIFY_PAGE', token: dw_token, level: dw_simplify_level || 2 });
+  }
+
+  // ── Whole-page read aloud (new) ────────────────────────────────────────────
+  if (info.menuItemId === 'dw-read-page') {
+    await ensureContentScript(tab.id);
+    safeSend(tab.id, { type: 'DW_READ_PAGE' });
   }
 });

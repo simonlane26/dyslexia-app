@@ -16,6 +16,8 @@ zip -r "$OUT" \
   manifest.json \
   popup.html \
   popup.js \
+  background.js \
+  content.js \
   icons/icon16.png \
   icons/icon48.png \
   icons/icon128.png
