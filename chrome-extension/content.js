@@ -343,17 +343,70 @@
     return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
   }
 
-  function findReadableBlocks() {
+  // Minimum length a cleaned block must have to count as real prose, not a
+  // UI label ("More", a sender name, a timestamp, a kebab-menu glyph).
+  const MIN_BLOCK_LENGTH = 25;
+
+  // Emoji, pictographs, and symbol glyphs (star ratings, kebab-menu dots,
+  // variation selectors) that speech synthesis mangles — stripped before
+  // a block is spoken rather than excluding the whole block, since real
+  // prose often has a trailing emoji attached.
+  const NOISE_CHARS_RE = /[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}\u{2022}\u{22EE}\u{22EF}]/gu;
+
+  function cleanReadText(raw) {
+    const text = (raw || '').replace(NOISE_CHARS_RE, '').replace(/\s{2,}/g, ' ').trim();
+    if (text.length < MIN_BLOCK_LENGTH) return null;
+    const letters = (text.match(/[a-zA-Z]/g) || []).length;
+    if (letters / text.length < 0.4) return null; // mostly symbols/numbers, not prose
+    return text;
+  }
+
+  // Gmail renders the open email's body inside div.a3s — a long-standing,
+  // stable internal class Gmail uses for rendered message content. Scoping
+  // to it skips the sender/date header and the per-message toolbar (More,
+  // reply, star, labels) that would otherwise get read out line by line.
+  function getReadRoots() {
+    if (detectPlatform() === 'gmail') {
+      const bodies = Array.from(document.querySelectorAll('div.a3s'));
+      if (bodies.length > 0) return bodies;
+    }
+    return [document.body];
+  }
+
+  function blocksFromStructure(root) {
     const seen = new Set();
     const blocks = [];
-    document.querySelectorAll('h1, h2, h3, h4, p, li, td, th, blockquote, dd, figcaption').forEach(el => {
+    root.querySelectorAll('h1, h2, h3, h4, p, li, td, th, blockquote, dd, figcaption').forEach(el => {
       if (seen.has(el)) return;
-      if (el.closest('script, style, code, pre, nav, header, footer, [role="navigation"], [role="banner"], [role="menubar"], form, noscript, [contenteditable="true"]')) return;
-      const text = (el.innerText || '').trim();
-      if (text.length < 15) return;
+      if (el.closest('script, style, code, pre, nav, header, footer, button, [role="navigation"], [role="banner"], [role="menubar"], [role="toolbar"], [role="button"], form, noscript, [contenteditable="true"]')) return;
       if (!isVisible(el)) return;
+      const text = cleanReadText(el.innerText || '');
+      if (!text) return;
       seen.add(el);
       blocks.push({ element: el, text });
+    });
+    return blocks;
+  }
+
+  // Plain-text emails (and similarly unstructured content) are often just
+  // <br>-separated text with no <p>/<li> wrapping, so the structural pass
+  // above finds nothing — fall back to splitting the root's own text by
+  // blank lines, highlighting the whole root for the duration of that read.
+  function blocksFromPlainText(root) {
+    if (!isVisible(root)) return [];
+    const raw = root.innerText || '';
+    return raw
+      .split(/\n\s*\n+/)
+      .map(chunk => cleanReadText(chunk))
+      .filter(Boolean)
+      .map(text => ({ element: root, text }));
+  }
+
+  function findReadableBlocks() {
+    const blocks = [];
+    getReadRoots().forEach(root => {
+      const structured = blocksFromStructure(root);
+      blocks.push(...(structured.length > 0 ? structured : blocksFromPlainText(root)));
     });
     return blocks;
   }
