@@ -204,7 +204,11 @@ export function SettingsPanel({
               <option value="Lexend">Lexend</option>
               <option value="Open Dyslexic">Open Dyslexic</option>
               <option value="Arial">Arial</option>
+              <option value="Helvetica">Helvetica</option>
               <option value="Verdana">Verdana</option>
+              <option value="Tahoma">Tahoma</option>
+              <option value="Calibri">Calibri</option>
+              <option value="Times New Roman">Times New Roman</option>
               <option value="Comic Sans">Comic Sans</option>
             </select>
           </div>

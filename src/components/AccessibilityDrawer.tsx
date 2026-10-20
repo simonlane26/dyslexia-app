@@ -218,10 +218,14 @@ export function AccessibilityDrawer({
               }}
             >
               <option value="Open Dyslexic">Open Dyslexic</option>
-              <option value="Comic Sans MS">Comic Sans MS</option>
+              <option value="Comic Sans">Comic Sans MS</option>
               <option value="Arial">Arial</option>
+              <option value="Helvetica">Helvetica</option>
               <option value="Verdana">Verdana</option>
+              <option value="Tahoma">Tahoma</option>
+              <option value="Calibri">Calibri</option>
               <option value="Georgia">Georgia</option>
+              <option value="Times New Roman">Times New Roman</option>
               <option value="Courier New">Courier New</option>
             </select>
 

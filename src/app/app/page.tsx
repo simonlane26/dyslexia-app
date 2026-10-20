@@ -543,8 +543,20 @@ function PageBody() {
         return `'Arial', Helvetica, sans-serif`;
       case 'Verdana':
         return `'Verdana', Tahoma, sans-serif`;
+      case 'Tahoma':
+        return `'Tahoma', Geneva, sans-serif`;
+      case 'Calibri':
+        return `'Calibri', Candara, sans-serif`;
+      case 'Helvetica':
+        return `'Helvetica', Arial, sans-serif`;
       case 'Comic Sans':
         return `"Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif`;
+      case 'Georgia':
+        return `'Georgia', 'Times New Roman', serif`;
+      case 'Times New Roman':
+        return `'Times New Roman', Times, serif`;
+      case 'Courier New':
+        return `'Courier New', Courier, monospace`;
       default:
         return `'Lexend', sans-serif`;
     }
