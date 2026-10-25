@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import React from 'react';
 import { Brain, Mic, Volume2, Smartphone, Pen, BookOpen, GraduationCap, BarChart2, ClipboardList, Calendar, Sparkles, Check } from 'lucide-react';
+import { SocialLinks } from '@/components/SocialLinks';
 
 const S = {
   page: { fontFamily: "'DM Sans', system-ui, sans-serif", color: '#2C2C2A', lineHeight: 1.7, background: '#fff' } as React.CSSProperties,
@@ -477,6 +478,7 @@ export default function SchoolsClient() {
           <Link href="/vs/claroread" style={S.footerLink}>vs ClaroRead</Link>
           <Link href="/vs/immersive-reader" style={S.footerLink}>vs Immersive Reader</Link>
         </div>
+        <SocialLinks />
       </footer>
     </div>
   );

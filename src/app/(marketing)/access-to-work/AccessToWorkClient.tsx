@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import { SocialLinks } from '@/components/SocialLinks';
 
 const S = {
   page: { fontFamily: "'DM Sans', system-ui, sans-serif", color: '#2C2C2A', lineHeight: 1.7, background: '#fff' } as React.CSSProperties,
@@ -253,6 +254,7 @@ export default function AccessToWorkClient() {
             <Link key={h} href={h} style={{ fontSize: 13, color: '#888780', textDecoration: 'none' }}>{l}</Link>
           ))}
         </div>
+        <SocialLinks />
       </footer>
     </div>
   );

@@ -10,6 +10,7 @@ import { FundingCompatibilityFAQ } from '@/components/FundingCompatibilityFAQ';
 import { HomeInfoSections } from '@/components/HomeInfoSections';
 import { ComparisonTeaser } from '@/components/ComparisonTeaser';
 import { DyslexiaWritingSection } from '@/components/DyslexiaWritingSection';
+import { SocialLinks } from '@/components/SocialLinks';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
 import { Reveal } from '@/components/Reveal';
 import { AccessToWorkGuideOptIn } from '@/components/AccessToWorkGuideOptIn';
@@ -289,6 +290,7 @@ export default function LandingPage() {
               </a>
             ))}
           </div>
+          <SocialLinks />
           <span style={{ fontSize: '13px', color: landing.inkFaint }}>© 2026 DyslexiaWrite. Write, simplify, and listen.</span>
         </div>
       </footer>
