@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { organizationSchema } from '@/app/schema';
 import { OtherComparisons } from '@/components/OtherComparisons';
+import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'Dyslexia Write vs Grammarly — Honest Comparison',
@@ -435,6 +436,8 @@ export default function VsGrammarlyPage() {
           <OtherComparisons current="grammarly" />
         </div>
       </div>
+
+      <Footer />
     </>
   );
 }

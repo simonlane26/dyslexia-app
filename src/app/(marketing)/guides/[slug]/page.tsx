@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { GUIDES, getGuideBySlug } from '@/lib/guides-data';
 import { guideArticleSchema } from '@/app/schema';
 import { landing } from '@/lib/landingTheme';
+import { Footer } from '@/components/Footer';
 
 export function generateStaticParams() {
   return GUIDES.map((g) => ({ slug: g.slug }));
@@ -156,6 +157,8 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
           </div>
         )}
       </article>
+
+      <Footer />
     </div>
   );
 }

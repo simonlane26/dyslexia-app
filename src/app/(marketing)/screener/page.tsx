@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import DyslexiaScreener from '@/components/screener/DyslexiaScreener';
+import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'Free Dyslexia Screener | DyslexiaWrite',
@@ -49,6 +50,7 @@ export default function ScreenerPage() {
       />
       <div style={{ minHeight: '100vh', background: '#FDF6E3' }}>
         <DyslexiaScreener />
+        <Footer />
       </div>
     </>
   );

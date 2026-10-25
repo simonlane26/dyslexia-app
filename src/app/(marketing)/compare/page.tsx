@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { organizationSchema } from '@/app/schema';
 import { OtherComparisons } from '@/components/OtherComparisons';
+import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'DyslexiaWrite vs TextHelp Read&Write — Honest Comparison',
@@ -498,6 +499,8 @@ export default function ComparePage() {
           </div>
         </div>
       </div>
+
+      <Footer />
     </>
   );
 }

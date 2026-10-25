@@ -10,6 +10,7 @@ import Link from 'next/link';
 import React, { type CSSProperties } from 'react';
 import { Check, Star, Users, School, Sparkles, Volume2, Download, Palette, Briefcase } from 'lucide-react';
 import { AccessToWorkGuideOptIn } from '@/components/AccessToWorkGuideOptIn';
+import { Footer } from '@/components/Footer';
 
 /* ---------- Modern Button ---------- */
 
@@ -994,6 +995,8 @@ export default function PricingClient() {
 
       {/* Second door: not ready to buy today, mid Access to Work funding */}
       <AccessToWorkGuideOptIn source="pricing" />
+
+      <Footer />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { organizationSchema, faqSchema } from '@/app/schema';
+import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'Frequently Asked Questions — DyslexiaWrite',
@@ -290,6 +291,8 @@ export default function FAQPage() {
           </div>
         </div>
       </div>
+
+      <Footer />
     </>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { GUIDES } from '@/lib/guides-data';
 import { landing } from '@/lib/landingTheme';
+import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'Guides — Writing and Reading With Dyslexia',
@@ -65,6 +66,8 @@ export default function GuidesPage() {
           ))}
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

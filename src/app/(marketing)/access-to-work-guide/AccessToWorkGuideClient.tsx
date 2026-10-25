@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { landing } from '@/lib/landingTheme';
 import { AccessToWorkGuideOptIn } from '@/components/AccessToWorkGuideOptIn';
+import { Footer } from '@/components/Footer';
 
 export default function AccessToWorkGuideClient() {
   return (
@@ -50,6 +51,8 @@ export default function AccessToWorkGuideClient() {
           </Link>
         </p>
       </div>
+
+      <Footer />
     </div>
   );
 }

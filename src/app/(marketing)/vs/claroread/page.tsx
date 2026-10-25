@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { organizationSchema } from '@/app/schema';
 import { OtherComparisons } from '@/components/OtherComparisons';
+import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'Dyslexia Write vs ClaroRead — Honest Comparison',
@@ -342,6 +343,8 @@ export default function VsClaroReadPage() {
           <OtherComparisons current="claroread" />
         </div>
       </div>
+
+      <Footer />
     </>
   );
 }

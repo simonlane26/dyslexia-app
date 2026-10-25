@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { organizationSchema } from '@/app/schema';
 import { OtherComparisons } from '@/components/OtherComparisons';
+import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'Dyslexia Write vs Immersive Reader — Honest Comparison',
@@ -318,6 +319,8 @@ export default function VsImmersiveReaderPage() {
           <OtherComparisons current="immersive-reader" />
         </div>
       </div>
+
+      <Footer />
     </>
   );
 }

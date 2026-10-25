@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import React from 'react';
 import { FileText, User, School, Building2 } from 'lucide-react';
+import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'About DyslexiaWrite',
@@ -309,6 +310,8 @@ export default function AboutPage() {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }
