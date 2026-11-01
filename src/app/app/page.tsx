@@ -1031,6 +1031,14 @@ function PageBody() {
       setFloatingRewrite(null);
       return;
     }
+    // A double- or triple-click also selects the word/line under the
+    // cursor, which would otherwise pop this up on top of Word Helper
+    // (opened by the same double-click's dblclick event). Only show it
+    // for a deliberate click-and-drag selection.
+    if (e.detail >= 2) {
+      setFloatingRewrite(null);
+      return;
+    }
     setFloatingRewrite({ x: e.clientX, y: e.clientY });
   };
 
