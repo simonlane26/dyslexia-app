@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { GUIDES, getGuideBySlug } from '@/lib/guides-data';
-import { guideArticleSchema } from '@/app/schema';
+import { guideArticleSchema, guideFaqSchema } from '@/app/schema';
 import { landing } from '@/lib/landingTheme';
 import { Footer } from '@/components/Footer';
 
@@ -40,6 +40,12 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(guideArticleSchema(guide)) }}
       />
+      {guide.faqs && guide.faqs.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(guideFaqSchema(guide.faqs)) }}
+        />
+      )}
 
       <article style={{ maxWidth: '720px', margin: '0 auto', padding: '64px 20px 40px' }}>
         <Link href="/guides" style={{ fontSize: '13px', fontWeight: 600, color: landing.amberDark, textDecoration: 'none' }}>
@@ -93,8 +99,68 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                 ))}
               </ul>
             )}
+            {section.table && (
+              <div style={{ overflowX: 'auto', margin: '18px 0 14px', borderRadius: '10px', border: `1px solid ${landing.line}` }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14.5px' }}>
+                  <thead>
+                    <tr>
+                      {section.table.headers.map((h) => (
+                        <th
+                          key={h}
+                          style={{
+                            textAlign: 'left',
+                            padding: '10px 14px',
+                            fontWeight: 700,
+                            color: landing.ink,
+                            backgroundColor: landing.bgAlt,
+                            borderBottom: `1px solid ${landing.line}`,
+                          }}
+                        >
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {section.table.rows.map((row, ri) => (
+                      <tr key={ri}>
+                        {row.map((cell, ci) => (
+                          <td
+                            key={ci}
+                            style={{
+                              padding: '10px 14px',
+                              color: landing.inkMuted,
+                              lineHeight: 1.6,
+                              borderBottom: ri < section.table!.rows.length - 1 ? `1px solid ${landing.line}` : 'none',
+                            }}
+                          >
+                            {cell}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </section>
         ))}
+
+        {guide.faqs && guide.faqs.length > 0 && (
+          <section style={{ marginBottom: '30px' }}>
+            <h2 style={{ fontFamily: landing.fontDisplay, fontSize: '22px', fontWeight: 600, color: landing.ink, marginBottom: '16px' }}>
+              Frequently asked questions
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              {guide.faqs.map((f) => (
+                <div key={f.q}>
+                  <h3 style={{ fontSize: '16px', fontWeight: 700, color: landing.ink, marginBottom: '6px' }}>{f.q}</h3>
+                  <p style={{ fontSize: '15px', color: landing.inkMuted, lineHeight: 1.7, margin: 0 }}>{f.a}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         <div
           style={{
@@ -139,6 +205,21 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                 </li>
               ))}
             </ul>
+          </div>
+        )}
+
+        {guide.relatedLinks && guide.relatedLinks.length > 0 && (
+          <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: `1px solid ${landing.line}` }}>
+            <p style={{ fontSize: '13px', fontWeight: 700, color: landing.inkFaint, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
+              You might also find useful
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {guide.relatedLinks.map((link) => (
+                <Link key={link.href} href={link.href} style={{ fontSize: '14.5px', fontWeight: 600, color: landing.teal, textDecoration: 'none' }}>
+                  {link.label} →
+                </Link>
+              ))}
+            </div>
           </div>
         )}
 

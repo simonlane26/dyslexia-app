@@ -31,6 +31,18 @@ export function guideArticleSchema(guide: {
   };
 }
 
+export function guideFaqSchema(faqs: { q: string; a: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  };
+}
+
 export const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
