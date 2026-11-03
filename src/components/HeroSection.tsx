@@ -76,14 +76,14 @@ export function HeroSection({ onGetStarted, onSeeFunding }: HeroSectionProps) {
             style={{
               fontFamily: landing.fontDisplay,
               fontWeight: 600,
-              fontSize: 'clamp(30px, 4vw, 44px)',
-              lineHeight: 1.22,
+              fontSize: 'clamp(26px, 3.1vw, 36px)',
+              lineHeight: 1.3,
               letterSpacing: '-0.01em',
               marginBottom: '18px',
               color: landing.ink,
             }}
           >
-            Write it once.{' '}
+            Dyslexia writing support that helps you write it once and{' '}
             <span
               style={{
                 background: `linear-gradient(120deg, ${landing.amber}52 0%, ${landing.amber}52 100%)`,
@@ -93,7 +93,7 @@ export function HeroSection({ onGetStarted, onSeeFunding }: HeroSectionProps) {
                 padding: '0 2px',
               }}
             >
-              Get it right.
+              get it right.
             </span>
           </h1>
 
