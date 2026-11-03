@@ -20,9 +20,9 @@ const atkinson = Atkinson_Hyperlegible({
 });
 
 export const metadata: Metadata = {
-  title: "Dyslexia Write — Dyslexia-friendly Writing App",
+  title: "Dyslexia Writing Tools for Clear, Confident Writing | Dyslexia Write",
   description:
-    "Write faster with dictation, simplify complex text, and listen back. Dyslexia-friendly fonts, high-contrast themes, and easy exports.",
+    "Dyslexia writing tools and support: dictation, text simplification, and read-aloud built for dyslexic writers. Dyslexia-friendly fonts, high-contrast themes, and easy exports.",
   alternates: { canonical: "https://www.dyslexiawrite.com/" },
   openGraph: {
     title: "Dyslexia Write — Write, Simplify & Read Aloud",

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { SocialLinks } from '@/components/SocialLinks';
+import { AccessToWorkGuideOptIn } from '@/components/AccessToWorkGuideOptIn';
 
 const S = {
   page: { fontFamily: "'DM Sans', system-ui, sans-serif", color: '#2C2C2A', lineHeight: 1.7, background: '#fff' } as React.CSSProperties,
@@ -182,6 +183,80 @@ export default function AccessToWorkClient() {
         </div>
       </section>
 
+      {/* How to ask your assessor */}
+      <section style={S.sectionGray}>
+        <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
+          <div style={S.sectionLabel}>Your workplace assessment</div>
+          <h2 style={S.h2}>How to ask your assessor for DyslexiaWrite</h2>
+          <p style={S.sectionDesc}>
+            The assessment is a conversation, not a test. The assessor's job is to match tools to the
+            difficulties you describe — naming a specific product you've already tried makes their
+            report easier to write, not harder.
+          </p>
+        </div>
+        <div style={{ maxWidth: 700, margin: '0 auto' }}>
+          <div style={{ ...S.reassureBox, margin: '0 auto 24px', textAlign: 'left' as const }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#085041', marginBottom: 8, textTransform: 'uppercase' as const, letterSpacing: 0.5 }}>
+              Something you could say
+            </div>
+            <p style={{ fontSize: 15, color: '#0F6E56', lineHeight: 1.7, fontStyle: 'italic' }}>
+              "I've been using DyslexiaWrite for [emails / reports / {'{your main writing task}'}] and it's
+              helped with [spelling / proofreading / getting started — whatever applies to you]. I'd like to
+              request it as part of my support."
+            </p>
+          </div>
+          <div style={S.steps}>
+            <div style={S.step}>
+              <div style={S.stepNum('#E1F5EE', '#5DCAA5', '#085041')}>1</div>
+              <div style={S.stepContent}>
+                <h3 style={S.stepH3}>Describe the difficulty, not just the diagnosis</h3>
+                <p style={S.stepP}>"I have dyslexia" tells the assessor less than "I often reverse letters when typing quickly" or "I lose track of what I meant partway through a long sentence." Specific examples make it easier for them to match a specific tool to your report.</p>
+              </div>
+            </div>
+            <div style={S.step}>
+              <div style={S.stepNum('#EEEDFE', '#CECBF6', '#3C3489')}>2</div>
+              <div style={S.stepContent}>
+                <h3 style={S.stepH3}>Try it before the assessment if you can</h3>
+                <p style={S.stepP}>DyslexiaWrite has a free tier with no card required. Assessors are more likely to recommend a tool you can already say has helped you, rather than one you're asking about blind.</p>
+              </div>
+            </div>
+            <div style={S.step}>
+              <div style={S.stepNum('#FAEEDA', '#FAC775', '#633806')}>3</div>
+              <div style={S.stepContent}>
+                <h3 style={S.stepH3}>You can ask for it by name, even if they suggest something else</h3>
+                <p style={S.stepP}>The assessor's recommendation is guidance, not a requirement — you have the right to request the tool that actually works for you.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Cost comparison */}
+      <section style={S.section}>
+        <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
+          <div style={S.sectionLabel}>What it actually costs</div>
+          <h2 style={S.h2}>With Access to Work vs. paying for it yourself</h2>
+        </div>
+        <div style={{ maxWidth: 700, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+          <div style={{ background: '#fff', border: '1px solid #F1EFE8', borderRadius: 14, padding: 24 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#888780', textTransform: 'uppercase' as const, letterSpacing: 0.5, marginBottom: 10 }}>
+              Paying yourself
+            </div>
+            <div style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: 26, fontWeight: 600, color: '#2C2C2A', marginBottom: 4 }}>£6.99/month</div>
+            <div style={{ fontSize: 13, color: '#888780', marginBottom: 14 }}>≈ £84/year, billed monthly, individual plan</div>
+            <p style={{ fontSize: 13.5, color: '#5F5E5A', lineHeight: 1.6 }}>Nothing wrong with this route if you'd rather not apply for a grant — it's the same product either way.</p>
+          </div>
+          <div style={{ background: '#fff', border: '2px solid #5DCAA5', borderRadius: 14, padding: 24 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#0F6E56', textTransform: 'uppercase' as const, letterSpacing: 0.5, marginBottom: 10 }}>
+              Via Access to Work
+            </div>
+            <div style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: 26, fontWeight: 600, color: '#0F6E56', marginBottom: 4 }}>£0 to you</div>
+            <div style={{ fontSize: 13, color: '#888780', marginBottom: 14 }}>DWP pays £120 (1 year) or £300 (3 years) directly to us</div>
+            <p style={{ fontSize: 13.5, color: '#5F5E5A', lineHeight: 1.6 }}>You and your employer pay nothing — the grant covers the full licence cost, invoiced directly to the DWP.</p>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing */}
       <section style={S.sectionGray} id="get-started">
         <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
@@ -245,6 +320,9 @@ export default function AccessToWorkClient() {
           </div>
         </div>
       </section>
+
+      {/* Second door: waiting on a decision, not ready to claim yet */}
+      <AccessToWorkGuideOptIn source="access-to-work-page" />
 
       {/* Footer */}
       <footer style={S.footer}>

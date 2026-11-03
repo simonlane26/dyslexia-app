@@ -13,7 +13,6 @@ const isPublicPage = createRouteMatcher([
   '/screener',
   '/faq',
   '/access-to-work',
-  '/access-to-work-guide',
   '/schools',
   '/enterprise',
   '/compare',

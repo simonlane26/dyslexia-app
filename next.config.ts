@@ -93,6 +93,19 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [];
   },
+
+  async redirects() {
+    return [
+      // The guide page overlapped /access-to-work on the same search
+      // intent and was barely indexed on its own — merged into the main
+      // page, which keeps the lead-capture opt-in as a section instead.
+      {
+        source: "/access-to-work-guide",
+        destination: "/access-to-work",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
