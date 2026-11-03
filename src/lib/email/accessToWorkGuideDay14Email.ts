@@ -22,7 +22,7 @@ export function buildDay14Email({ firstName, guideUrl, appUrl }: Day14EmailInput
     'A few things worth doing while you wait:',
     "- Double-check you have your Access to Work reference number saved somewhere safe",
     "- If it's been over 25 working days, it's reasonable to call the helpline (0800 121 7479) and ask for a status update quoting that reference number",
-    '- Keep using Dyslexia Write\'s free tier if you haven\'t already — it means you can genuinely tell your assessor "I\'ve already tried it and it helps", which is exactly the kind of concrete evidence that speeds up a recommendation',
+    '- Keep using DyslexiaWrite\'s free tier if you haven\'t already — it means you can genuinely tell your assessor "I\'ve already tried it and it helps", which is exactly the kind of concrete evidence that speeds up a recommendation',
     '',
     `Re-read the guide any time: ${guideUrl}`,
     `Start writing free (no card required): ${appUrl}`,

@@ -49,7 +49,7 @@ export default function ExtensionConnectPage() {
           <div style={{ width: '56px', height: '56px', background: 'linear-gradient(135deg, #7c3aed, #2563eb)', borderRadius: '14px', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '26px' }}>✨</div>
           <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#1e293b', margin: '0 0 8px' }}>Connect your account</h1>
           <p style={{ fontSize: '14px', color: '#64748b', lineHeight: '1.6', margin: 0 }}>
-            Link your Dyslexia Write account to the Chrome extension to unlock AI Simplify.
+            Link your DyslexiaWrite account to the Chrome extension to unlock AI Simplify.
           </p>
         </div>
 
@@ -57,7 +57,7 @@ export default function ExtensionConnectPage() {
           /* Not signed in */
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '20px' }}>
-              Sign in to your Dyslexia Write account first.
+              Sign in to your DyslexiaWrite account first.
             </p>
             <SignInButton mode="modal">
               <button style={{ background: 'linear-gradient(135deg, #7c3aed, #2563eb)', color: 'white', border: 'none', borderRadius: '12px', padding: '14px 32px', fontSize: '15px', fontWeight: '700', cursor: 'pointer', width: '100%' }}>
@@ -116,7 +116,7 @@ export default function ExtensionConnectPage() {
             <div style={{ background: '#ede9fe', borderRadius: '12px', padding: '16px' }}>
               <div style={{ fontSize: '12px', fontWeight: '700', color: '#7c3aed', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Next steps</div>
               <ol style={{ paddingLeft: '18px', margin: 0 }}>
-                {['Open the Dyslexia Write extension in Chrome.', 'Click "Connect account" in the extension.', 'Paste the token and click Connect.', 'AI Simplify is now unlocked.'].map((step, i) => (
+                {['Open the DyslexiaWrite extension in Chrome.', 'Click "Connect account" in the extension.', 'Paste the token and click Connect.', 'AI Simplify is now unlocked.'].map((step, i) => (
                   <li key={i} style={{ fontSize: '13px', color: '#4c1d95', lineHeight: '1.7', marginBottom: i < 3 ? '4px' : 0 }}>{step}</li>
                 ))}
               </ol>

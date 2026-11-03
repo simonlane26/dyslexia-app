@@ -1,10 +1,10 @@
 import Link from 'next/link';
 
 const COMPARISONS = [
-  { slug: 'texthelp', label: 'Dyslexia Write vs TextHelp Read&Write', href: '/compare' },
-  { slug: 'grammarly', label: 'Dyslexia Write vs Grammarly', href: '/vs/grammarly' },
-  { slug: 'claroread', label: 'Dyslexia Write vs ClaroRead', href: '/vs/claroread' },
-  { slug: 'immersive-reader', label: 'Dyslexia Write vs Microsoft Immersive Reader', href: '/vs/immersive-reader' },
+  { slug: 'texthelp', label: 'DyslexiaWrite vs TextHelp Read&Write', href: '/compare' },
+  { slug: 'grammarly', label: 'DyslexiaWrite vs Grammarly', href: '/vs/grammarly' },
+  { slug: 'claroread', label: 'DyslexiaWrite vs ClaroRead', href: '/vs/claroread' },
+  { slug: 'immersive-reader', label: 'DyslexiaWrite vs Microsoft Immersive Reader', href: '/vs/immersive-reader' },
 ] as const;
 
 export function OtherComparisons({ current }: { current: (typeof COMPARISONS)[number]['slug'] }) {

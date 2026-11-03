@@ -1757,9 +1757,9 @@ function PageBody() {
             style={{ height: '80px', width: 'auto' }}
           />
         </div>
-        <div className="mb-2">© 2025 Dyslexia Write Ltd. All rights reserved.</div>
+        <div className="mb-2">© 2025 DyslexiaWrite Ltd. All rights reserved.</div>
         <div className="mb-2">
-          "Dyslexia Write"
+          "DyslexiaWrite"
           <sup className="ml-0.5 align-super text-[0.7em]">™</sup> is a trademark of IgnisTech Ltd.
           All other trademarks are the property of their respective owners.
         </div>

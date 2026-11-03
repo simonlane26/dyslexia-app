@@ -63,11 +63,11 @@ function SubBlock({ title, children }: { title: string; children: string }) {
 export function HomeInfoSections() {
   return (
     <>
-      {/* Who Dyslexia Write is for */}
+      {/* Who DyslexiaWrite is for */}
       <div style={{ padding: '70px 20px', backgroundColor: landing.bgAlt }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <Reveal>
-            <SectionHead eyebrow="Who it's for" title="Who Dyslexia Write is for" />
+            <SectionHead eyebrow="Who it's for" title="Who DyslexiaWrite is for" />
             <p
               style={{
                 color: landing.inkMuted,
@@ -78,14 +78,14 @@ export function HomeInfoSections() {
                 textAlign: 'center',
               }}
             >
-              Dyslexia Write is built for two groups: adults who need to write confidently at work, and
+              DyslexiaWrite is built for two groups: adults who need to write confidently at work, and
               students who need to keep up with reading and writing at school, college, or university.
             </p>
           </Reveal>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
             <Reveal>
               <SubBlock title="For adults writing at work">
-                At work, Dyslexia Write helps you write emails, reports, and messages without worrying
+                At work, DyslexiaWrite helps you write emails, reports, and messages without worrying
                 about spelling or grammar mistakes standing out. It works inside the tools you already
                 use, and — for UK employees — is fundable through the government&apos;s Access to Work
                 scheme.
@@ -93,7 +93,7 @@ export function HomeInfoSections() {
             </Reveal>
             <Reveal>
               <SubBlock title="For students and university writers">
-                For students, Dyslexia Write supports essays, coursework, and exam preparation with
+                For students, DyslexiaWrite supports essays, coursework, and exam preparation with
                 reading modes, a vocabulary builder, and lesson capture tools. Schools and colleges can
                 license it site-wide, with a teacher dashboard and no student writing stored.
               </SubBlock>
@@ -106,7 +106,7 @@ export function HomeInfoSections() {
       <div style={{ padding: '70px 20px', backgroundColor: landing.bg }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <Reveal>
-            <SectionHead eyebrow="Funding" title="Getting Dyslexia Write funded through Access to Work" />
+            <SectionHead eyebrow="Funding" title="Getting DyslexiaWrite funded through Access to Work" />
             <p
               style={{
                 color: landing.inkMuted,
@@ -117,7 +117,7 @@ export function HomeInfoSections() {
                 textAlign: 'center',
               }}
             >
-              If you&apos;re an employee in the UK, Dyslexia Write can be funded in full through the
+              If you&apos;re an employee in the UK, DyslexiaWrite can be funded in full through the
               government&apos;s Access to Work scheme — most applicants pay nothing themselves.
             </p>
           </Reveal>
@@ -126,16 +126,16 @@ export function HomeInfoSections() {
               <SubBlock title="Am I eligible?">
                 If you&apos;re employed or self-employed in the UK, have dyslexia, and it affects your
                 work, you can apply for an Access to Work grant. The grant can cover the full cost of
-                Dyslexia Write plus training. You apply directly on GOV.UK — you don&apos;t need a
+                DyslexiaWrite plus training. You apply directly on GOV.UK — you don&apos;t need a
                 diagnosis report in every case, and your employer doesn&apos;t pay.
               </SubBlock>
             </Reveal>
             <Reveal>
-              <SubBlock title="How to name Dyslexia Write on your application">
-                When you speak to your Access to Work assessor, mention Dyslexia Write by name and
+              <SubBlock title="How to name DyslexiaWrite on your application">
+                When you speak to your Access to Work assessor, mention DyslexiaWrite by name and
                 explain that you&apos;ve already tried it — assessors are more likely to recommend a tool
                 you have hands-on experience with. If they recommend a different product, you can still
-                request Dyslexia Write instead; you have the right to choose the tool that works best for
+                request DyslexiaWrite instead; you have the right to choose the tool that works best for
                 you.
               </SubBlock>
             </Reveal>
@@ -159,7 +159,7 @@ export function HomeInfoSections() {
           <Reveal>
             <SectionHead eyebrow="For schools" title="School and college site licences" />
             <p style={{ color: landing.inkMuted, fontSize: '15.5px', lineHeight: 1.65, marginBottom: '24px' }}>
-              Dyslexia Write offers whole-school and college site licences, priced by number of students,
+              DyslexiaWrite offers whole-school and college site licences, priced by number of students,
               with a teacher dashboard, child-safe copy with no grades or red marks, and GDPR-compliant EU
               data hosting. Book a demo with your SENCO or inclusion lead to see it in your setting.
             </p>

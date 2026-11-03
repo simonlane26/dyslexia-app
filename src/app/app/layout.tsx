@@ -8,7 +8,7 @@ import { LanguageProvider } from "@/lib/i18n";
 
 export const dynamic = 'force-dynamic'; // prevents static prerender of `/`
 export const metadata: Metadata = {
-  title: "Dyslexia Write",
+  title: "DyslexiaWrite",
   description: "Dyslexia-friendly writing and reading tools.",
 };
 

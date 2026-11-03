@@ -2,9 +2,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Cookie Policy | Dyslexia Write",
+  title: "Cookie Policy | DyslexiaWrite",
   description:
-    "Dyslexia Write Cookie Policy: the necessary, functional and analytics cookies we use, what each does, and how to manage or disable them in your browser.",
+    "DyslexiaWrite Cookie Policy: the necessary, functional and analytics cookies we use, what each does, and how to manage or disable them in your browser.",
   alternates: { canonical: "https://www.dyslexiawrite.com/cookies" },
 };
 
@@ -21,7 +21,7 @@ export default function CookiesPage() {
       <p><strong>Last Updated:</strong> {Today}</p>
 
       <p>
-        This Cookie Policy explains how <strong>Dyslexia Write</strong> (“we”, “our”, “us”)
+        This Cookie Policy explains how <strong>DyslexiaWrite</strong> (“we”, “our”, “us”)
         uses cookies and similar technologies on our website and app.
       </p>
 

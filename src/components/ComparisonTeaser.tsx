@@ -22,7 +22,7 @@ const COMPARISONS = [
   },
   {
     name: 'Microsoft Immersive Reader',
-    hook: 'Free and great for reading — but it won’t help you write. Dyslexia Write does both.',
+    hook: 'Free and great for reading — but it won’t help you write. DyslexiaWrite does both.',
     href: '/vs/immersive-reader',
   },
 ] as const;

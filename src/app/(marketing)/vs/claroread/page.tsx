@@ -5,26 +5,26 @@ import { OtherComparisons } from '@/components/OtherComparisons';
 import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Dyslexia Write vs ClaroRead: Features and Price Compared',
+  title: 'DyslexiaWrite vs ClaroRead: Features and Price Compared',
   description:
-    'A feature-by-feature price comparison of Dyslexia Write and ClaroRead for schools and Access to Work — AI-powered spelling correction, word prediction, OCR scanning, and what each one costs.',
+    'A feature-by-feature price comparison of DyslexiaWrite and ClaroRead for schools and Access to Work — AI-powered spelling correction, word prediction, OCR scanning, and what each one costs.',
   alternates: { canonical: 'https://www.dyslexiawrite.com/vs/claroread' },
 };
 
 const comparisonSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
-  name: 'Dyslexia Write vs ClaroRead: Features and Price Compared',
+  name: 'DyslexiaWrite vs ClaroRead: Features and Price Compared',
   url: 'https://www.dyslexiawrite.com/vs/claroread',
   description:
-    'A feature-by-feature price comparison of Dyslexia Write and ClaroRead for schools and Access to Work — AI-powered spelling correction, word prediction, OCR scanning, and what each one costs.',
+    'A feature-by-feature price comparison of DyslexiaWrite and ClaroRead for schools and Access to Work — AI-powered spelling correction, word prediction, OCR scanning, and what each one costs.',
   mainEntity: {
     '@type': 'ItemList',
     itemListElement: [
       {
         '@type': 'SoftwareApplication',
         position: 1,
-        name: 'Dyslexia Write',
+        name: 'DyslexiaWrite',
         url: 'https://www.dyslexiawrite.com',
         offers: { '@type': 'Offer', price: '6.99', priceCurrency: 'GBP', billingIncrement: 'P1M' },
         description: 'AI-powered writing support built specifically for dyslexic writers.',
@@ -57,12 +57,12 @@ const faqSchema = {
       name: 'Does ClaroRead have word prediction?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes — word prediction is one of its real strengths. Dyslexia Write does not currently offer word prediction; it focuses on correcting what you have already typed or dictated.',
+        text: 'Yes — word prediction is one of its real strengths. DyslexiaWrite does not currently offer word prediction; it focuses on correcting what you have already typed or dictated.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Can I try Dyslexia Write before paying?',
+      name: 'Can I try DyslexiaWrite before paying?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: "Yes — the free tier has no time limit and doesn't need a card. It has daily usage limits; Pro removes them.",
@@ -78,7 +78,7 @@ const featureRows: Row[] = [
   ['Same vendor as TextHelp Read&Write', false, true, 'ClaroRead is made by Everway, formerly Texthelp Group'],
   ['Phonetic spelling correction ("nolij" → knowledge)', true, true, 'ClaroRead’s speaking spellchecker is genuinely strong here too'],
   ['Homophone help, meanings shown in plain English', true, 'Partial'],
-  ['Word prediction as you type', false, true, 'A real ClaroRead strength — Dyslexia Write focuses on correcting what you’ve already written'],
+  ['Word prediction as you type', false, true, 'A real ClaroRead strength — DyslexiaWrite focuses on correcting what you’ve already written'],
   ['OCR — scan paper documents to text', false, true, 'Another genuine ClaroRead strength if you work from printed material'],
   ['AI document decoding (explain any document in plain English)', true, false],
   ['Read-aloud with word highlighting', true, true],
@@ -134,7 +134,7 @@ export default function VsClaroReadPage() {
             Honest comparison
           </div>
           <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: 'clamp(26px,4.2vw,42px)', fontWeight: 600, lineHeight: 1.25, color: '#2C2C2A', maxWidth: 760, margin: '0 auto 20px' }}>
-            Dyslexia Write vs ClaroRead: features and price compared
+            DyslexiaWrite vs ClaroRead: features and price compared
           </h1>
           <p style={{ fontSize: 16, color: '#5F5E5A', maxWidth: 640, margin: '0 auto 12px', lineHeight: 1.65 }}>
             ClaroRead is a genuine dyslexia-specific tool, not a general grammar checker — it&apos;s a fair
@@ -152,7 +152,7 @@ export default function VsClaroReadPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, marginBottom: 56 }}>
             {[
               {
-                name: 'Dyslexia Write',
+                name: 'DyslexiaWrite',
                 tag: 'Our product',
                 tagColor: '#6366f1',
                 price: 'Free tier, or £6.99/month',
@@ -197,7 +197,7 @@ export default function VsClaroReadPage() {
           <h2 style={S.h2}>The short answer</h2>
           <p style={S.body}>
             If you need to scan printed worksheets or want word prediction as you type, ClaroRead does
-            those things and Dyslexia Write doesn&apos;t — not yet. If you want AI that understands what
+            those things and DyslexiaWrite doesn&apos;t — not yet. If you want AI that understands what
             you meant to type, explains any document in plain English, and costs a third of the price,
             that&apos;s us.
           </p>
@@ -209,7 +209,7 @@ export default function VsClaroReadPage() {
               <thead>
                 <tr>
                   <th style={{ ...S.th, width: '44%' }}>Feature</th>
-                  <th style={{ ...S.th, width: '28%' }}>Dyslexia Write</th>
+                  <th style={{ ...S.th, width: '28%' }}>DyslexiaWrite</th>
                   <th style={{ ...S.th, width: '28%' }}>ClaroRead</th>
                 </tr>
               </thead>
@@ -242,7 +242,7 @@ export default function VsClaroReadPage() {
           {/* Where DW wins */}
           <h2 style={S.h2}>Where we&apos;re better</h2>
           <p style={S.body}>
-            Dyslexia Write uses AI to understand what you meant, not a fixed dictionary — so it handles
+            DyslexiaWrite uses AI to understand what you meant, not a fixed dictionary — so it handles
             spelling that&apos;s further from the target word. It explains any document in plain English,
             costs roughly a third of ClaroRead&apos;s individual price, and doesn&apos;t require a separate
             licence for dictation. It&apos;s also a newer product, which cuts both ways: fewer legacy
@@ -288,12 +288,12 @@ export default function VsClaroReadPage() {
             <div style={{ marginBottom: 20 }}>
               <h3 style={S.h3}>Does ClaroRead have word prediction?</h3>
               <p style={{ fontSize: 14.5, color: '#5F5E5A', lineHeight: 1.6 }}>
-                Yes — it&apos;s one of its real strengths. Dyslexia Write doesn&apos;t currently offer
+                Yes — it&apos;s one of its real strengths. DyslexiaWrite doesn&apos;t currently offer
                 word prediction; it focuses on correcting what you&apos;ve already typed or dictated.
               </p>
             </div>
             <div>
-              <h3 style={S.h3}>Can I try Dyslexia Write first?</h3>
+              <h3 style={S.h3}>Can I try DyslexiaWrite first?</h3>
               <p style={{ fontSize: 14.5, color: '#5F5E5A', lineHeight: 1.6 }}>
                 Yes — the free tier has no time limit and no card required. It has daily usage limits;
                 upgrading to Pro removes them.
@@ -311,7 +311,7 @@ export default function VsClaroReadPage() {
               <thead>
                 <tr>
                   <th style={{ ...S.th, width: '34%' }}>Plan</th>
-                  <th style={{ ...S.th, width: '33%' }}>Dyslexia Write</th>
+                  <th style={{ ...S.th, width: '33%' }}>DyslexiaWrite</th>
                   <th style={{ ...S.th, width: '33%' }}>ClaroRead</th>
                 </tr>
               </thead>

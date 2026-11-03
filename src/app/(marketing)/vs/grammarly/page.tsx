@@ -5,26 +5,26 @@ import { OtherComparisons } from '@/components/OtherComparisons';
 import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Dyslexia Write vs Grammarly — Honest Comparison',
+  title: 'DyslexiaWrite vs Grammarly — Honest Comparison',
   description:
-    'An honest comparison of Dyslexia Write and Grammarly for dyslexic writers: phonetic spelling correction, homophones, read-aloud, dictation, pricing, and Access to Work funding.',
+    'An honest comparison of DyslexiaWrite and Grammarly for dyslexic writers: phonetic spelling correction, homophones, read-aloud, dictation, pricing, and Access to Work funding.',
   alternates: { canonical: 'https://www.dyslexiawrite.com/vs/grammarly' },
 };
 
 const comparisonSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
-  name: 'Dyslexia Write vs Grammarly Comparison',
+  name: 'DyslexiaWrite vs Grammarly Comparison',
   url: 'https://www.dyslexiawrite.com/vs/grammarly',
   description:
-    'An honest comparison of Dyslexia Write and Grammarly, covering phonetic spelling correction, homophones, read-aloud, dictation, pricing, and Access to Work funding.',
+    'An honest comparison of DyslexiaWrite and Grammarly, covering phonetic spelling correction, homophones, read-aloud, dictation, pricing, and Access to Work funding.',
   mainEntity: {
     '@type': 'ItemList',
     itemListElement: [
       {
         '@type': 'SoftwareApplication',
         position: 1,
-        name: 'Dyslexia Write',
+        name: 'DyslexiaWrite',
         url: 'https://www.dyslexiawrite.com',
         offers: { '@type': 'Offer', price: '6.99', priceCurrency: 'GBP', billingIncrement: 'P1M' },
         description: 'AI-powered writing support built specifically for dyslexic writers.',
@@ -55,12 +55,12 @@ const faqSchema = {
     },
     {
       '@type': 'Question',
-      name: 'Do I have to cancel Grammarly to use Dyslexia Write?',
+      name: 'Do I have to cancel Grammarly to use DyslexiaWrite?',
       acceptedAnswer: { '@type': 'Answer', text: 'No. Plenty of our users run both side by side.' },
     },
     {
       '@type': 'Question',
-      name: 'Can I try Dyslexia Write before paying?',
+      name: 'Can I try DyslexiaWrite before paying?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: "Yes — the free tier has no time limit and doesn't need a card. It has daily usage limits; Pro removes them.",
@@ -74,12 +74,12 @@ type Row = [string, string | boolean, string | boolean, string?];
 const featureRows: Row[] = [
   ['Built for', 'Dyslexic writers', 'General business writing'],
   ['Phonetic spelling correction ("nolij" → knowledge)', true, false, 'Grammarly is built on standard spellcheck dictionaries, which need your spelling to be close to the target word'],
-  ['Homophone help (their/there, form/from)', true, 'Partial', 'Dyslexia Write shows the meaning of each option, not just a flag'],
+  ['Homophone help (their/there, form/from)', true, 'Partial', 'DyslexiaWrite shows the meaning of each option, not just a flag'],
   ['AI document decoding (explain any document in plain English)', true, false],
   ['Read-aloud with word-level highlighting', true, false],
   ['Voice dictation', true, 'Limited', 'Grammarly has no built-in dictation outside its desktop app'],
   ['Tone and style suggestions', 'Basic', 'Excellent', "This is Grammarly's core strength"],
-  ['Native Word / Outlook add-in', false, true, "Dyslexia Write is a Chrome extension and web editor today — no desktop Office add-in"],
+  ['Native Word / Outlook add-in', false, true, "DyslexiaWrite is a Chrome extension and web editor today — no desktop Office add-in"],
   ['Chrome extension (Gmail, Docs, Slack, web)', true, true],
   ['Access to Work fundable', true, 'Not typically'],
   ['School / college site licence', true, 'Enterprise plan only'],
@@ -192,7 +192,7 @@ export default function VsGrammarlyPage() {
               margin: '0 auto 20px',
             }}
           >
-            Dyslexia Write vs Grammarly: which one actually helps you write with dyslexia?
+            DyslexiaWrite vs Grammarly: which one actually helps you write with dyslexia?
           </h1>
           <p style={{ fontSize: 16, color: '#5F5E5A', maxWidth: 620, margin: '0 auto 12px', lineHeight: 1.65 }}>
             Grammarly is a very good grammar checker. It was built for people who can already get roughly
@@ -208,7 +208,7 @@ export default function VsGrammarlyPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, marginBottom: 56 }}>
             {[
               {
-                name: 'Dyslexia Write',
+                name: 'DyslexiaWrite',
                 tag: 'Our product',
                 tagColor: '#6366f1',
                 price: 'Free tier, or £6.99/month',
@@ -273,7 +273,7 @@ export default function VsGrammarlyPage() {
             If your spelling is close enough that Grammarly can guess what you meant, Grammarly is fine.
             If you type &quot;nolij&quot;, &quot;peaple&quot; or &quot;seperete&quot; and Grammarly shrugs
             — or &quot;corrects&quot; it to the wrong word entirely — that&apos;s the gap we built
-            Dyslexia Write to fill.
+            DyslexiaWrite to fill.
           </p>
 
           {/* Side by side */}
@@ -283,7 +283,7 @@ export default function VsGrammarlyPage() {
               <thead>
                 <tr>
                   <th style={{ ...S.th, width: '44%' }}>Feature</th>
-                  <th style={{ ...S.th, width: '28%' }}>Dyslexia Write</th>
+                  <th style={{ ...S.th, width: '28%' }}>DyslexiaWrite</th>
                   <th style={{ ...S.th, width: '28%' }}>Grammarly</th>
                 </tr>
               </thead>
@@ -318,7 +318,7 @@ export default function VsGrammarlyPage() {
           {/* Where DW wins */}
           <h2 style={S.h2}>Where we&apos;re better</h2>
           <p style={S.body}>
-            Getting the sentence out in the first place. Dyslexia Write recognises spellings that
+            Getting the sentence out in the first place. DyslexiaWrite recognises spellings that
             aren&apos;t close to the target word, shows you the difference between homophones in plain
             English, and reads your work back so you catch the errors your eyes skip over. That&apos;s a
             different job.
@@ -327,7 +327,7 @@ export default function VsGrammarlyPage() {
           {/* Can I use both */}
           <h2 style={S.h2}>Can I use both?</h2>
           <p style={S.body}>
-            Yes, and plenty of our users do. Dyslexia Write to get the words down, Grammarly to tidy them
+            Yes, and plenty of our users do. DyslexiaWrite to get the words down, Grammarly to tidy them
             up. They don&apos;t conflict.
           </p>
 
@@ -373,7 +373,7 @@ export default function VsGrammarlyPage() {
               </p>
             </div>
             <div>
-              <h3 style={S.h3}>Can I try Dyslexia Write first?</h3>
+              <h3 style={S.h3}>Can I try DyslexiaWrite first?</h3>
               <p style={{ fontSize: 14.5, color: '#5F5E5A', lineHeight: 1.6 }}>
                 Yes — the free tier has no time limit and no card required. It has daily usage limits;
                 upgrading to Pro removes them.
@@ -391,7 +391,7 @@ export default function VsGrammarlyPage() {
               <thead>
                 <tr>
                   <th style={{ ...S.th, width: '34%' }}>Plan</th>
-                  <th style={{ ...S.th, width: '33%' }}>Dyslexia Write</th>
+                  <th style={{ ...S.th, width: '33%' }}>DyslexiaWrite</th>
                   <th style={{ ...S.th, width: '33%' }}>Grammarly</th>
                 </tr>
               </thead>

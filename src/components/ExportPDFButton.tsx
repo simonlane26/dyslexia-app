@@ -50,7 +50,7 @@ export function ExportPDFButton({ text, isPro, simplifiedText, documentTitle, do
     const now = new Date().toLocaleString();
     doc.setFontSize(10);
     doc.setTextColor(120);
-    doc.text(`Dyslexia Write — ${now}`, margin, margin);
+    doc.text(`DyslexiaWrite — ${now}`, margin, margin);
     doc.setTextColor(0);
 
     let y = margin + 10;

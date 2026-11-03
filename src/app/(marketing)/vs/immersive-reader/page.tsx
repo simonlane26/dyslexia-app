@@ -5,26 +5,26 @@ import { OtherComparisons } from '@/components/OtherComparisons';
 import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Dyslexia Write vs Immersive Reader — Honest Comparison',
+  title: 'DyslexiaWrite vs Immersive Reader — Honest Comparison',
   description:
-    'An honest comparison of Dyslexia Write and Microsoft Immersive Reader: what the free built-in reading tool does well, and where you still need writing support.',
+    'An honest comparison of DyslexiaWrite and Microsoft Immersive Reader: what the free built-in reading tool does well, and where you still need writing support.',
   alternates: { canonical: 'https://www.dyslexiawrite.com/vs/immersive-reader' },
 };
 
 const comparisonSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
-  name: 'Dyslexia Write vs Microsoft Immersive Reader Comparison',
+  name: 'DyslexiaWrite vs Microsoft Immersive Reader Comparison',
   url: 'https://www.dyslexiawrite.com/vs/immersive-reader',
   description:
-    'An honest comparison of Dyslexia Write and Microsoft Immersive Reader, covering reading support, writing correction, and where the free tool stops.',
+    'An honest comparison of DyslexiaWrite and Microsoft Immersive Reader, covering reading support, writing correction, and where the free tool stops.',
   mainEntity: {
     '@type': 'ItemList',
     itemListElement: [
       {
         '@type': 'SoftwareApplication',
         position: 1,
-        name: 'Dyslexia Write',
+        name: 'DyslexiaWrite',
         url: 'https://www.dyslexiawrite.com',
         offers: { '@type': 'Offer', price: '6.99', priceCurrency: 'GBP', billingIncrement: 'P1M' },
         description: 'AI-powered writing and reading support built specifically for dyslexic writers.',
@@ -66,7 +66,7 @@ const faqSchema = {
       name: 'Does Immersive Reader work in Gmail or Google Docs?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No — it only works inside Microsoft’s own apps and the Edge browser. Dyslexia Write’s Chrome extension works on any website, including Gmail and Google Docs.',
+        text: 'No — it only works inside Microsoft’s own apps and the Edge browser. DyslexiaWrite’s Chrome extension works on any website, including Gmail and Google Docs.',
       },
     },
   ],
@@ -128,7 +128,7 @@ export default function VsImmersiveReaderPage() {
             Honest comparison
           </div>
           <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: 'clamp(26px,4.2vw,42px)', fontWeight: 600, lineHeight: 1.25, color: '#2C2C2A', maxWidth: 760, margin: '0 auto 20px' }}>
-            Dyslexia Write vs Microsoft Immersive Reader: do you still need it if it&apos;s free?
+            DyslexiaWrite vs Microsoft Immersive Reader: do you still need it if it&apos;s free?
           </h1>
           <p style={{ fontSize: 16, color: '#5F5E5A', maxWidth: 640, margin: '0 auto 12px', lineHeight: 1.65 }}>
             Immersive Reader is free, built into Word, Outlook, Teams, and Edge, and it&apos;s genuinely
@@ -145,7 +145,7 @@ export default function VsImmersiveReaderPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, marginBottom: 56 }}>
             {[
               {
-                name: 'Dyslexia Write',
+                name: 'DyslexiaWrite',
                 tag: 'Our product',
                 tagColor: '#6366f1',
                 price: 'Free tier, or £6.99/month',
@@ -189,7 +189,7 @@ export default function VsImmersiveReaderPage() {
           {/* The short answer */}
           <h2 style={S.h2}>The short answer</h2>
           <p style={S.body}>
-            Immersive Reader and Dyslexia Write aren&apos;t really competing for the same job. Immersive
+            Immersive Reader and DyslexiaWrite aren&apos;t really competing for the same job. Immersive
             Reader helps you take text in — reading it, hearing it, breaking it into syllables. Dyslexia
             Write helps you put text out — writing an email, an essay, a report — and it works wherever
             you&apos;re writing it, not just inside Microsoft&apos;s apps.
@@ -202,7 +202,7 @@ export default function VsImmersiveReaderPage() {
               <thead>
                 <tr>
                   <th style={{ ...S.th, width: '44%' }}>Feature</th>
-                  <th style={{ ...S.th, width: '28%' }}>Dyslexia Write</th>
+                  <th style={{ ...S.th, width: '28%' }}>DyslexiaWrite</th>
                   <th style={{ ...S.th, width: '28%' }}>Immersive Reader</th>
                 </tr>
               </thead>
@@ -238,7 +238,7 @@ export default function VsImmersiveReaderPage() {
             Writing. Immersive Reader has no spelling correction, no grammar checking, no dictation, and
             no homophone help — that&apos;s not a gap in the product, it&apos;s simply not what it&apos;s
             for (Microsoft Editor covers grammar, separately, and still won&apos;t handle spelling that&apos;s
-            phonetically distant from the target word). Dyslexia Write also works everywhere you write,
+            phonetically distant from the target word). DyslexiaWrite also works everywhere you write,
             not just inside Microsoft&apos;s own apps — Gmail, Google Docs, Slack, and the open web
             included.
           </p>
@@ -247,7 +247,7 @@ export default function VsImmersiveReaderPage() {
           <h2 style={S.h2}>Can I use both?</h2>
           <p style={S.body}>
             Yes, easily — they don&apos;t overlap. Use Immersive Reader to read a document Word or Teams
-            handed you; use Dyslexia Write to write the reply.
+            handed you; use DyslexiaWrite to write the reply.
           </p>
 
           {/* Funding */}
@@ -256,7 +256,7 @@ export default function VsImmersiveReaderPage() {
             <div style={{ border: '1px solid #E9E7E0', borderRadius: 14, padding: '22px 20px' }}>
               <h3 style={S.h3}>Employed in the UK?</h3>
               <p style={{ fontSize: 14.5, color: '#5F5E5A', lineHeight: 1.6, marginBottom: 14 }}>
-                Access to Work grants can cover the full cost of Dyslexia Write. We&apos;ll send you a
+                Access to Work grants can cover the full cost of DyslexiaWrite. We&apos;ll send you a
                 quote and spec sheet formatted for the application.
               </p>
               <Link href="/access-to-work" style={{ fontSize: 14, fontWeight: 700, color: '#6366f1' }}>

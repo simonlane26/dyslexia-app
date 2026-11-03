@@ -4,7 +4,7 @@ function createMenus() {
     // Right-click on selected text
     chrome.contextMenus.create({
       id: 'dw-simplify',
-      title: 'Simplify with Dyslexia Write',
+      title: 'Simplify with DyslexiaWrite',
       contexts: ['selection'],
     });
     // Right-click anywhere on the page
@@ -56,7 +56,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
     const { dw_token } = await chrome.storage.local.get('dw_token');
     if (!dw_token) {
-      safeSend(tab.id, { type: 'DW_SIMPLIFY_ERROR', message: 'Connect your account first — open the Dyslexia Write extension.' });
+      safeSend(tab.id, { type: 'DW_SIMPLIFY_ERROR', message: 'Connect your account first — open the DyslexiaWrite extension.' });
       return;
     }
 
@@ -83,7 +83,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
     const { dw_token, dw_simplify_level } = await chrome.storage.local.get(['dw_token', 'dw_simplify_level']);
     if (!dw_token) {
-      safeSend(tab.id, { type: 'DW_SIMPLIFY_ERROR', message: 'Connect your account first — open the Dyslexia Write extension.' });
+      safeSend(tab.id, { type: 'DW_SIMPLIFY_ERROR', message: 'Connect your account first — open the DyslexiaWrite extension.' });
       return;
     }
 

@@ -15,7 +15,7 @@ const APPLYING_VIA_OPTIONS: { value: ApplyingVia; label: string }[] = [
 
 const BULLETS = [
   'A step-by-step breakdown of the Access to Work application for assistive software',
-  'The exact wording that speeds up approval for writing tools like Dyslexia Write',
+  'The exact wording that speeds up approval for writing tools like DyslexiaWrite',
   'A funding request template you can hand to your employer, SENCO, or Access to Work assessor',
   "A check-in email in a few weeks with tips on chasing your application if you haven't heard back",
 ];

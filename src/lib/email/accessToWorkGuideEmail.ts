@@ -18,7 +18,7 @@ export function buildAccessToWorkGuideEmail({ firstName, guideUrl, appUrl, atwUr
     '',
     `Full Access to Work walkthrough: ${atwUrl}`,
     '',
-    `When you're ready, start writing with Dyslexia Write free: ${appUrl}`,
+    `When you're ready, start writing with DyslexiaWrite free: ${appUrl}`,
     '',
     "We'll check in in a few weeks to see how your application's going. No spam, no sales calls — just a heads-up service for people mid-funding.",
   ].join('\n');
@@ -40,7 +40,7 @@ export function buildAccessToWorkGuideEmail({ firstName, guideUrl, appUrl, atwUr
     </p>
     <p style="margin: 0 0 28px;">
       <a href="${appUrl}" style="display: inline-block; background: #D98C2B; color: #ffffff; font-size: 16px; font-weight: 700; padding: 14px 28px; border-radius: 12px; text-decoration: none;">
-        Start writing with Dyslexia Write free →
+        Start writing with DyslexiaWrite free →
       </a>
     </p>
     <p style="font-size: 13px; line-height: 1.6; color: #6B6558; background: #F4EEDE; border-radius: 12px; padding: 14px 16px; margin: 0 0 20px;">

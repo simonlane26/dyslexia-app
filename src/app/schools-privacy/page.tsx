@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Schools Privacy Policy | Dyslexia Write",
+  title: "Schools Privacy Policy | DyslexiaWrite",
   description:
-    "How Dyslexia Write handles student data for schools — GDPR compliant, EU-hosted, no student writing stored, no ads.",
+    "How DyslexiaWrite handles student data for schools — GDPR compliant, EU-hosted, no student writing stored, no ads.",
   alternates: { canonical: "https://www.dyslexiawrite.com/schools-privacy" },
 };
 
@@ -24,7 +24,7 @@ export default function SchoolsPrivacyPage() {
 
       <p>
         This policy applies specifically to schools, teachers, and students using
-        Dyslexia Write under a school plan. It explains exactly what data we
+        DyslexiaWrite under a school plan. It explains exactly what data we
         collect, what we do not collect, and how we protect student privacy.
       </p>
 
@@ -85,7 +85,7 @@ export default function SchoolsPrivacyPage() {
       <ul>
         <li>Display writing progress summaries to the class teacher</li>
         <li>Show positive progress badges (&ldquo;Writing Confidence Improving&rdquo;, &ldquo;Clearer Sentences&rdquo;)</li>
-        <li>Operate and improve the Dyslexia Write service</li>
+        <li>Operate and improve the DyslexiaWrite service</li>
       </ul>
       <p>
         We do not sell, rent, share, or monetise school data in any form. We do
@@ -118,14 +118,14 @@ export default function SchoolsPrivacyPage() {
       </ul>
       <p>
         Schools act as <strong>data controllers</strong> for any student personal
-        data they provide. Dyslexia Write acts as a <strong>data processor</strong>{" "}
+        data they provide. DyslexiaWrite acts as a <strong>data processor</strong>{" "}
         on behalf of the school. A <strong>Data Processing Agreement (DPA)</strong>{" "}
         is available on request — please contact us at the address below.
       </p>
 
       <h2>6. ICO Registration</h2>
       <p>
-        Dyslexia Write is registered with the UK Information Commissioner&apos;s
+        DyslexiaWrite is registered with the UK Information Commissioner&apos;s
         Office (ICO). Our registration number is available on request.
       </p>
 
@@ -144,7 +144,7 @@ export default function SchoolsPrivacyPage() {
 
       <h2>8. Age-Appropriate Use</h2>
       <p>
-        Dyslexia Write for Schools is designed for students aged <strong>7 and above</strong>,
+        DyslexiaWrite for Schools is designed for students aged <strong>7 and above</strong>,
         under teacher supervision. The tool does not:
       </p>
       <ul>

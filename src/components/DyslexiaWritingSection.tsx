@@ -30,7 +30,7 @@ export function DyslexiaWritingSection() {
             patterns, so dyslexic writing often gets flagged as careless when it isn't.
           </p>
           <p style={{ fontSize: '16px', color: landing.inkMuted, lineHeight: 1.75, marginBottom: 0 }}>
-            Dyslexia Write is built around those patterns specifically: it catches phonetic misspellings and
+            DyslexiaWrite is built around those patterns specifically: it catches phonetic misspellings and
             real-word errors that regular spellcheck misses, and helps you simplify and rewrite sentences
             without losing what you meant to say. Read more in our guide to{' '}
             <Link href="/guides/dyslexia-writing-mistakes-spellcheckers-miss" style={{ color: landing.amberDark, fontWeight: 600 }}>

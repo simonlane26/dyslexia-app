@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const guide = getGuideBySlug(slug);
   if (!guide) return {};
   return {
-    title: `${guide.title} | Dyslexia Write Guides`,
+    title: `${guide.title} | DyslexiaWrite Guides`,
     description: guide.description,
     alternates: { canonical: `https://www.dyslexiawrite.com/guides/${guide.slug}` },
     openGraph: {

@@ -17,7 +17,7 @@ interface OnboardingStep {
 
 const ONBOARDING_STEPS: OnboardingStep[] = [
   {
-    title: 'Welcome to Dyslexia Write!',
+    title: 'Welcome to DyslexiaWrite!',
     description: 'A dyslexia-friendly writing app with powerful tools to help you write, simplify, and listen to your text. Let\'s take a quick tour!',
     icon: IconMoodSmile,
   },

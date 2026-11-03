@@ -5,14 +5,14 @@ import PricingClient from './PricingClient';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Pricing — Dyslexia Write Plans for Individuals & Schools',
+  title: 'Pricing — DyslexiaWrite Plans for Individuals & Schools',
   description:
-    'Compare Dyslexia Write plans for individuals, workplaces, and schools — from a free tier to Access to Work-funded licences and whole-school pricing.',
+    'Compare DyslexiaWrite plans for individuals, workplaces, and schools — from a free tier to Access to Work-funded licences and whole-school pricing.',
   alternates: { canonical: 'https://www.dyslexiawrite.com/pricing' },
   openGraph: {
-    title: 'Pricing — Dyslexia Write Plans for Individuals & Schools',
+    title: 'Pricing — DyslexiaWrite Plans for Individuals & Schools',
     description:
-      'Compare Dyslexia Write plans for individuals, workplaces, and schools — from a free tier to Access to Work-funded licences.',
+      'Compare DyslexiaWrite plans for individuals, workplaces, and schools — from a free tier to Access to Work-funded licences.',
     url: 'https://www.dyslexiawrite.com/pricing',
   },
 };

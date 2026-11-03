@@ -75,7 +75,7 @@ export function AppSumoRedeemClient() {
             Redeem your AppSumo purchase
           </h1>
           <p style={{ color: landing.inkMuted, marginTop: "10px", fontSize: "15px", lineHeight: 1.5 }}>
-            Create or sign in to your Dyslexia Write account, then enter your
+            Create or sign in to your DyslexiaWrite account, then enter your
             AppSumo code below to activate your lifetime deal.
           </p>
         </div>
@@ -92,7 +92,7 @@ export function AppSumoRedeemClient() {
                 marginBottom: "20px",
               }}
             >
-              Your AppSumo lifetime deal is active. Welcome to Dyslexia Write!
+              Your AppSumo lifetime deal is active. Welcome to DyslexiaWrite!
             </div>
             <button
               type="button"

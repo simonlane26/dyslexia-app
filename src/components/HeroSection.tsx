@@ -106,7 +106,7 @@ export function HeroSection({ onGetStarted, onSeeFunding }: HeroSectionProps) {
               lineHeight: 1.65,
             }}
           >
-            Dyslexia Write helps you get the words out of your head and onto the page — then fixes the
+            DyslexiaWrite helps you get the words out of your head and onto the page — then fixes the
             spelling, grammar and phrasing that regular tools miss, including the errors that are
             actually correct words. Built for work emails, essays, reports and applications.
           </p>

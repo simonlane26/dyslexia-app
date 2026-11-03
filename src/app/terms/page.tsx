@@ -2,9 +2,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | Dyslexia Write",
+  title: "Terms of Service | DyslexiaWrite",
   description:
-    "Dyslexia Write Terms of Service: account rules, Free/Pro/School plans, Stripe-processed payments and renewals, and acceptable use of our AI writing tools.",
+    "DyslexiaWrite Terms of Service: account rules, Free/Pro/School plans, Stripe-processed payments and renewals, and acceptable use of our AI writing tools.",
   alternates: { canonical: "https://www.dyslexiawrite.com/terms" },
 };
 

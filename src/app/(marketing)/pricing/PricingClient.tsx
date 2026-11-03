@@ -311,7 +311,7 @@ export default function PricingClient() {
                 margin: 0,
               }}
             >
-              Dyslexia Write
+              DyslexiaWrite
             </h1>
           </div>
           <p

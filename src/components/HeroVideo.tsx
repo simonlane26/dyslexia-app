@@ -73,7 +73,7 @@ export function HeroVideo() {
       <button
         type="button"
         onClick={openModal}
-        aria-label="Play video: See what Dyslexia Write can do"
+        aria-label="Play video: See what DyslexiaWrite can do"
         style={{
           position: 'relative',
           display: 'block',
@@ -102,7 +102,7 @@ export function HeroVideo() {
           // weight at all, until the viewer taps to open the full player.
           <img
             src={POSTER_SRC}
-            alt="Dyslexia Write product preview"
+            alt="DyslexiaWrite product preview"
             style={{ width: '100%', display: 'block', aspectRatio: '16 / 9', objectFit: 'cover' }}
           />
         )}
@@ -137,14 +137,14 @@ export function HeroVideo() {
       </button>
 
       <p style={{ textAlign: 'center', marginTop: '12px', fontSize: '14px', color: landing.inkMuted }}>
-        See what Dyslexia Write can do
+        See what DyslexiaWrite can do
       </p>
 
       {modalOpen && (
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Dyslexia Write product demo video"
+          aria-label="DyslexiaWrite product demo video"
           onClick={closeModal}
           style={{
             position: 'fixed',

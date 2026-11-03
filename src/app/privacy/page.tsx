@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Dyslexia Write',
+  title: 'Privacy Policy | DyslexiaWrite',
   description:
-    'Dyslexia Write Privacy Policy: the account, payment and usage data we collect, how your writing is processed by OpenAI/ElevenLabs, and your GDPR rights.',
+    'DyslexiaWrite Privacy Policy: the account, payment and usage data we collect, how your writing is processed by OpenAI/ElevenLabs, and your GDPR rights.',
   alternates: { canonical: 'https://www.dyslexiawrite.com/privacy' },
 };
 

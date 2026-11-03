@@ -35,7 +35,7 @@ export function HeaderBar() {
         <div className="flex items-center gap-2">
           <IconPencil size={22} stroke={1.75} className="text-amber-600" aria-hidden />
           <span className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-            Dyslexia Write
+            DyslexiaWrite
           </span>
         </div>
 

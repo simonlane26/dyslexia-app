@@ -17,15 +17,15 @@ const CORE_BENEFITS: CoreBenefit[] = [
     eyebrow: 'Writing',
     title: 'Three ways to say it, one click to apply',
     description:
-      "Select any sentence and Dyslexia Write offers three real alternatives — Simpler, Clearer, or More confident — each with a plain-English note on why it changed. No grammar jargon, just a version that actually sounds like you.",
+      "Select any sentence and DyslexiaWrite offers three real alternatives — Simpler, Clearer, or More confident — each with a plain-English note on why it changed. No grammar jargon, just a version that actually sounds like you.",
     imgSrc: '/images/screenshots/shot-rewrite.png',
-    imgAlt: 'The Dyslexia Write rewrite panel showing three alternative versions of a sentence — Simpler, Clearer, and More confident — each with an Apply button',
+    imgAlt: 'The DyslexiaWrite rewrite panel showing three alternative versions of a sentence — Simpler, Clearer, and More confident — each with an Apply button',
   },
   {
     eyebrow: 'Writing',
     title: 'Catches the mistakes dyslexic writers make most',
     description:
-      'Standard spellcheckers miss reversed letters and homophones like their/there or weather/whether. Dyslexia Write catches them specifically, underlines them right where they happen, and explains the fix in plain language.',
+      'Standard spellcheckers miss reversed letters and homophones like their/there or weather/whether. DyslexiaWrite catches them specifically, underlines them right where they happen, and explains the fix in plain language.',
     imgSrc: '/images/screenshots/shot-grammar.png',
     imgAlt: 'A paragraph of text with grammar and homophone mistakes underlined in red and amber wavy lines, directly in the editor',
   },
@@ -133,10 +133,10 @@ export function FeaturesSection() {
               Features
             </div>
             <h2 style={{ fontFamily: landing.fontDisplay, fontSize: 'clamp(26px, 4vw, 32px)', fontWeight: 600, marginBottom: '14px', color: landing.ink }}>
-              How Dyslexia Write works
+              How DyslexiaWrite works
             </h2>
             <p style={{ color: landing.inkMuted, fontSize: '15.5px', maxWidth: '640px', margin: '0 auto', lineHeight: 1.65, textAlign: 'left' }}>
-              You write or paste text into the editor, and Dyslexia Write checks it in real time for the
+              You write or paste text into the editor, and DyslexiaWrite checks it in real time for the
               spelling and grammar mistakes dyslexic writers make most often — reversed letters,
               homophones, and missed words. Select any sentence to get a simpler, clearer, or more
               confident rewrite in one click. When you&apos;d rather speak than type, dictate instead;

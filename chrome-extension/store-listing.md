@@ -1,7 +1,7 @@
-# Chrome Web Store Listing — Dyslexia Write
+# Chrome Web Store Listing — DyslexiaWrite
 
 ## Name
-Dyslexia Write
+DyslexiaWrite
 
 ## Short description (max 132 chars)
 Dyslexia-friendly writing pad — choose your font, background colour, and simplify any text with one click.
@@ -10,7 +10,7 @@ Dyslexia-friendly writing pad — choose your font, background colour, and simpl
 Productivity
 
 ## Long description
-Dyslexia Write is a distraction-free writing space designed for people who find writing difficult — especially those with dyslexia.
+DyslexiaWrite is a distraction-free writing space designed for people who find writing difficult — especially those with dyslexia.
 
 Open the extension whenever you need to draft an email, write a message, or compose anything in your browser. Your work saves automatically and stays there next time you open it.
 
@@ -45,7 +45,7 @@ https://www.dyslexiawrite.com
 3. Font/colour settings bar (show Comic Sans + cream background)
 
 ## Promotional tile (440×280) — optional but recommended
-Purple gradient background, "Dyslexia Write" in white, tagline below
+Purple gradient background, "DyslexiaWrite" in white, tagline below
 
 ---
 

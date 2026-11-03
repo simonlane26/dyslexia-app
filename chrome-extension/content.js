@@ -559,7 +559,7 @@
     if (msg.type === 'DW_SIMPLIFY_START') {
       showPanel(`
         <div style="background:linear-gradient(135deg,#7c3aed,#2563eb);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
-          <span style="color:white;font-weight:700;font-size:13px;">✨ Dyslexia Write</span>
+          <span style="color:white;font-weight:700;font-size:13px;">✨ DyslexiaWrite</span>
           <button id="dw-close" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:12px;">✕</button>
         </div>
         <div style="padding:16px;color:#64748b;font-size:13px;">Simplifying…</div>
@@ -570,7 +570,7 @@
       const safe = esc(msg.simplified);
       showPanel(`
         <div style="background:linear-gradient(135deg,#7c3aed,#2563eb);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
-          <span style="color:white;font-weight:700;font-size:13px;">✨ Dyslexia Write</span>
+          <span style="color:white;font-weight:700;font-size:13px;">✨ DyslexiaWrite</span>
           <button id="dw-close" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:12px;">✕</button>
         </div>
         <div style="padding:14px 16px;">
@@ -587,7 +587,7 @@
     if (msg.type === 'DW_SIMPLIFY_ERROR') {
       showPanel(`
         <div style="background:linear-gradient(135deg,#7c3aed,#2563eb);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
-          <span style="color:white;font-weight:700;font-size:13px;">✨ Dyslexia Write</span>
+          <span style="color:white;font-weight:700;font-size:13px;">✨ DyslexiaWrite</span>
           <button id="dw-close" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:12px;">✕</button>
         </div>
         <div style="padding:14px 16px;color:#dc2626;font-size:13px;">${esc(msg.message)}</div>

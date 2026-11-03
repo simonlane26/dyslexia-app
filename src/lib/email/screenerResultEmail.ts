@@ -17,7 +17,7 @@ export function buildScreenerResultEmail({ resultTitle, audience, guideUrl, appU
     '',
     `Your 1-page guide (5 writing workarounds, and how to ask your employer or school to fund assistive tech): ${guideUrl}`,
     '',
-    `Start writing with Dyslexia Write free: ${appUrl}`,
+    `Start writing with DyslexiaWrite free: ${appUrl}`,
     ...(showB2B2C ? ['', B2B2C_LINE] : []),
   ].join('\n');
 
@@ -34,7 +34,7 @@ export function buildScreenerResultEmail({ resultTitle, audience, guideUrl, appU
     </p>
     <p style="margin: 0 0 28px;">
       <a href="${appUrl}" style="display: inline-block; background: #1D9E75; color: #ffffff; font-size: 16px; font-weight: 700; padding: 14px 28px; border-radius: 12px; text-decoration: none;">
-        Start writing with Dyslexia Write free →
+        Start writing with DyslexiaWrite free →
       </a>
     </p>
     ${
