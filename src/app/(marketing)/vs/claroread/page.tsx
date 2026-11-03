@@ -5,19 +5,19 @@ import { OtherComparisons } from '@/components/OtherComparisons';
 import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Dyslexia Write vs ClaroRead — Honest Comparison',
+  title: 'Dyslexia Write vs ClaroRead: Features and Price Compared',
   description:
-    'An honest comparison of Dyslexia Write and ClaroRead: phonetic spelling correction, word prediction, OCR scanning, pricing, and Access to Work funding.',
+    'A feature-by-feature price comparison of Dyslexia Write and ClaroRead for schools and Access to Work — AI-powered spelling correction, word prediction, OCR scanning, and what each one costs.',
   alternates: { canonical: 'https://www.dyslexiawrite.com/vs/claroread' },
 };
 
 const comparisonSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
-  name: 'Dyslexia Write vs ClaroRead Comparison',
+  name: 'Dyslexia Write vs ClaroRead: Features and Price Compared',
   url: 'https://www.dyslexiawrite.com/vs/claroread',
   description:
-    'An honest comparison of Dyslexia Write and ClaroRead, covering phonetic spelling correction, word prediction, OCR scanning, pricing, and Access to Work funding.',
+    'A feature-by-feature price comparison of Dyslexia Write and ClaroRead for schools and Access to Work — AI-powered spelling correction, word prediction, OCR scanning, and what each one costs.',
   mainEntity: {
     '@type': 'ItemList',
     itemListElement: [
@@ -134,7 +134,7 @@ export default function VsClaroReadPage() {
             Honest comparison
           </div>
           <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: 'clamp(26px,4.2vw,42px)', fontWeight: 600, lineHeight: 1.25, color: '#2C2C2A', maxWidth: 760, margin: '0 auto 20px' }}>
-            Dyslexia Write vs ClaroRead: which one actually helps you write with dyslexia?
+            Dyslexia Write vs ClaroRead: features and price compared
           </h1>
           <p style={{ fontSize: 16, color: '#5F5E5A', maxWidth: 640, margin: '0 auto 12px', lineHeight: 1.65 }}>
             ClaroRead is a genuine dyslexia-specific tool, not a general grammar checker — it&apos;s a fair

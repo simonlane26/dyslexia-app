@@ -4,9 +4,9 @@ import { organizationSchema, faqSchema } from '@/app/schema';
 import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Frequently Asked Questions — DyslexiaWrite',
+  title: 'Dyslexia Writing Support — Frequently Asked Questions | DyslexiaWrite',
   description:
-    'Answers to common questions about DyslexiaWrite, dyslexia assistive technology, pricing, Access to Work funding, and how DyslexiaWrite compares to TextHelp Read&Write.',
+    'Answers to common questions about dyslexia writing support and tools: pricing, Access to Work funding, device and browser compatibility, and how DyslexiaWrite compares to TextHelp Read&Write.',
   alternates: { canonical: 'https://www.dyslexiawrite.com/faq' },
 };
 

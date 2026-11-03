@@ -84,9 +84,9 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'best-fonts-for-dyslexia',
-    title: 'Best Fonts and Text Formatting for Dyslexia',
+    title: 'Best Fonts for Dyslexia: What Actually Helps',
     description:
-      'What actually helps with dyslexia-friendly formatting — font choice, spacing, size, and contrast — including what the evidence on "dyslexia fonts" like OpenDyslexic really shows.',
+      'Best fonts for dyslexia, explained — font choice, spacing, size, and contrast that actually help, including what the evidence on "dyslexia fonts" like OpenDyslexic really shows.',
     publishedAt: '2026-09-29',
     readingTime: '5 min read',
     ctaText: 'See your own writing in a dyslexia-friendly font and layout',
@@ -136,12 +136,12 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'dyslexia-writing-mistakes-spellcheckers-miss',
-    title: "Dyslexia Writing: Why It's Hard and What Actually Helps",
-    h1: 'Dyslexia Writing: The Mistakes, the Causes and What Helps',
+    title: 'Common Dyslexia Spelling Mistakes (and What Actually Helps)',
+    h1: 'Common Dyslexia Spelling Mistakes: Causes and What Helps',
     description:
-      'Dyslexia writing explained: why spelling, homophones and sentences go wrong, what helps at work and study, and which tools earn their place.',
+      'Common dyslexia spelling mistakes explained — homophones, phonetic spelling, letter reversals — plus what helps at work, at study, and when choosing a tool.',
     publishedAt: '2026-09-29',
-    updatedAt: '2026-10-19',
+    updatedAt: '2026-11-03',
     ctaText: 'Check your own writing for these exact patterns',
     readingTime: '8 min read',
     author: { name: 'Simon Lane', title: 'Founder, DyslexiaWrite' },
