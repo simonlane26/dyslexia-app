@@ -39,54 +39,175 @@ export interface Guide {
 export const GUIDES: Guide[] = [
   {
     slug: 'how-to-write-with-dyslexia',
-    title: 'How to Write With Dyslexia: Practical Tips and Tools',
+    title: 'Dyslexia Writing Support: Tips and Tools',
+    h1: 'Dyslexia Writing Support: Practical Tips and Tools',
     description:
-      'Practical, non-clinical strategies for writing with dyslexia — getting ideas down without self-editing, proofreading methods that actually work, and what tools help most.',
+      'Practical dyslexia writing support: how to plan, draft, proofread and get funding in the UK, plus what to look for in a writing tool.',
     publishedAt: '2026-09-29',
-    readingTime: '6 min read',
+    updatedAt: '2026-11-03',
+    readingTime: '9 min read',
+    author: { name: 'Simon Lane', title: 'Founder, DyslexiaWrite' },
     ctaText: 'Try dictation and read-back proofreading on your own writing',
     sections: [
       {
+        heading: 'What helps most',
         paragraphs: [
-          "Dyslexia affects the mechanics of writing — spelling, working memory for sentence structure, proofreading — not intelligence or the quality of your ideas. Most of the strategies that help aren't about trying harder; they're about changing the process so the mechanics stop getting in the way.",
+          "Dyslexia affects the mechanics of writing, such as spelling, holding a sentence in mind and proofreading, not intelligence or the quality of your ideas. The strategies that help most change the process so those mechanics stop getting in the way:",
+        ],
+        list: [
+          'Get your ideas down first by typing or dictating a rough draft, and edit as a separate step.',
+          "Plan before you write, even if it's only a few bullet points.",
+          'Proofread by ear: have your writing read aloud to you instead of re-reading it silently.',
+          'Use shorter sentences, then join a few together if it reads choppy.',
+          'Check for the errors an ordinary spellchecker misses.',
+          "Set up your page so it's easier to read.",
         ],
       },
       {
-        heading: 'Get your ideas down before you edit',
         paragraphs: [
-          "Trying to spell correctly, structure sentences, and generate ideas all at once is where most writing blocks happen. Write or dictate a rough first pass without stopping to fix anything, then go back and edit as a separate step. Voice dictation is worth trying even if you're a confident typist — speaking removes the spelling barrier entirely while you're still forming the idea.",
+          'The rest of this guide explains each one, then covers where to get support in the UK.',
         ],
       },
       {
-        heading: "Read it back instead of just re-reading it",
+        heading: 'Why writing is hard with dyslexia',
         paragraphs: [
-          "Silently re-reading your own writing is one of the least reliable ways to catch errors — your brain tends to read what you meant to write, not what's actually on the page. Reading it aloud, or having text-to-speech read it back to you, forces you to process the actual words in order, which catches missing words, repeated words, and sentences that don't quite make sense far more reliably.",
+          'Writing asks you to choose words, spell them, hold the sentence in mind and form the letters, all at once. The British Dyslexia Association describes dyslexia as a lifelong, genetic, neurological specific learning difficulty that mainly affects accurate and fluent word reading and spelling, and it can also affect how people use working memory. In practice, spelling often takes conscious effort, long sentences take more mental space to hold, and mistakes are easy to miss when you re-read.',
+          "None of this reflects effort or ability. It's a bottleneck between the idea and the page, which is why the strategies below change the process instead of asking you to try harder. For the specific errors to watch for, see our guide to common dyslexia spelling mistakes.",
         ],
       },
       {
-        heading: 'Use a tool built for dyslexic spelling, not just any spellchecker',
+        heading: 'Six strategies that help',
         paragraphs: [
-          "Generic spellcheckers are built to catch typos — a swapped letter, a dropped character — by finding words that are visually close to what you typed. Dyslexic spelling errors are often phonetic (writing a word the way it sounds, like 'thort' for 'thought') rather than close to the correct spelling visually, which is exactly the case standard spellcheck handles worst. Tools built specifically around phonetic matching and common dyslexic error patterns — homophones like their/there/they're especially — catch a lot that generic spellcheck misses.",
+          'What works varies from person to person. Treat these as things to try and keep what suits you, not as rules.',
         ],
       },
       {
-        heading: 'Break long sentences into shorter ones',
+        heading: '1. Get your ideas down before you edit',
         paragraphs: [
-          'Holding a long sentence\'s full structure in mind while writing it takes working memory, which is often where dyslexia adds friction — leading to run-on sentences or a dropped word partway through. Writing in shorter sentences, then combining a couple if it reads too choppy, is usually easier to get right the first time than trying to build one long sentence correctly from scratch.',
+          "Trying to spell correctly, structure sentences and come up with ideas all at once is where many writing blocks happen. Write or dictate a rough first pass without stopping to fix anything, then edit as a separate step. Dictation is worth trying even if you type confidently, because speaking removes the spelling barrier while you're still forming the idea.",
         ],
       },
       {
-        heading: "Give yourself extra time, and it's okay to ask for it",
+        heading: '2. Plan before you start',
         paragraphs: [
-          'If dyslexia is a diagnosed condition, extra time for written work — at school, in exams, or at work — is a standard, reasonable adjustment, not a special favour. Employers in the UK are expected to make reasonable adjustments under the Equality Act 2010, and schools do the same through EHCPs and SEN support. Asking for it directly is usually more effective than trying to work around the problem alone.',
+          "A few bullet points, a numbered list of the points in the order you want to make them, or a quick mind map gives you the structure up front, so you aren't inventing it sentence by sentence while also spelling. For an email it can be as short as what you need, what they need to do, and by when.",
+        ],
+      },
+      {
+        heading: '3. Proofread by ear, not just by eye',
+        paragraphs: [
+          "Silently re-reading your own writing is an unreliable way to catch errors, because your brain tends to read what you meant to write. Reading it aloud, or having text-to-speech read it back to you, makes you process the words that are actually on the page. It tends to catch missing words, repeated words and sentences that don't quite make sense.",
+        ],
+      },
+      {
+        heading: '4. Use shorter sentences',
+        paragraphs: [
+          "Holding a long sentence's whole structure in mind takes working memory, which is where dyslexia often adds friction. That can lead to run-on sentences or a dropped word partway through. Writing in shorter sentences, then combining a couple if it reads too choppy, is usually easier to get right the first time than building one long sentence from scratch.",
+        ],
+      },
+      {
+        heading: '5. Check for the errors a spellchecker misses',
+        paragraphs: [
+          'A standard spellchecker looks for words that are visually close to what you typed. Many dyslexic errors don\'t work that way. Some are real words in the wrong place, such as their and there or form and from. Others are phonetic spellings, like "thort" for "thought", that sit far from the correct word. Read the final version aloud, and consider a tool built for these patterns. Our guide to common dyslexia spelling mistakes has examples to watch for.',
+        ],
+      },
+      {
+        heading: "6. Set up your page so it's easier to read",
+        paragraphs: [
+          "Line spacing, text size and background colour often help more than the choice of font. If you're reading back your own work, a layout that suits you makes proofreading less tiring. We cover what the research does and doesn't support in our guide to the best fonts for dyslexia.",
+        ],
+      },
+      {
+        heading: 'Getting support in the UK',
+        paragraphs: [
+          'Disability law and funding differ across the UK, so check the rules for where you live. This section reflects what the official pages said in November 2026.',
+        ],
+      },
+      {
+        heading: 'At work',
+        paragraphs: [],
+        list: [
+          "Reasonable adjustments. Under the Equality Act 2010, employers must make reasonable adjustments to reduce the impact of a disability on someone's work, and the British Dyslexia Association notes that dyslexia meets the Act's definition because it's lifelong. In Northern Ireland the Disability Discrimination Act 1995 applies instead (BDA guidance). Adjustments can include extra time on written tasks, written instead of verbal instructions, and permission to use assistive software.",
+          "Access to Work. This government grant can help pay for practical support at work, including specialist equipment and assistive software. It won't pay for adjustments your employer is legally required to make, and you or your employer may need to pay some costs up front and claim them back. It doesn't affect other benefits and you don't repay it. See GOV.UK for eligibility and how to apply, and our Access to Work page for how it relates to DyslexiaWrite.",
+        ],
+      },
+      {
+        heading: 'At school, college or university',
+        paragraphs: [],
+        list: [
+          "Extra time. Extra time in exams and coursework, arranged through your school, college or university's support service, is a standard, recognised adjustment, not a special favour.",
+          'Schools. In England, schools provide SEN support and some children have an EHC plan. Scotland, Wales and Northern Ireland each have their own systems.',
+          "Disabled Students' Allowance (DSA). DSA helps with extra study costs caused by a learning difficulty, health problem or disability. It doesn't depend on household income and you don't pay it back. After you get your eligibility letter, a needs assessment is arranged, and you shouldn't buy equipment before it, because you may not be reimbursed (GOV.UK). In England you apply through Student Finance England, and the other nations have their own student finance services.",
+          'Check which software DSA will fund. The Department for Education consulted in 2026 on funding assistive software only where free alternatives can\'t meet a student\'s needs. It had not published its response when this guide was written, so ask your needs assessor what they can recommend.',
+        ],
+      },
+      {
+        heading: 'For everyday writing',
+        paragraphs: [
+          'Most phones and computers have free built-in dictation and read-aloud, which are worth trying before you pay for anything. A dedicated tool is worth considering when you want phonetic and homophone-aware correction, or support inside your email and work apps.',
+        ],
+      },
+      {
+        heading: 'What to look for in a dyslexia writing tool',
+        paragraphs: [
+          'A good tool should reduce effort at the points above, not just underline errors. Questions worth asking of any option, including ours:',
+        ],
+        list: [
+          'Does it understand phonetic spelling? Type a word the way it sounds and see whether the right word comes up.',
+          'Does it catch real-word errors? Test it with sentences containing their/there and form/from.',
+          'Can it read your writing back, highlighting each word as it goes, in a voice you can listen to for a while?',
+          'Does it support dictation, so you can draft without typing?',
+          'Does it work where you actually write, such as email, chat and documents, or only inside its own editor?',
+          'Can you change text size, spacing and background colour?',
+          'Can you try it free, and can someone else fund it? Check whether your employer, school or a government scheme can pay.',
+          "What happens to your text? Read the privacy policy, particularly where text is processed and whether it's used to train models.",
+        ],
+      },
+      {
+        paragraphs: [
+          "Try two or three with a paragraph of your own writing before you commit. If you're comparing options, see how DyslexiaWrite compares with TextHelp Read&Write, ClaroRead, Grammarly and Immersive Reader.",
         ],
       },
       {
         heading: 'Where a tool like DyslexiaWrite fits in',
         paragraphs: [
-          'DyslexiaWrite is built around several of these strategies directly: voice dictation to get ideas down without typing, text-to-speech read-back with word-level highlighting for proofreading, and phonetic + homophone-aware correction instead of generic spellcheck. There\'s a free tier with no card required if you want to try the approach before deciding whether a dedicated tool is worth it.',
+          "DyslexiaWrite is built around several of these strategies directly: voice dictation to get ideas down without typing, text-to-speech read-back with word-level highlighting for proofreading, phonetic and homophone-aware correction instead of generic spellcheck, and sentence rewriting that shortens and clarifies without changing your meaning. Reading modes let you adjust font, size, spacing and colour tint. There's a free tier with no card required, and UK employees and the self-employed may be able to get it funded through Access to Work.",
         ],
       },
+    ],
+    faqs: [
+      {
+        q: 'How can someone with dyslexia improve their writing?',
+        a: 'Mostly by changing the process, not by trying harder. Separate drafting from editing, plan before you write, proofread by ear, keep sentences short and use tools that catch dyslexic spelling patterns. Practice helps too, but the goal is to stop the mechanics getting in the way of your ideas.',
+      },
+      {
+        q: 'Is dictation good for dyslexia?',
+        a: "Many dyslexic writers find it helps, because speaking removes the spelling barrier while you're still forming ideas. It isn't a complete fix. You'll still want to edit the draft, and accuracy depends on your voice, microphone and software, so try it on a first draft before relying on it.",
+      },
+      {
+        q: 'Does spellcheck catch dyslexic spelling mistakes?',
+        a: 'Often not. Standard spellcheckers look for words that are visually close to what you typed, but many dyslexic errors are real words in the wrong place or phonetic spellings that look nothing like the target word. Our guide to common dyslexia spelling mistakes gives examples.',
+      },
+      {
+        q: 'What is the best software for dyslexic writing?',
+        a: 'It depends on what you struggle with most. Use the checklist above, and try two or three options with a paragraph of your own writing before you commit.',
+      },
+      {
+        q: 'Can I get dyslexia writing software paid for?',
+        a: 'In the UK, possibly. Access to Work can help employed and self-employed people with practical support at work, and Disabled Students\' Allowance can help students, but both depend on eligibility and assessment. The rules for assistive software under DSA are under review, so check the current position on GOV.UK.',
+      },
+    ],
+    relatedLinks: [
+      { label: 'Is DyslexiaWrite funded through Access to Work?', href: '/access-to-work' },
+      { label: 'Full feature and pricing comparison', href: '/compare' },
+      { label: 'How DyslexiaWrite compares to Grammarly', href: '/vs/grammarly' },
+    ],
+    references: [
+      { label: 'British Dyslexia Association — dyslexia factsheet', url: 'https://www.bdadyslexia.org.uk/dyslexia' },
+      { label: 'British Dyslexia Association — legislation guidance for employers', url: 'https://www.bdadyslexia.org.uk/employer/legislation' },
+      { label: 'GOV.UK — Access to Work', url: 'https://www.gov.uk/access-to-work' },
+      { label: "GOV.UK — Disabled Students' Allowance", url: 'https://www.gov.uk/disabled-students-allowances-dsas' },
+      { label: 'Department for Education — assistive software funded through Disabled Students’ Allowance (consultation)', url: 'https://consult.education.gov.uk/disabled-students-allowance-team/assistive-software-funded-through-disabled-student' },
     ],
   },
   {

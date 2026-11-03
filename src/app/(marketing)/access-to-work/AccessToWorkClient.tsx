@@ -316,6 +316,7 @@ export default function AccessToWorkClient() {
           <p style={{ fontSize: 14, color: '#534AB7', lineHeight: 1.6, marginBottom: 16 }}>We know the Access to Work process can feel daunting. We're happy to support you at every step — just get in touch.</p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="mailto:support@dyslexiawrite.com?subject=Access%20to%20Work%20help" style={{ padding: '10px 20px', borderRadius: 8, fontSize: 14, fontWeight: 500, background: '#534AB7', color: '#fff', textDecoration: 'none' }}>Email us for help</a>
+            <Link href="/guides/how-to-write-with-dyslexia" style={{ padding: '10px 20px', borderRadius: 8, fontSize: 14, fontWeight: 500, background: '#fff', color: '#3C3489', textDecoration: 'none', border: '1px solid #CECBF6' }}>Writing tips & support guide →</Link>
             <Link href="/enterprise" style={{ padding: '10px 20px', borderRadius: 8, fontSize: 14, fontWeight: 500, background: '#fff', color: '#3C3489', textDecoration: 'none', border: '1px solid #CECBF6' }}>For employers →</Link>
           </div>
         </div>
