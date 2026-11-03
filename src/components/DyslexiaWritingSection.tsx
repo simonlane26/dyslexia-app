@@ -38,6 +38,14 @@ export function DyslexiaWritingSection() {
             </Link>
             .
           </p>
+          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '22px' }}>
+            <Link href="/guides/how-to-write-with-dyslexia" style={{ fontSize: '14px', fontWeight: 600, color: landing.teal, textDecoration: 'none' }}>
+              How to write with dyslexia →
+            </Link>
+            <Link href="/guides/best-fonts-for-dyslexia" style={{ fontSize: '14px', fontWeight: 600, color: landing.teal, textDecoration: 'none' }}>
+              Best fonts for dyslexia →
+            </Link>
+          </div>
         </Reveal>
       </div>
     </div>

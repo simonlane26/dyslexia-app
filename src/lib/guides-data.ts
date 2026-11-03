@@ -22,6 +22,9 @@ export interface Guide {
   updatedAt?: string; // ISO date — set when a guide is substantially revised
   readingTime: string;
   author?: { name: string; title: string };
+  // Lead-in line above the end-of-guide CTA button — keep it specific to
+  // what this guide covers, not a generic "try the tools" line.
+  ctaText?: string;
   sections: GuideSection[];
   references?: { label: string; url: string }[];
 }
@@ -34,6 +37,7 @@ export const GUIDES: Guide[] = [
       'Practical, non-clinical strategies for writing with dyslexia — getting ideas down without self-editing, proofreading methods that actually work, and what tools help most.',
     publishedAt: '2026-09-29',
     readingTime: '6 min read',
+    ctaText: 'Try dictation and read-back proofreading on your own writing',
     sections: [
       {
         paragraphs: [
@@ -85,6 +89,7 @@ export const GUIDES: Guide[] = [
       'What actually helps with dyslexia-friendly formatting — font choice, spacing, size, and contrast — including what the evidence on "dyslexia fonts" like OpenDyslexic really shows.',
     publishedAt: '2026-09-29',
     readingTime: '5 min read',
+    ctaText: 'See your own writing in a dyslexia-friendly font and layout',
     sections: [
       {
         paragraphs: [
@@ -137,6 +142,7 @@ export const GUIDES: Guide[] = [
       'Dyslexia writing explained: why spelling, homophones and sentences go wrong, what helps at work and study, and which tools earn their place.',
     publishedAt: '2026-09-29',
     updatedAt: '2026-10-19',
+    ctaText: 'Check your own writing for these exact patterns',
     readingTime: '8 min read',
     author: { name: 'Simon Lane', title: 'Founder, DyslexiaWrite' },
     sections: [

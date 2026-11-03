@@ -106,7 +106,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
           }}
         >
           <p style={{ fontSize: '15px', color: landing.ink, marginBottom: '16px', fontWeight: 600 }}>
-            Want to try the tools mentioned here?
+            {guide.ctaText ?? 'Want to try the tools mentioned here?'}
           </p>
           <Link
             href="/sign-up"
