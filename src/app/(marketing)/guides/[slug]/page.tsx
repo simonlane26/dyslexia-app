@@ -5,6 +5,7 @@ import { GUIDES, getGuideBySlug } from '@/lib/guides-data';
 import { guideArticleSchema, guideFaqSchema } from '@/app/schema';
 import { landing } from '@/lib/landingTheme';
 import { Footer } from '@/components/Footer';
+import { chromeWebStoreUrl } from '@/lib/chromeExtension';
 
 export function generateStaticParams() {
   return GUIDES.map((g) => ({ slug: g.slug }));
@@ -189,6 +190,16 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
           >
             Start free — no card needed
           </Link>
+          <div style={{ marginTop: '12px' }}>
+            <a
+              href={chromeWebStoreUrl('guides')}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontSize: '13px', fontWeight: 600, color: landing.teal, textDecoration: 'none' }}
+            >
+              Or Add to Chrome →
+            </a>
+          </div>
         </div>
 
         {guide.references && guide.references.length > 0 && (

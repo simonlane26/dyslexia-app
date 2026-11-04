@@ -24,6 +24,7 @@ const isPublicPage = createRouteMatcher([
   '/appsumo',
   '/guides',
   '/guides/(.*)',
+  '/welcome',
   '/robots.txt',
   '/sitemap.xml',
   '/sign-in(.*)',

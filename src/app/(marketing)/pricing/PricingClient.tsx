@@ -11,6 +11,7 @@ import React, { type CSSProperties } from 'react';
 import { Check, Star, Users, School, Sparkles, Volume2, Download, Palette, Briefcase } from 'lucide-react';
 import { AccessToWorkGuideOptIn } from '@/components/AccessToWorkGuideOptIn';
 import { Footer } from '@/components/Footer';
+import { chromeWebStoreUrl } from '@/lib/chromeExtension';
 
 /* ---------- Modern Button ---------- */
 
@@ -325,6 +326,18 @@ export default function PricingClient() {
           >
             Choose the perfect plan for your writing journey. From individual
             learners to entire schools.
+          </p>
+          <p style={{ fontSize: '14px', color: '#9C9686', marginTop: '14px' }}>
+            Every plan includes the{' '}
+            <a
+              href={chromeWebStoreUrl('pricing')}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#2F7A6B', fontWeight: 600, textDecoration: 'none' }}
+            >
+              Add to Chrome
+            </a>{' '}
+            extension for Gmail, Outlook, Slack and Teams.
           </p>
         </div>
 

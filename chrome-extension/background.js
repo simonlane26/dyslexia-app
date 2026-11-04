@@ -22,7 +22,34 @@ function createMenus() {
   });
 }
 
-chrome.runtime.onInstalled.addListener(createMenus);
+chrome.runtime.onInstalled.addListener((details) => {
+  createMenus();
+
+  // First install only (not updates) — the extension needs an account to do
+  // anything useful, so this is the single biggest drop-off point. Sending
+  // people straight to a page that explains that and gets them signed in
+  // immediately, rather than leaving them with just a toolbar icon, also
+  // lets installs-that-become-signups be measured via utm_source=extension.
+  if (details.reason === 'install') {
+    chrome.tabs.create({ url: 'https://www.dyslexiawrite.com/welcome?utm_source=extension&utm_medium=install' });
+  }
+});
+
+// ── Website -> extension handoff ────────────────────────────────────────────
+// Lets /extension-connect hand the auth token straight to the extension via
+// chrome.runtime.sendMessage instead of the user copying and pasting it.
+// Requires manifest.json's externally_connectable to list the site's origin.
+chrome.runtime.onMessageExternal.addListener((message, _sender, sendResponse) => {
+  if (message?.type === 'DW_PING') {
+    sendResponse({ ok: true, installed: true });
+    return;
+  }
+  if (message?.type === 'DW_CONNECT_TOKEN' && typeof message.token === 'string' && message.token) {
+    chrome.storage.local.set({ dw_token: message.token }, () => sendResponse({ ok: true }));
+    return true; // keep the message channel open for the async sendResponse
+  }
+  sendResponse({ ok: false, error: 'Unrecognised message' });
+});
 
 // ── Helper: ensure content script is injected ──────────────────────────────────
 // Returns false if the tab is restricted (chrome://, extension pages, etc.)

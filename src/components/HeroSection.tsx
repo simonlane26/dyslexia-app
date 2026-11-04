@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { landing } from '@/lib/landingTheme';
 import { HeroVideo } from './HeroVideo';
+import { chromeWebStoreUrl } from '@/lib/chromeExtension';
 
 interface HeroSectionProps {
   onGetStarted: () => void;
@@ -151,7 +152,15 @@ export function HeroSection({ onGetStarted, onSeeFunding }: HeroSectionProps) {
           </div>
 
           <p style={{ fontSize: '13.5px', color: landing.inkFaint, margin: 0 }}>
-            Chrome extension for Gmail, Outlook, Slack and Teams — plus the web editor built in.
+            <a
+              href={chromeWebStoreUrl('homepage')}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: landing.teal, fontWeight: 600, textDecoration: 'none' }}
+            >
+              Add to Chrome
+            </a>
+            {' '}— works in Gmail, Outlook, Slack and Teams, plus the web editor built in.
             Eligible for Access to Work funding.
           </p>
         </div>

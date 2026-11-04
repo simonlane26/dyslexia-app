@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { GUIDES } from '@/lib/guides-data';
 import { landing } from '@/lib/landingTheme';
 import { Footer } from '@/components/Footer';
+import { chromeWebStoreUrl } from '@/lib/chromeExtension';
 
 export const metadata: Metadata = {
   title: 'Guides — Writing and Reading With Dyslexia',
@@ -33,6 +34,17 @@ export default function GuidesPage() {
           </h1>
           <p style={{ color: landing.inkMuted, fontSize: '16px', maxWidth: '560px', margin: '0 auto', lineHeight: 1.6 }}>
             Practical guides on writing, formatting, and proofreading with dyslexia — useful whether or not you ever try DyslexiaWrite.
+          </p>
+          <p style={{ fontSize: '14px', color: landing.inkFaint, marginTop: '14px' }}>
+            Want the tools built in as you write?{' '}
+            <a
+              href={chromeWebStoreUrl('guides')}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: landing.amberDark, fontWeight: 600, textDecoration: 'none' }}
+            >
+              Add to Chrome
+            </a>
           </p>
         </div>
 

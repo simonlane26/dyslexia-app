@@ -1,7 +1,49 @@
 'use client';
 
 import { useAuth, useUser, SignInButton } from '@clerk/nextjs';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { CHROME_EXTENSION_ID } from '@/lib/chromeExtension';
+
+// Chrome injects a limited chrome.runtime global into pages whose origin an
+// installed extension lists in externally_connectable — regular sites don't
+// have this, so its presence (plus a successful DW_PING round-trip) is how
+// we tell whether the extension is actually installed before offering the
+// one-click connect button instead of the copy/paste fallback.
+declare global {
+  interface Window {
+    chrome?: {
+      runtime?: {
+        sendMessage: (
+          extensionId: string,
+          message: unknown,
+          callback: (response: unknown) => void
+        ) => void;
+        lastError?: { message?: string };
+      };
+    };
+  }
+}
+
+function sendToExtension(message: unknown): Promise<{ ok: boolean; error?: string }> {
+  return new Promise((resolve) => {
+    const runtime = window.chrome?.runtime;
+    if (!runtime?.sendMessage) {
+      resolve({ ok: false, error: 'not available' });
+      return;
+    }
+    try {
+      runtime.sendMessage(CHROME_EXTENSION_ID, message, (response: any) => {
+        if (runtime.lastError || !response?.ok) {
+          resolve({ ok: false, error: runtime.lastError?.message || response?.error });
+        } else {
+          resolve({ ok: true });
+        }
+      });
+    } catch {
+      resolve({ ok: false, error: 'send failed' });
+    }
+  });
+}
 
 export default function ExtensionConnectPage() {
   const { isSignedIn, isLoaded } = useAuth();
@@ -10,6 +52,15 @@ export default function ExtensionConnectPage() {
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [extensionDetected, setExtensionDetected] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+  const [connected, setConnected] = useState(false);
+  const [connectError, setConnectError] = useState('');
+  const [showManual, setShowManual] = useState(false);
+
+  useEffect(() => {
+    sendToExtension({ type: 'DW_PING' }).then((res) => setExtensionDetected(res.ok));
+  }, []);
 
   async function getToken() {
     setLoading(true);
@@ -35,6 +86,20 @@ export default function ExtensionConnectPage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   }
+
+  const connectDirectly = useCallback(async () => {
+    if (!token) return;
+    setConnecting(true);
+    setConnectError('');
+    const res = await sendToExtension({ type: 'DW_CONNECT_TOKEN', token });
+    setConnecting(false);
+    if (res.ok) {
+      setConnected(true);
+    } else {
+      setConnectError("Couldn't reach the extension automatically — use the manual steps below instead.");
+      setShowManual(true);
+    }
+  }, [token]);
 
   if (!isLoaded) return null;
 
@@ -96,8 +161,46 @@ export default function ExtensionConnectPage() {
             )}
           </div>
 
+        ) : connected ? (
+          /* Connected automatically — the whole point of the one-click path */
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ width: '48px', height: '48px', background: '#dcfce7', color: '#16a34a', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px', fontSize: '22px', fontWeight: '700' }}>✓</div>
+            <h2 style={{ fontSize: '17px', fontWeight: '700', color: '#1e293b', margin: '0 0 8px' }}>Connected!</h2>
+            <p style={{ fontSize: '14px', color: '#64748b', lineHeight: '1.6', margin: 0 }}>
+              AI Simplify is now unlocked. You can close this tab and start writing.
+            </p>
+          </div>
+
+        ) : extensionDetected && !showManual ? (
+          /* Extension found on this device — skip the copy/paste entirely */
+          <div>
+            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '10px', padding: '12px 16px', marginBottom: '20px', fontSize: '13px', color: '#166534', textAlign: 'center' }}>
+              DyslexiaWrite extension detected on this browser
+            </div>
+
+            <button
+              onClick={connectDirectly}
+              disabled={connecting}
+              style={{ width: '100%', background: connecting ? '#e2e8f0' : 'linear-gradient(135deg, #7c3aed, #2563eb)', color: connecting ? '#94a3b8' : 'white', border: 'none', borderRadius: '12px', padding: '14px', fontSize: '15px', fontWeight: '700', cursor: connecting ? 'not-allowed' : 'pointer', marginBottom: '12px' }}
+            >
+              {connecting ? 'Connecting…' : 'Connect extension'}
+            </button>
+
+            {connectError && (
+              <p style={{ fontSize: '13px', color: '#dc2626', marginBottom: '12px', textAlign: 'center' }}>{connectError}</p>
+            )}
+
+            <button
+              onClick={() => setShowManual(true)}
+              style={{ width: '100%', background: 'transparent', color: '#64748b', border: 'none', fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}
+            >
+              Connect manually instead
+            </button>
+          </div>
+
         ) : (
-          /* Token ready */
+          /* Manual fallback — extension not detected on this device/browser,
+             or the user asked for the copy/paste path directly */
           <div>
             <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '10px', padding: '14px 16px', marginBottom: '16px' }}>
               <div style={{ fontSize: '11px', fontWeight: '700', color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Your token is ready</div>

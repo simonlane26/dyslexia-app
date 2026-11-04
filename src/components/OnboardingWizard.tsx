@@ -5,6 +5,7 @@ import { useState, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { Home, GraduationCap, Briefcase, Pen, Mail, Volume2, FileText, Mic, BookOpen, Camera, Globe, Sparkles } from 'lucide-react';
+import { chromeWebStoreUrl } from '@/lib/chromeExtension';
 
 type UserType = 'individual' | 'student' | 'employee' | null;
 type Feature = 'writing' | 'emails' | 'readAloud' | 'documents' | 'dictation' | 'reading';
@@ -107,7 +108,7 @@ export default function OnboardingWizard() {
           router.push('/app?tab=decoder');
           break;
         case 'extension':
-          window.open('https://chromewebstore.google.com/detail/dyslexia-write/kokkanejochocedpilnmpdeffjkjnmdc', '_blank');
+          window.open(chromeWebStoreUrl('app_onboarding'), '_blank');
           router.push('/app');
           break;
         default:

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { landing } from '@/lib/landingTheme';
 import { SocialLinks } from './SocialLinks';
+import { chromeWebStoreUrl } from '@/lib/chromeExtension';
 
 const FOOTER_LINKS: [string, string][] = [
   ['Pricing', '/pricing'],
@@ -48,6 +49,14 @@ export function Footer() {
               {label}
             </Link>
           ))}
+          <a
+            href={chromeWebStoreUrl('footer')}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontSize: '13px', color: landing.amberDark, fontWeight: 600, textDecoration: 'none' }}
+          >
+            Add to Chrome
+          </a>
         </div>
         <SocialLinks />
         <span style={{ fontSize: '13px', color: landing.inkFaint }}>© 2026 DyslexiaWrite. Write, simplify, and listen.</span>
