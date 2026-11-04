@@ -19,7 +19,7 @@
       position: 'fixed', bottom: '24px', right: '24px', zIndex: '2147483647',
       width: '340px', background: 'white', borderRadius: '14px',
       boxShadow: '0 8px 40px rgba(0,0,0,0.18)', fontFamily: 'Arial, sans-serif',
-      fontSize: '14px', overflow: 'hidden', border: '1px solid #e2e8f0',
+      fontSize: '14px', overflow: 'hidden', border: '1px solid #E6DECB',
     });
     document.body.appendChild(panel);
 
@@ -29,7 +29,7 @@
       navigator.clipboard.writeText(simplified).then(() => {
         const btn = panel.querySelector('#dw-copy');
         if (btn) { btn.textContent = 'Copied!'; btn.style.background = '#16a34a'; }
-        setTimeout(() => { if (btn) { btn.textContent = 'Copy'; btn.style.background = '#7c3aed'; } }, 2000);
+        setTimeout(() => { if (btn) { btn.textContent = 'Copy'; btn.style.background = '#D98C2B'; } }, 2000);
       });
     });
 
@@ -177,7 +177,7 @@
     el.id = OVERLAY_ID;
     Object.assign(el.style, {
       position: 'fixed', top: '16px', right: '16px', zIndex: '2147483647',
-      background: 'linear-gradient(135deg,#7c3aed,#2563eb)', color: 'white',
+      background: 'linear-gradient(135deg,#D98C2B,#B06F1D)', color: 'white',
       padding: '10px 18px', borderRadius: '10px', fontSize: '13px',
       fontFamily: 'Arial, sans-serif', fontWeight: '600',
       boxShadow: '0 4px 20px rgba(0,0,0,0.25)', display: 'flex',
@@ -235,29 +235,29 @@
       zIndex: '2147483647', background: 'white', borderRadius: '28px',
       padding: '6px 8px', boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
       display: 'flex', alignItems: 'center', gap: '4px',
-      border: '1px solid #e2e8f0', fontFamily: 'Arial, sans-serif',
+      border: '1px solid #E6DECB', fontFamily: 'Arial, sans-serif',
       animation: 'dw-fadein 0.2s ease',
     });
 
     bar.innerHTML = `
       <button id="dw-btn-simplified"
-        style="padding:7px 16px;border-radius:20px;border:none;background:linear-gradient(135deg,#7c3aed,#2563eb);color:white;font-size:12px;font-weight:700;cursor:pointer;transition:opacity 0.15s;">
+        style="padding:7px 16px;border-radius:20px;border:none;background:linear-gradient(135deg,#D98C2B,#B06F1D);color:white;font-size:12px;font-weight:700;cursor:pointer;transition:opacity 0.15s;">
         ✨ Simplified
       </button>
       <button id="dw-btn-original"
-        style="padding:7px 16px;border-radius:20px;border:none;background:transparent;color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;transition:opacity 0.15s;">
+        style="padding:7px 16px;border-radius:20px;border:none;background:transparent;color:#9C9686;font-size:12px;font-weight:600;cursor:pointer;transition:opacity 0.15s;">
         Original
       </button>
-      <span style="font-size:11px;color:#cbd5e1;padding:0 4px 0 2px;">${blockCount} blocks</span>
+      <span style="font-size:11px;color:#D6CCB4;padding:0 4px 0 2px;">${blockCount} blocks</span>
       <button id="dw-btn-dismiss"
-        style="padding:5px 9px;border-radius:20px;border:none;background:transparent;color:#94a3b8;font-size:13px;cursor:pointer;">
+        style="padding:5px 9px;border-radius:20px;border:none;background:transparent;color:#9C9686;font-size:13px;cursor:pointer;">
         ✕
       </button>
     `;
     document.body.appendChild(bar);
 
-    const BG_ON  = 'padding:7px 16px;border-radius:20px;border:none;background:linear-gradient(135deg,#7c3aed,#2563eb);color:white;font-size:12px;font-weight:700;cursor:pointer;';
-    const BG_OFF = 'padding:7px 16px;border-radius:20px;border:none;background:transparent;color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;';
+    const BG_ON  = 'padding:7px 16px;border-radius:20px;border:none;background:linear-gradient(135deg,#D98C2B,#B06F1D);color:white;font-size:12px;font-weight:700;cursor:pointer;';
+    const BG_OFF = 'padding:7px 16px;border-radius:20px;border:none;background:transparent;color:#9C9686;font-size:12px;font-weight:600;cursor:pointer;';
 
     document.getElementById('dw-btn-original').addEventListener('click', () => {
       if (!pageState.isShowingSimplified) return;
@@ -425,7 +425,7 @@
 
   function highlightReadBlock(el) {
     clearReadHighlight();
-    el.style.outline = '2px solid #0ea5e9';
+    el.style.outline = '2px solid #2F7A6B';
     el.style.outlineOffset = '3px';
     el.style.backgroundColor = 'rgba(14,165,233,0.08)';
     readState.highlightedEl = el;
@@ -452,18 +452,18 @@
       zIndex: '2147483647', background: 'white', borderRadius: '28px',
       padding: '8px 10px', boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
       display: 'flex', alignItems: 'center', gap: '8px',
-      border: '1px solid #e2e8f0', fontFamily: 'Arial, sans-serif',
+      border: '1px solid #E6DECB', fontFamily: 'Arial, sans-serif',
       animation: 'dw-fadein 0.2s ease',
     });
     bar.innerHTML = `
       <span style="font-size:13px;">🔊</span>
       <button id="dw-read-pause" type="button"
-        style="width:30px;height:30px;border-radius:50%;border:none;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:white;font-size:13px;cursor:pointer;">⏸</button>
-      <span id="dw-read-progress" style="font-size:12px;color:#64748b;min-width:44px;text-align:center;">1 / ${readState.blocks.length}</span>
+        style="width:30px;height:30px;border-radius:50%;border:none;background:linear-gradient(135deg,#2F7A6B,#245F52);color:white;font-size:13px;cursor:pointer;">⏸</button>
+      <span id="dw-read-progress" style="font-size:12px;color:#6B6558;min-width:44px;text-align:center;">1 / ${readState.blocks.length}</span>
       <button id="dw-read-speed" type="button" title="Reading speed"
-        style="padding:6px 10px;border-radius:20px;border:none;background:#f1f5f9;color:#475569;font-size:12px;font-weight:600;cursor:pointer;">${readState.rate}x</button>
+        style="padding:6px 10px;border-radius:20px;border:none;background:#F4EEDE;color:#6B6558;font-size:12px;font-weight:600;cursor:pointer;">${readState.rate}x</button>
       <button id="dw-read-stop" type="button"
-        style="padding:6px 14px;border-radius:20px;border:none;background:#f1f5f9;color:#475569;font-size:12px;font-weight:600;cursor:pointer;">⏹ Stop</button>
+        style="padding:6px 14px;border-radius:20px;border:none;background:#F4EEDE;color:#6B6558;font-size:12px;font-weight:600;cursor:pointer;">⏹ Stop</button>
     `;
     document.body.appendChild(bar);
 
@@ -558,27 +558,27 @@
     // Existing: right-click selection simplify
     if (msg.type === 'DW_SIMPLIFY_START') {
       showPanel(`
-        <div style="background:linear-gradient(135deg,#7c3aed,#2563eb);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="background:linear-gradient(135deg,#D98C2B,#B06F1D);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
           <span style="color:white;font-weight:700;font-size:13px;">✨ DyslexiaWrite</span>
           <button id="dw-close" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:12px;">✕</button>
         </div>
-        <div style="padding:16px;color:#64748b;font-size:13px;">Simplifying…</div>
+        <div style="padding:16px;color:#6B6558;font-size:13px;">Simplifying…</div>
       `);
     }
 
     if (msg.type === 'DW_SIMPLIFY_RESULT') {
       const safe = esc(msg.simplified);
       showPanel(`
-        <div style="background:linear-gradient(135deg,#7c3aed,#2563eb);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="background:linear-gradient(135deg,#D98C2B,#B06F1D);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
           <span style="color:white;font-weight:700;font-size:13px;">✨ DyslexiaWrite</span>
           <button id="dw-close" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:12px;">✕</button>
         </div>
         <div style="padding:14px 16px;">
-          <div style="font-size:11px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Simplified</div>
-          <div style="font-size:14px;line-height:1.7;color:#1e293b;margin-bottom:14px;">${safe}</div>
+          <div style="font-size:11px;font-weight:700;color:#D98C2B;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Simplified</div>
+          <div style="font-size:14px;line-height:1.7;color:#2B2A28;margin-bottom:14px;">${safe}</div>
           <div style="display:flex;gap:8px;">
-            <button id="dw-replace" style="flex:1;background:linear-gradient(135deg,#7c3aed,#2563eb);color:white;border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;cursor:pointer;">Replace selection</button>
-            <button id="dw-copy" style="background:#7c3aed;color:white;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;">Copy</button>
+            <button id="dw-replace" style="flex:1;background:linear-gradient(135deg,#D98C2B,#B06F1D);color:white;border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;cursor:pointer;">Replace selection</button>
+            <button id="dw-copy" style="background:#D98C2B;color:white;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;">Copy</button>
           </div>
         </div>
       `, msg.simplified, msg.original);
@@ -586,7 +586,7 @@
 
     if (msg.type === 'DW_SIMPLIFY_ERROR') {
       showPanel(`
-        <div style="background:linear-gradient(135deg,#7c3aed,#2563eb);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="background:linear-gradient(135deg,#D98C2B,#B06F1D);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
           <span style="color:white;font-weight:700;font-size:13px;">✨ DyslexiaWrite</span>
           <button id="dw-close" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:12px;">✕</button>
         </div>
@@ -754,27 +754,27 @@
       position: 'fixed', top: '16px', left: '50%', transform: 'translateX(-50%)',
       zIndex: '2147483647', background: 'white', borderRadius: '12px',
       boxShadow: '0 4px 24px rgba(0,0,0,0.16)', fontFamily: 'Arial, sans-serif',
-      fontSize: '13px', width: '360px', border: '1px solid #e2e8f0',
+      fontSize: '13px', width: '360px', border: '1px solid #E6DECB',
       animation: 'dw-fadein 0.2s ease', overflow: 'hidden',
     });
 
     const sugItems = suggestions.map((s, i) => `
-      <div style="display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:1px solid #f1f5f9;">
-        <span style="flex:1;color:#1e293b;">
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:1px solid #F4EEDE;">
+        <span style="flex:1;color:#2B2A28;">
           <span style="background:#fde68a;padding:1px 4px;border-radius:3px;">${esc(s.original)}</span>
-          <span style="color:#94a3b8;margin:0 4px;">→</span>
+          <span style="color:#9C9686;margin:0 4px;">→</span>
           <span style="background:#d1fae5;padding:1px 4px;border-radius:3px;font-weight:600;">${esc(s.suggestion)}</span>
-          <span style="color:#94a3b8;font-size:11px;margin-left:4px;">${esc(s.reason || '')}</span>
+          <span style="color:#9C9686;font-size:11px;margin-left:4px;">${esc(s.reason || '')}</span>
         </span>
         <button type="button" data-idx="${i}"
-          style="background:#7c3aed;color:white;border:none;border-radius:5px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0;">
+          style="background:#D98C2B;color:white;border:none;border-radius:5px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0;">
           Fix
         </button>
       </div>
     `).join('');
 
     panel.innerHTML = `
-      <div style="background:linear-gradient(135deg,#7c3aed,#2563eb);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="background:linear-gradient(135deg,#D98C2B,#B06F1D);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
         <span style="color:white;font-weight:700;font-size:13px;">✍️ ${suggestions.length} suggestion${suggestions.length > 1 ? 's' : ''}</span>
         <div style="display:flex;gap:6px;">
           <button id="dw-comp-tone" type="button"
@@ -788,13 +788,13 @@
         </div>
       </div>
       <div id="dw-comp-suggestions">${sugItems}</div>
-      <div style="padding:8px 14px;background:#f8fafc;display:flex;gap:6px;justify-content:flex-end;">
+      <div style="padding:8px 14px;background:#F4EEDE;display:flex;gap:6px;justify-content:flex-end;">
         <button id="dw-comp-fix-all" type="button"
-          style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:white;border:none;border-radius:6px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;">
+          style="background:linear-gradient(135deg,#D98C2B,#B06F1D);color:white;border:none;border-radius:6px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;">
           Fix all
         </button>
         <button id="dw-comp-dismiss" type="button"
-          style="background:#e2e8f0;color:#475569;border:none;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;">
+          style="background:#E6DECB;color:#6B6558;border:none;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;">
           Dismiss
         </button>
       </div>
@@ -856,7 +856,7 @@
     const { confidence, summary, suggestion, rewrite } = result || {};
     const colors = {
       'sounds great':        { bg: '#d1fae5', text: '#065f46', icon: '✓' },
-      'mostly good':         { bg: '#fef3c7', text: '#92400e', icon: '~' },
+      'mostly good':         { bg: '#FBEEDA', text: '#B06F1D', icon: '~' },
       'might need adjusting':{ bg: '#fee2e2', text: '#991b1b', icon: '!' },
     };
     const c = colors[confidence] || colors['mostly good'];
@@ -906,7 +906,7 @@
     badge.textContent = '✍️ DW';
     Object.assign(badge.style, {
       position: 'fixed', bottom: '8px', right: '8px', zIndex: '2147483647',
-      background: '#7c3aed', color: 'white', fontSize: '11px', fontWeight: '700',
+      background: '#D98C2B', color: 'white', fontSize: '11px', fontWeight: '700',
       padding: '3px 8px', borderRadius: '8px', pointerEvents: 'none',
       fontFamily: 'Arial, sans-serif', opacity: '0.85',
     });

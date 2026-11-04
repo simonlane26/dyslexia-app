@@ -148,8 +148,8 @@ swatches.forEach(swatch => {
 function applyBgColor() {
   editor.style.backgroundColor = bgColor;
   // Dark bg needs light text
-  editor.style.color = isDark(bgColor) ? '#f1f5f9' : '#1e293b';
-  editor.style.caretColor = isDark(bgColor) ? '#f1f5f9' : '#1e293b';
+  editor.style.color = isDark(bgColor) ? '#f1f5f9' : '#2B2A28';
+  editor.style.caretColor = isDark(bgColor) ? '#f1f5f9' : '#2B2A28';
   // Update active swatch
   swatches.forEach(s => {
     s.classList.toggle('active', s.dataset.color === bgColor);
@@ -370,14 +370,14 @@ rewriteBtn.addEventListener('click', async () => {
     rewriteCards.innerHTML = '';
     alternatives.forEach((alt) => {
       const card = document.createElement('div');
-      card.style.cssText = 'background:white;border:1px solid #c7d7fd;border-radius:8px;padding:10px 12px;';
+      card.style.cssText = 'background:white;border:1px solid #C5DDD4;border-radius:8px;padding:10px 12px;';
       card.innerHTML = `
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
           <span style="font-size:14px;">${alt.icon || '✏️'}</span>
-          <span style="font-size:11px;font-weight:700;color:#2563eb;text-transform:uppercase;letter-spacing:0.05em;">${(alt.label || '').replace(/</g,'&lt;')}</span>
+          <span style="font-size:11px;font-weight:700;color:#2F7A6B;text-transform:uppercase;letter-spacing:0.05em;">${(alt.label || '').replace(/</g,'&lt;')}</span>
         </div>
-        <div style="font-size:13px;line-height:1.6;color:#1e293b;margin-bottom:8px;">${(alt.text || '').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-        <button type="button" style="background:linear-gradient(135deg,#2563eb,#7c3aed);color:white;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">Use this</button>
+        <div style="font-size:13px;line-height:1.6;color:#2B2A28;margin-bottom:8px;">${(alt.text || '').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        <button type="button" style="background:linear-gradient(135deg,#D98C2B,#B06F1D);color:white;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">Use this</button>
       `;
       card.querySelector('button').addEventListener('click', () => {
         editor.value = alt.text;

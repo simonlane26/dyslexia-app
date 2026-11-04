@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <title>Icon Generator — DyslexiaWrite</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 40px; background: #f8fafc; color: #1e293b; }
+    body { font-family: Arial, sans-serif; padding: 40px; background: #FBF7EF; color: #2B2A28; }
     h1 { margin-bottom: 8px; }
-    p { color: #64748b; margin-bottom: 32px; }
+    p { color: #6B6558; margin-bottom: 32px; }
     .icons { display: flex; gap: 40px; align-items: flex-end; flex-wrap: wrap; }
     .icon-block { text-align: center; }
     canvas { display: block; border-radius: 22%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 10px; }
-    .label { font-size: 13px; color: #64748b; margin-bottom: 8px; }
-    a.dl { display: inline-block; padding: 7px 16px; background: #7c3aed; color: white;
+    .label { font-size: 13px; color: #6B6558; margin-bottom: 8px; }
+    a.dl { display: inline-block; padding: 7px 16px; background: #D98C2B; color: white;
            border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; }
-    a.dl:hover { background: #6d28d9; }
+    a.dl:hover { background: #B06F1D; }
   </style>
 </head>
 <body>
@@ -50,8 +50,8 @@
 
       // Gradient fill
       const grad = ctx.createLinearGradient(0, 0, size, size);
-      grad.addColorStop(0, '#7c3aed');
-      grad.addColorStop(1, '#2563eb');
+      grad.addColorStop(0, '#D98C2B');
+      grad.addColorStop(1, '#B06F1D');
       ctx.fillStyle = grad;
       ctx.fill();
 
