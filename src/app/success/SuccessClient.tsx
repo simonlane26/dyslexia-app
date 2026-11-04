@@ -79,7 +79,7 @@ export default function SuccessClient(): JSX.Element {
           onClick={goHome}
           style={{
             marginTop: 12,
-            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+            background: 'linear-gradient(135deg, #D98C2B 0%, #B06F1D 100%)',
             color: '#fff',
             border: 'none',
             padding: '10px 16px',

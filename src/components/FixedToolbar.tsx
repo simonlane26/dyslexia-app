@@ -735,7 +735,7 @@ function ProUpgradePopover({
         left: '50%',
         transform: 'translateX(-50%)',
         backgroundColor: darkMode ? '#1e293b' : '#ffffff',
-        border: `1px solid ${darkMode ? 'rgba(139,92,246,0.4)' : 'rgba(139,92,246,0.25)'}`,
+        border: `1px solid ${darkMode ? 'rgba(217,140,43,0.4)' : 'rgba(217,140,43,0.25)'}`,
         borderRadius: '12px',
         padding: '14px 16px',
         fontSize: '13px',
@@ -753,7 +753,7 @@ function ProUpgradePopover({
           type="button"
           onClick={onUpgrade}
           style={{
-            background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
+            background: 'linear-gradient(135deg, #D98C2B 0%, #B06F1D 100%)',
             border: 'none',
             borderRadius: '8px',
             color: '#ffffff',

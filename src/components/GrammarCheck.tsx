@@ -188,11 +188,11 @@ export function GrammarCheck({
             gap: '6px',
             padding: '6px 12px',
             backgroundColor: isSchoolMode
-              ? (darkMode ? 'rgba(167, 139, 250, 0.2)' : 'rgba(167, 139, 250, 0.1)')
+              ? (darkMode ? 'rgba(217, 140, 43, 0.2)' : 'rgba(217, 140, 43, 0.1)')
               : (darkMode ? 'rgba(239, 68, 68, 0.2)' : 'rgba(239, 68, 68, 0.1)'),
             borderRadius: '6px',
             fontSize: '12px',
-            color: isSchoolMode ? '#7c3aed' : theme.danger,
+            color: isSchoolMode ? '#D98C2B' : theme.danger,
             zIndex: 10,
           }}
         >
@@ -305,9 +305,9 @@ function GrammarHighlightedText({
 
   const getUnderlineColor = (severity: string, isDyslexia: boolean) => {
     if (isSchoolMode) {
-      // Soft, non-shaming purple tones in school mode
-      if (isDyslexia) return '#a78bfa';
-      return '#c4b5fd';
+      // Soft, non-shaming amber tones in school mode
+      if (isDyslexia) return '#E8B570';
+      return '#F0D9B0';
     }
     if (isDyslexia) return '#f59e0b'; // Orange for dyslexia-relevant
     if (severity === 'error') return '#ef4444'; // Red for errors

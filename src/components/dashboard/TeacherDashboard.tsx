@@ -133,7 +133,7 @@ export function TeacherDashboard() {
     return (
       <div style={{ padding: "60px", textAlign: "center", color: "#dc2626", fontFamily: "Lexend, sans-serif" }}>
         <p style={{ marginBottom: "16px" }}>{error}</p>
-        <Link href="/app" style={{ color: "#2563eb" }}>Go back to the editor</Link>
+        <Link href="/app" style={{ color: "#D98C2B" }}>Go back to the editor</Link>
       </div>
     );
   }
@@ -172,8 +172,8 @@ export function TeacherDashboard() {
           <div style={{
             marginTop: "24px",
             padding: "16px 20px",
-            background: "linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(59,130,246,0.08) 100%)",
-            border: "1px solid rgba(139,92,246,0.2)",
+            background: "linear-gradient(135deg, rgba(217,140,43,0.08) 0%, rgba(176,111,29,0.08) 100%)",
+            border: "1px solid rgba(217,140,43,0.2)",
             borderRadius: "12px",
             display: "flex",
             alignItems: "center",
@@ -181,7 +181,7 @@ export function TeacherDashboard() {
             flexWrap: "wrap",
           }}>
             <div>
-              <div style={{ fontSize: "12px", fontWeight: 600, color: "#7c3aed", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <div style={{ fontSize: "12px", fontWeight: 600, color: "#D98C2B", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 School join code
               </div>
               <div style={{ fontSize: "28px", fontWeight: 800, color: "#1e293b", letterSpacing: "0.1em" }}>
@@ -194,9 +194,9 @@ export function TeacherDashboard() {
               style={{
                 padding: "8px 16px",
                 borderRadius: "8px",
-                border: "1px solid rgba(139,92,246,0.3)",
-                backgroundColor: codeCopied ? "#7c3aed" : "white",
-                color: codeCopied ? "white" : "#7c3aed",
+                border: "1px solid rgba(217,140,43,0.3)",
+                backgroundColor: codeCopied ? "#D98C2B" : "white",
+                color: codeCopied ? "white" : "#D98C2B",
                 cursor: "pointer",
                 fontSize: "14px",
                 fontWeight: 600,
@@ -292,7 +292,7 @@ export function TeacherDashboard() {
                 padding: "8px 16px",
                 borderRadius: "8px",
                 border: "none",
-                background: "linear-gradient(135deg, #7c3aed, #2563eb)",
+                background: "linear-gradient(135deg, #D98C2B, #B06F1D)",
                 color: "white",
                 cursor: "pointer",
                 fontSize: "14px",
@@ -420,7 +420,7 @@ export function TeacherDashboard() {
                   padding: "10px 20px",
                   borderRadius: "8px",
                   border: "none",
-                  background: "linear-gradient(135deg, #7c3aed, #2563eb)",
+                  background: "linear-gradient(135deg, #D98C2B, #B06F1D)",
                   color: "white",
                   cursor: formSaving ? "not-allowed" : "pointer",
                   fontSize: "14px",
@@ -469,7 +469,7 @@ export function TeacherDashboard() {
       {/* Footer note */}
       <p style={{ marginTop: "48px", fontSize: "12px", color: "#94a3b8", textAlign: "center" }}>
         DyslexiaWrite never stores student writing.{" "}
-        <Link href="/schools-privacy" style={{ color: "#7c3aed" }}>Schools privacy policy</Link>
+        <Link href="/schools-privacy" style={{ color: "#D98C2B" }}>Schools privacy policy</Link>
       </p>
     </div>
   );
@@ -606,7 +606,7 @@ function StudentCard({ student, hasActiveAssignment, assignmentMinWords, assignm
               padding: "6px 14px",
               borderRadius: "6px",
               border: "none",
-              backgroundColor: feedbackSaved ? "#16a34a" : "#7c3aed",
+              backgroundColor: feedbackSaved ? "#16a34a" : "#D98C2B",
               color: "white",
               cursor: feedbackSaving ? "not-allowed" : "pointer",
               fontSize: "12px",

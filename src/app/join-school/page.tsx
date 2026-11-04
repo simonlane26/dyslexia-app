@@ -97,7 +97,7 @@ export default function JoinSchoolPage() {
                 outline: "none",
                 boxSizing: "border-box",
               }}
-              onFocus={(e) => (e.target.style.borderColor = "#7c3aed")}
+              onFocus={(e) => (e.target.style.borderColor = "#D98C2B")}
               onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
             />
           </div>
@@ -117,9 +117,9 @@ export default function JoinSchoolPage() {
                     flex: 1,
                     padding: "12px",
                     borderRadius: "10px",
-                    border: `2px solid ${role === r ? "#7c3aed" : "#e2e8f0"}`,
-                    backgroundColor: role === r ? "rgba(124,58,237,0.06)" : "white",
-                    color: role === r ? "#7c3aed" : "#64748b",
+                    border: `2px solid ${role === r ? "#D98C2B" : "#e2e8f0"}`,
+                    backgroundColor: role === r ? "rgba(217,140,43,0.06)" : "white",
+                    color: role === r ? "#D98C2B" : "#64748b",
                     fontWeight: role === r ? 700 : 500,
                     fontSize: "15px",
                     cursor: "pointer",
@@ -158,7 +158,7 @@ export default function JoinSchoolPage() {
               border: "none",
               background: loading || code.length < 6
                 ? "#e2e8f0"
-                : "linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)",
+                : "linear-gradient(135deg, #D98C2B 0%, #B06F1D 100%)",
               color: loading || code.length < 6 ? "#94a3b8" : "white",
               fontWeight: 700,
               fontSize: "16px",
@@ -171,9 +171,9 @@ export default function JoinSchoolPage() {
         </form>
 
         <p style={{ textAlign: "center", marginTop: "20px", fontSize: "13px", color: "#94a3b8" }}>
-          <Link href="/app" style={{ color: "#7c3aed" }}>Skip for now</Link>
+          <Link href="/app" style={{ color: "#D98C2B" }}>Skip for now</Link>
           {" · "}
-          <Link href="/schools-privacy" style={{ color: "#7c3aed" }}>Privacy policy</Link>
+          <Link href="/schools-privacy" style={{ color: "#D98C2B" }}>Privacy policy</Link>
         </p>
       </div>
     </main>

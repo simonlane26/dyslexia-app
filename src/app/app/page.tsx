@@ -1275,10 +1275,10 @@ function PageBody() {
           justifyContent: 'space-between',
           gap: '12px',
           padding: '12px 20px',
-          backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.15)' : 'rgba(139, 92, 246, 0.08)',
-          borderBottom: `1px solid ${darkMode ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.15)'}`,
+          backgroundColor: darkMode ? 'rgba(217, 140, 43, 0.15)' : 'rgba(217, 140, 43, 0.08)',
+          borderBottom: `1px solid ${darkMode ? 'rgba(217, 140, 43, 0.3)' : 'rgba(217, 140, 43, 0.15)'}`,
         }}>
-          <p style={{ margin: 0, fontSize: '14px', color: darkMode ? '#c4b5fd' : '#6d28d9', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <p style={{ margin: 0, fontSize: '14px', color: darkMode ? '#F0C78C' : '#B06F1D', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' }}>
             <IconPencil size={16} stroke={2} style={{ flexShrink: 0 }} /> Start anywhere. There&apos;s no right way to write here.
           </p>
           <button
@@ -1292,7 +1292,7 @@ function PageBody() {
               border: 'none',
               cursor: 'pointer',
               fontSize: '18px',
-              color: darkMode ? '#a78bfa' : '#7c3aed',
+              color: darkMode ? '#F0C78C' : '#D98C2B',
               lineHeight: 1,
               padding: '0 4px',
               flexShrink: 0,
@@ -1356,13 +1356,13 @@ function PageBody() {
           maxWidth: '860px',
           margin: '0 auto',
           padding: '10px 20px',
-          backgroundColor: darkMode ? 'rgba(124,58,237,0.12)' : 'rgba(124,58,237,0.06)',
-          borderLeft: '3px solid #7c3aed',
+          backgroundColor: darkMode ? 'rgba(217,140,43,0.12)' : 'rgba(217,140,43,0.06)',
+          borderLeft: '3px solid #D98C2B',
         }}>
-          <span style={{ fontSize: '13px', fontWeight: 700, color: darkMode ? '#c4b5fd' : '#7c3aed', marginRight: '8px' }}>
+          <span style={{ fontSize: '13px', fontWeight: 700, color: darkMode ? '#F0C78C' : '#D98C2B', marginRight: '8px' }}>
             Teacher note
           </span>
-          <span style={{ fontSize: '13px', color: darkMode ? '#e2d9f3' : '#4c1d95' }}>
+          <span style={{ fontSize: '13px', color: darkMode ? '#F0C78C' : '#7A4A14' }}>
             {teacherFeedback}
           </span>
         </div>
@@ -1805,7 +1805,7 @@ function PageBody() {
               gap: '6px',
               alignItems: 'center',
               backgroundColor: darkMode ? '#1e293b' : '#ffffff',
-              border: `1px solid ${darkMode ? 'rgba(139,92,246,0.35)' : 'rgba(139,92,246,0.2)'}`,
+              border: `1px solid ${darkMode ? 'rgba(217,140,43,0.35)' : 'rgba(217,140,43,0.2)'}`,
               borderRadius: '12px',
               padding: '6px 10px',
               boxShadow: '0 4px 20px rgba(0,0,0,0.18)',

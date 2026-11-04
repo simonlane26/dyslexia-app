@@ -265,8 +265,8 @@ const styles: Record<string, React.CSSProperties> = {
   select: { marginTop: 6, padding: '8px 10px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 14 },
   checkLabel: { display: 'flex', alignItems: 'center', gap: 6, color: '#334155', fontSize: 14 },
   primaryBtn: {
-    padding: '10px 14px', borderRadius: 10, border: '1px solid #2563eb',
-    background: '#2563eb', color: '#fff', cursor: 'pointer', fontWeight: 700
+    padding: '10px 14px', borderRadius: 10, border: '1px solid #D98C2B',
+    background: '#D98C2B', color: '#fff', cursor: 'pointer', fontWeight: 700
   },
   ghostBtn: { padding: '10px 14px', borderRadius: 10, border: '1px solid #cbd5e1', background: '#fff', cursor: 'pointer', fontWeight: 700 },
   suggestionList: { display: 'grid', gap: 10 },
@@ -280,8 +280,8 @@ function chip(active: boolean): React.CSSProperties {
   return {
     padding: '8px 12px',
     borderRadius: 999,
-    border: `2px solid ${active ? '#2563eb' : '#cbd5e1'}`,
-    color: active ? '#2563eb' : '#334155',
+    border: `2px solid ${active ? '#D98C2B' : '#cbd5e1'}`,
+    color: active ? '#D98C2B' : '#334155',
     background: active ? '#eef2ff' : '#fff',
     cursor: 'pointer',
     fontWeight: 800
@@ -290,7 +290,7 @@ function chip(active: boolean): React.CSSProperties {
 
 function suggestionCard(active: boolean): React.CSSProperties {
   return {
-    border: `2px solid ${active ? '#2563eb' : '#e2e8f0'}`,
+    border: `2px solid ${active ? '#D98C2B' : '#e2e8f0'}`,
     background: active ? '#f0f7ff' : '#fff',
     borderRadius: 12,
     padding: 10,

@@ -471,7 +471,7 @@ export function SentenceRewriteModal({
                             style={{
                               marginTop: '8px',
                               padding: '12px',
-                              backgroundColor: darkMode ? 'rgba(167, 139, 250, 0.1)' : 'rgba(124, 58, 237, 0.06)',
+                              backgroundColor: darkMode ? 'rgba(240, 199, 140, 0.1)' : 'rgba(217, 140, 43, 0.06)',
                               borderRadius: '8px',
                               fontSize: '13px',
                               color: theme.text,

@@ -560,8 +560,8 @@ export default function CoachPanel({
             <div
               className="p-3 border rounded-xl text-sm italic flex items-center gap-2"
               style={{
-                borderColor: 'rgba(139, 92, 246, 0.3)',
-                backgroundColor: 'rgba(139, 92, 246, 0.05)',
+                borderColor: 'rgba(217, 140, 43, 0.3)',
+                backgroundColor: 'rgba(217, 140, 43, 0.05)',
               }}
             >
               <IconBolt size={16} stroke={1.75} style={{ flexShrink: 0 }} /> {state.data.motivation}

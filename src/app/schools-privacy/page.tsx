@@ -29,13 +29,13 @@ export default function SchoolsPrivacyPage() {
       </p>
 
       <div style={{
-        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%)',
-        border: '1px solid rgba(139, 92, 246, 0.2)',
+        background: 'linear-gradient(135deg, rgba(217, 140, 43, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%)',
+        border: '1px solid rgba(217, 140, 43, 0.2)',
         borderRadius: '12px',
         padding: '20px 24px',
         marginBottom: '32px',
       }}>
-        <p style={{ margin: 0, fontWeight: 600, color: '#4c1d95' }}>
+        <p style={{ margin: 0, fontWeight: 600, color: '#7A4A14' }}>
           Key commitments at a glance:
         </p>
         <ul style={{ margin: '12px 0 0 0' }}>
