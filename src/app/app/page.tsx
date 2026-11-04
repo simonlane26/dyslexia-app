@@ -511,9 +511,9 @@ function PageBody() {
     ? {
         bg: '#0f1629',
         text: '#ffffff',
-        primary: '#3b82f6',
-        secondary: '#6366f1',
-        accent: '#8b5cf6',
+        primary: '#D98C2B',
+        secondary: '#2F7A6B',
+        accent: '#B65C4A',
         surface: 'rgba(30, 41, 59, 0.8)',
         border: '#334155',
         success: '#10b981',
@@ -523,9 +523,9 @@ function PageBody() {
     : {
         bg: '#f8fafc',
         text: highContrast ? '#000000' : '#1e293b',
-        primary: '#3b82f6',
-        secondary: '#6366f1',
-        accent: '#8b5cf6',
+        primary: '#D98C2B',
+        secondary: '#2F7A6B',
+        accent: '#B65C4A',
         surface: 'rgba(255, 255, 255, 0.8)',
         border: '#e2e8f0',
         success: '#10b981',
@@ -1393,7 +1393,7 @@ function PageBody() {
               value={documentTitle}
               onChange={(e) => setDocumentTitle(e.target.value)}
               placeholder="Untitled Document"
-              className="w-full p-3 transition-all duration-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-3 transition-all duration-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               style={{
                 backgroundColor: darkMode ? '#374151' : bgColor,
                 fontFamily: getFontFamily(),
@@ -1499,7 +1499,7 @@ function PageBody() {
                 onDoubleClick={handleEditorDoubleClick}
                 onKeyUp={() => setFloatingRewrite(null)}
                 placeholder={t('editor.placeholder')}
-                className="w-full transition-all duration-200 resize-none rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full transition-all duration-200 resize-none rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 style={{
                   backgroundColor: darkMode ? '#374151' : bgColor,
                   fontFamily: getFontFamily(),

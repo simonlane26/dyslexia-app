@@ -154,7 +154,7 @@ export function SettingsPanel({
         title={proOnly && !isPro ? "Pro only — Upgrade to use this color" : color.name}
         className={[
           "relative h-8 w-8 rounded-md border transition",
-          active ? "ring-2 ring-blue-500 scale-105" : "hover:scale-105",
+          active ? "ring-2 ring-amber-500 scale-105" : "hover:scale-105",
           proOnly && !isPro ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
         ].join(" ")}
         style={{
@@ -194,7 +194,7 @@ export function SettingsPanel({
             <select
               value={font}
               onChange={(e) => setFont(e.target.value)}
-              className="flex-1 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="flex-1 p-2 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
               style={{
                 backgroundColor: darkMode ? '#374151' : '#ffffff',
                 color: darkMode ? '#ffffff' : '#000000',
@@ -267,7 +267,7 @@ export function SettingsPanel({
               <select
                 value={voiceId}
                 onChange={(e) => setVoiceId(e.target.value)}
-                className="flex-1 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="flex-1 p-2 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
                 style={{
                   backgroundColor: darkMode ? '#374151' : '#ffffff',
                   color: darkMode ? '#ffffff' : '#000000',

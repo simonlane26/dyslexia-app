@@ -325,7 +325,7 @@ function GrammarHighlightedText({
         onBlur={() => setIsEditing(false)}
         autoFocus
         placeholder="Start writing here..."
-        className="w-full transition-all duration-200 resize-none rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        className="w-full transition-all duration-200 resize-none rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
         style={{
           backgroundColor: darkMode ? '#374151' : bgColor,
           fontFamily,

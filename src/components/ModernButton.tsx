@@ -40,7 +40,7 @@ export function ModernButton({
 
   const variants: Record<Variant, string> = {
     primary:
-      'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md hover:scale-[1.02] active:scale-[0.98]',
+      'bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-md hover:scale-[1.02] active:scale-[0.98]',
     secondary:
       'bg-slate-100 text-slate-700 border border-slate-300 hover:scale-[1.02] active:scale-[0.98]',
     success:
