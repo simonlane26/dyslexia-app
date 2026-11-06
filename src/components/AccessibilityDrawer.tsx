@@ -37,6 +37,8 @@ interface AccessibilityDrawerProps {
   setHighContrast: (value: boolean) => void;
   darkMode: boolean;
   setDarkMode: (value: boolean) => void;
+  aiFeaturesEnabled: boolean;
+  setAiFeaturesEnabled: (value: boolean) => void;
   voiceId: string;
   setVoiceId: (id: string) => void;
   resetSettings: () => void;
@@ -63,6 +65,8 @@ export function AccessibilityDrawer({
   setHighContrast,
   darkMode,
   setDarkMode,
+  aiFeaturesEnabled,
+  setAiFeaturesEnabled,
   voiceId,
   setVoiceId,
   resetSettings,
@@ -275,6 +279,24 @@ export function AccessibilityDrawer({
               />
               <span style={{ fontSize: '14px', color: theme.text }}>{t('a11y.highContrast')}</span>
             </label>
+          </div>
+
+          {/* AI Features */}
+          <div style={{ marginBottom: '24px' }}>
+            <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: theme.text }}>
+              {t('a11y.aiFeatures')}
+            </h3>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginBottom: '6px' }}>
+              <input
+                type="checkbox"
+                checked={aiFeaturesEnabled}
+                onChange={(e) => setAiFeaturesEnabled(e.target.checked)}
+              />
+              <span style={{ fontSize: '14px', color: theme.text }}>{t('a11y.aiFeatures')}</span>
+            </label>
+            <p style={{ fontSize: '12px', color: theme.text, opacity: 0.65, margin: 0 }}>
+              {t('a11y.aiFeaturesDesc')}
+            </p>
           </div>
 
           {/* Voice Settings */}

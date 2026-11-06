@@ -48,6 +48,7 @@ interface FixedToolbarProps {
   onSimplify: () => void;
   loading: boolean;
   onRewrite: () => void;
+  aiFeaturesEnabled: boolean;
   grammarCheckEnabled: boolean;
   onGrammarCheckToggle: () => void;
   isPro: boolean;
@@ -86,6 +87,7 @@ export function FixedToolbar({
   onSimplify,
   loading,
   onRewrite,
+  aiFeaturesEnabled,
   grammarCheckEnabled,
   onGrammarCheckToggle,
   isPro,
@@ -350,9 +352,9 @@ export function FixedToolbar({
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
           <ToolbarButton
             weight="bold"
-            disabled={!text.trim()}
+            disabled={!text.trim() || !aiFeaturesEnabled}
             onClick={onRewrite}
-            title={isPro ? 'Rewrite selected sentence with multiple tones' : 'Rewrite — Simpler mode free (3/day)'}
+            title={!aiFeaturesEnabled ? 'AI features are turned off in Settings' : isPro ? 'Rewrite selected sentence with multiple tones' : 'Rewrite — Simpler mode free (3/day)'}
             icon={<Edit3 size={15} />}
             label={t('toolbar.rewrite')}
           />
@@ -360,9 +362,9 @@ export function FixedToolbar({
           <div style={{ position: 'relative' }}>
             <ToolbarButton
               weight="bold"
-              disabled={loading || !text.trim()}
+              disabled={loading || !text.trim() || !aiFeaturesEnabled}
               onClick={() => { onSimplify(); dismissSimplifyTip(); }}
-              title="Simplify text"
+              title={!aiFeaturesEnabled ? 'AI features are turned off in Settings' : 'Simplify text'}
               icon={<Sparkles size={15} />}
               label={copy.simplifyLabel}
             />
@@ -380,8 +382,9 @@ export function FixedToolbar({
               weight="soft"
               active={coachPanelOpen}
               pro={!isPro}
+              disabled={isPro && !aiFeaturesEnabled}
               onClick={() => isPro ? onCoachPanelToggle() : setProPopover(proPopover === 'coach' ? null : 'coach')}
-              title={isPro ? `Toggle ${copy.aiCoachLabel} panel` : `${copy.aiCoachLabel} — Pro feature`}
+              title={isPro && !aiFeaturesEnabled ? 'AI features are turned off in Settings' : isPro ? `Toggle ${copy.aiCoachLabel} panel` : `${copy.aiCoachLabel} — Pro feature`}
               icon={<Brain size={15} />}
               label={copy.aiCoachButton}
             />
@@ -590,7 +593,7 @@ export function FixedToolbar({
           padding: '7px 12px',
         }}>
           <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
-            <ModernButton variant="secondary" size="sm" onClick={onSimplify} disabled={loading || !text.trim()}>
+            <ModernButton variant="secondary" size="sm" onClick={onSimplify} disabled={loading || !text.trim() || !aiFeaturesEnabled}>
               <Sparkles size={14} /> {copy.simplifyLabel}
             </ModernButton>
             <ModernButton variant="secondary" size="sm" onClick={onReadAloud}>

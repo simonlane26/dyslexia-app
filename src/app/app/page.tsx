@@ -75,6 +75,12 @@ function PageBody() {
   // Grammar checking
   const [grammarCheckEnabled, setGrammarCheckEnabled] = useState(false);
 
+  // Master switch for all generative-AI features (Simplify, Rewrite, Coach,
+  // AI Writing Assistant) — on by default, persisted like other settings.
+  // Does NOT affect Grammar/Spell Check, which is rules-based (LanguageTool),
+  // not AI, and already has its own separate toggle.
+  const [aiFeaturesEnabled, setAiFeaturesEnabled] = useState(true);
+
   // Reading Support Panel
   const [readingMode, setReadingMode] = useState<ReadingMode>('clean');
 
@@ -117,7 +123,7 @@ function PageBody() {
 
   // Auto-open the assistant after 3 min of editor inactivity (Pro only, once per session)
   useEffect(() => {
-    if (!isPro) return;
+    if (!isPro || !aiFeaturesEnabled) return;
     const words = text.trim() ? text.trim().split(/\s+/).length : 0;
     if (words < 20 || agentOpen || agentAutoOpenFired.current) return;
 
@@ -133,7 +139,7 @@ function PageBody() {
       if (agentAutoOpenTimer.current) clearTimeout(agentAutoOpenTimer.current);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text, isPro]);
+  }, [text, isPro, aiFeaturesEnabled]);
 
   // School session tracking (counts only, no content ever sent)
   const [sessionSimplifications, setSessionSimplifications] = useState(0);
@@ -256,10 +262,12 @@ function PageBody() {
     setHighContrast(load('highContrast', false));
     setDarkMode(load('darkMode', false));
     setVoiceId(load('voiceId', '21m00Tcm4TlvDq8ikWAM'));
+    setAiFeaturesEnabled(load('aiFeaturesEnabled', true));
   }, [mounted]);
 
   // Save settings
   useEffect(() => {
+    if (!mounted) return;
     const save = (key: string, value: any) =>
       localStorage.setItem(`dyslexia-${key}`, JSON.stringify(value));
     save('bgColor', bgColor);
@@ -268,7 +276,18 @@ function PageBody() {
     save('highContrast', highContrast);
     save('darkMode', darkMode);
     save('voiceId', voiceId);
-  }, [bgColor, font, fontSize, highContrast, darkMode, voiceId]);
+    save('aiFeaturesEnabled', aiFeaturesEnabled);
+  }, [mounted, bgColor, font, fontSize, highContrast, darkMode, voiceId, aiFeaturesEnabled]);
+
+  // If AI features are turned off while an AI panel happens to be open,
+  // close it immediately rather than leaving it usable until next reload.
+  useEffect(() => {
+    if (aiFeaturesEnabled) return;
+    setCoachPanelOpen(false);
+    setAgentOpen(false);
+    setShowRewriteModal(false);
+    setFloatingRewrite(null);
+  }, [aiFeaturesEnabled]);
 
   // ----- Document Management -----
 
@@ -638,6 +657,10 @@ function PageBody() {
 
   /* -------------------- Simplify -------------------- */
   const simplifyText = async () => {
+    if (!aiFeaturesEnabled) {
+      toast.info(t('toast.aiFeaturesDisabled'));
+      return;
+    }
     if (!text.trim()) {
       toast.warning(t('toast.noTextToSimplify'));
       return;
@@ -1133,6 +1156,10 @@ function PageBody() {
 
   // Handle rewrite sentence button
   const handleRewriteSentence = () => {
+    if (!aiFeaturesEnabled) {
+      toast.info(t('toast.aiFeaturesDisabled'));
+      return;
+    }
     // Try to get selection from textarea (normal mode)
     if (textareaRef.current) {
       const textarea = textareaRef.current;
@@ -1242,14 +1269,27 @@ function PageBody() {
         onSimplify={simplifyText}
         loading={loading}
         onRewrite={handleRewriteSentence}
+        aiFeaturesEnabled={aiFeaturesEnabled}
         grammarCheckEnabled={grammarCheckEnabled}
         onGrammarCheckToggle={() => setGrammarCheckEnabled(!grammarCheckEnabled)}
         isPro={isPro}
         onUpgradeClick={() => router.push('/pricing')}
         coachPanelOpen={coachPanelOpen}
-        onCoachPanelToggle={() => setCoachPanelOpen(!coachPanelOpen)}
+        onCoachPanelToggle={() => {
+          if (!coachPanelOpen && !aiFeaturesEnabled) {
+            toast.info(t('toast.aiFeaturesDisabled'));
+            return;
+          }
+          setCoachPanelOpen(!coachPanelOpen);
+        }}
         agentOpen={agentOpen}
-        onAgentToggle={() => setAgentOpen(!agentOpen)}
+        onAgentToggle={() => {
+          if (!agentOpen && !aiFeaturesEnabled) {
+            toast.info(t('toast.aiFeaturesDisabled'));
+            return;
+          }
+          setAgentOpen(!agentOpen);
+        }}
         accessibilityPanelOpen={accessibilityPanelOpen}
         onAccessibilityPanelToggle={() => setAccessibilityPanelOpen(!accessibilityPanelOpen)}
         onVocabToggle={() => setVocabOpen(v => !v)}
@@ -1737,6 +1777,8 @@ function PageBody() {
         setHighContrast={setHighContrast}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
+        aiFeaturesEnabled={aiFeaturesEnabled}
+        setAiFeaturesEnabled={setAiFeaturesEnabled}
         voiceId={voiceId}
         setVoiceId={setVoiceId}
         resetSettings={resetSettings}
