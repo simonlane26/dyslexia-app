@@ -40,8 +40,12 @@ export default function PrivacyPage() {
           <strong>Usage Data</strong>: App activity (e.g., simplifications, preferences).
         </li>
         <li>
-          <strong>Content</strong>: Text you submit for simplification and audio creation,
-          processed by OpenAI and ElevenLabs.
+          <strong>Content</strong>: Text you submit to an AI feature (Simplify, Rewrite, Writing
+          Coach, AI Writing Assistant) or for audio creation, processed by OpenAI (or OpenRouter as
+          a backup if OpenAI is unavailable) and ElevenLabs respectively. Text you check with the
+          grammar/spell checker is sent directly from your browser to LanguageTool, a third-party
+          checking service, and does not pass through our servers. All of these AI and grammar
+          features are optional and can be turned off in the app&apos;s settings.
         </li>
         <li>
           <strong>Free Screener (optional)</strong>: The screener itself runs on your device and
@@ -65,7 +69,9 @@ export default function PrivacyPage() {
       <ul>
         <li>Clerk (authentication)</li>
         <li>Stripe (payments &amp; subscriptions)</li>
-        <li>OpenAI (text processing)</li>
+        <li>OpenAI (AI text processing)</li>
+        <li>OpenRouter (backup AI text processing, used only if OpenAI is unavailable)</li>
+        <li>LanguageTool (grammar and spell checking)</li>
         <li>ElevenLabs (text-to-speech)</li>
         <li>Resend (transactional email delivery)</li>
         <li>Vercel (hosting) and Supabase — EU region (database)</li>
