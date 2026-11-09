@@ -126,7 +126,33 @@ export default function OCRImport({ onTextAction }: OCRProps) {
     setRunning(true);
 
     if (mode === 'import' && (file.type.includes('pdf') || file.name.endsWith('.pdf'))) {
-      // Client-side extraction for import mode (existing behaviour)
+      // Try the server first: pdf-parse runs server-side with no CDN or CSP
+      // involved at all, so it reliably handles any text-based PDF (the vast
+      // majority — including exports from Scrivener, Word, Google Docs, etc).
+      // The client-side pdf.js/Tesseract path below loads its scripts from
+      // unpkg.com, which the site's CSP (script-src) doesn't allow — it was
+      // silently failing for every PDF, not just scanned ones.
+      setProgress('Uploading…');
+      try {
+        const form = new FormData();
+        form.append('file', file);
+        form.append('mode', 'import');
+        const res = await fetch('/api/import', { method: 'POST', body: form });
+        const data = await res.json();
+        if (res.ok && (data.text || '').replace(/\s+/g, '').length > 200) {
+          onTextAction(data.text);
+          setProgress('Done.');
+          setRunning(false);
+          return;
+        }
+      } catch {
+        // Network/server error — fall through and try the client-side path below.
+      }
+
+      // No usable text came back server-side, which means this is likely a
+      // scanned image PDF with no embedded text layer. Fall back to in-browser
+      // OCR (requires the CDN scripts above to load, so this path can still
+      // fail under the current CSP — see note above).
       try {
         const text = await clientSideExtract(file, setProgress);
         setProgress('Done.');
