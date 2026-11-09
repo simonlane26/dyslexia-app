@@ -35,21 +35,21 @@ async function clientSideExtract(file: File, onProgress: (s: string) => void): P
   const pdf = await pdfjsLib.getDocument({ data: uint8 }).promise;
   const numPages: number = pdf.numPages;
 
-  onProgress('Checking for embedded text…');
-  let quickText = '';
-  for (let i = 1; i <= Math.min(numPages, 3); i++) {
+  // Read the embedded text layer across the WHOLE document before deciding
+  // whether it's usable. Sampling only the first few pages (the old approach)
+  // misfires on manuscripts that open with a sparse title/half-title page —
+  // Scrivener's PDF export is a common case — wrongly concluding the file is
+  // a scanned image and sending it through slow, lossy OCR instead of just
+  // reading the perfectly good text that's already there.
+  onProgress('Extracting embedded text…');
+  let allText = '';
+  for (let i = 1; i <= numPages; i++) {
+    onProgress(`Reading page ${i}/${numPages}…`);
     const page = await pdf.getPage(i);
     const tc = await page.getTextContent();
-    quickText += (tc.items as any[]).map((it: any) => it.str || '').join(' ').trim() + '\n\n';
+    allText += (tc.items as any[]).map((it: any) => it.str || '').join(' ').trim() + '\n\n';
   }
-  if (quickText.replace(/\s+/g, '').length > 200) {
-    onProgress('Extracting embedded text…');
-    let allText = '';
-    for (let i = 1; i <= numPages; i++) {
-      const page = await pdf.getPage(i);
-      const tc = await page.getTextContent();
-      allText += (tc.items as any[]).map((it: any) => it.str || '').join(' ').trim() + '\n\n';
-    }
+  if (allText.replace(/\s+/g, '').length > 200) {
     return allText.trim();
   }
 
