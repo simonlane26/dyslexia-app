@@ -45,6 +45,12 @@ export function TestimonialsSection() {
       author: 'Emma L.',
       role: 'Freelance Writer',
     },
+    {
+      quote:
+        "I would completely recommend this program. I love the prepare for meetings section, and the prepare for lessons section. If I was still teaching I would want all of my literacy students using it. It helps with all sorts of executive functioning issues as well as writing issues.",
+      author: 'Ingrid',
+      role: 'Retired Literacy & Numeracy Teacher',
+    },
   ];
 
   return (
